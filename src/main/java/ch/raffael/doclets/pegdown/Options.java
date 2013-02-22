@@ -250,17 +250,37 @@ public class Options {
     }
 
     /**
-     * Converts Markdown source to HTML according to this options object.
+     * Converts Markdown source to HTML according to this options object. Leading spaces
+     * will be fixed.
      *
      * @param markup    The Markdown source.
      *
      * @return The resulting HTML.
+     *
+     * @see #toHtml(String, boolean)
      */
     public String toHtml(String markup) {
+        return toHtml(markup, true);
+    }
+
+    /**
+     * Converts Markdown source to HTML according to this options object. If
+     * `fixLeadingSpaces` is `true`, exactly one leading whitespace character ('\\u0020')
+     * will be removed, if it exists.
+     *
+     * @param markup           The Markdown source.
+     * @param fixLeadingSpaces `true` if leading spaces should be fixed.
+     *
+     * @return The resulting HTML.
+     */
+    public String toHtml(String markup, boolean fixLeadingSpaces) {
         if ( processor == null ) {
             processor = createProcessor();
         }
-        return processor.markdownToHtml(LINE_START.matcher(markup).replaceAll(""), getLinkRenderer());
+        if ( fixLeadingSpaces ) {
+            markup = LINE_START.matcher(markup).replaceAll("");
+        }
+        return processor.markdownToHtml(markup, getLinkRenderer());
     }
 
     /**

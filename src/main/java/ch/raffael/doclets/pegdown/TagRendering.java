@@ -28,15 +28,13 @@ public final class TagRendering {
     /**
      * Removes the `<p>` tag if the given HTML contains only one paragraph.
      *
-     * **Note:** This implementation may be a bit simplistic:
+     * **Note:** This implementation may be a bit simplistic: If the HTML starts with a
+     * `<p>` tag, it will be removed. If it ends with `</p>`, this one will be removed,
+     * too. In 99% of the cases, this *exactly* what we wanted. It some special cases,
+     * the result may be invalid HTML -- it should never break things, however, because
+     * HTML is designed to handle "forgotten" tags gracefully.
      *
-     * 1. It checks that HTML starts with "`<p>`"
-     * 2. It checks that HTML contains any other instances of "`<p>`"
-     * 3. It checks that the HTML ends with "`</p>`"
-     *
-     * If all three conditions are true, the `<p>` tags are removed.
-     *
-     * @return The HTML without the `<p>` tags or the original HTML.
+     * @return The HTML without leading `<p>` or trailing `</p>`.
      */
     public static String simplifySingleParagraph(String html) {
         html = html.trim();

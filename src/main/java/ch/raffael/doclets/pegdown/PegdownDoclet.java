@@ -208,7 +208,7 @@ public class PegdownDoclet implements DocErrorReporter {
         if ( options.getOverviewFile() != null ) {
             try {
                 rootDoc.setRawCommentText(Files.toString(options.getOverviewFile(), options.getEncoding()));
-                defaultProcess(rootDoc);
+                defaultProcess(rootDoc, false);
             }
             catch ( IOException e ) {
                 printError("Error loading overview from " + options.getOverviewFile() + ": " + e.getLocalizedMessage());
@@ -223,7 +223,7 @@ public class PegdownDoclet implements DocErrorReporter {
      * @param doc   The class documentation.
      */
     protected void processClass(ClassDoc doc) {
-        defaultProcess(doc);
+        defaultProcess(doc, true);
         for ( MemberDoc member : doc.fields() ) {
             processMember(member);
         }
@@ -246,7 +246,7 @@ public class PegdownDoclet implements DocErrorReporter {
      * @param doc    The member documentation.
      */
     protected void processMember(MemberDoc doc) {
-        defaultProcess(doc);
+        defaultProcess(doc, true);
     }
 
     /**
@@ -255,18 +255,20 @@ public class PegdownDoclet implements DocErrorReporter {
      * @param doc    The package documentation.
      */
     protected void processPackage(PackageDoc doc) {
-        defaultProcess(doc);
+        defaultProcess(doc, true);
     }
 
     /**
-     * Default processing of any documentation node. It looks up a
-     * {@link TagRenderer tag renderer}
+     * Default processing of any documentation node.
      *
-     * @param doc    The documentation.
+     * @param doc              The documentation.
+     * @param fixLeadingSpaces `true` if leading spaces should be fixed.
+     *
+     * @see Options#toHtml(String, boolean)
      */
-    protected void defaultProcess(Doc doc) {
+    protected void defaultProcess(Doc doc, boolean fixLeadingSpaces) {
         StringBuilder buf = new StringBuilder();
-        buf.append(toHtml(doc.commentText()));
+        buf.append(getOptions().toHtml(doc.commentText(), fixLeadingSpaces));
         buf.append('\n');
         for ( Tag tag : doc.tags() ) {
             processTag(tag, buf);
