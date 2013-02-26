@@ -1,0 +1,43 @@
+<idea-plugin version="2">
+  <id>PegdownDocletIdea</id>
+  <name>Pegdown Doclet for IDEA</name>
+  <version>1.0</version>
+  <vendor email="herzog@raffael.ch" url="https://github.com/Abnaxos/pegdown-doclet/">Raffael Herzog</vendor>
+
+  <description><![CDATA[
+      Enables support for Quick Documentation (Ctrl-Q) for projects, modules and/or
+      libraries that use the Pegdown Doclet.
+      ]]></description>
+
+  <change-notes><![CDATA[
+      ]]>
+  </change-notes>
+
+  <!-- please see http://confluence.jetbrains.net/display/IDEADEV/Build+Number+Ranges for description -->
+  <idea-version since-build="107.105"/>
+
+  <!-- please see http://confluence.jetbrains.net/display/IDEADEV/Plugin+Compatibility+with+IntelliJ+Platform+Products
+       on how to target different products -->
+  <!-- uncomment to enable plugin in all products
+  <depends>com.intellij.modules.lang</depends>
+  -->
+
+  <application-components>
+  </application-components>
+
+  <project-components>
+    <component>
+      <implementation-class>ch.raffael.doclets.pegdown.integrations.idea.ProjectConfiguration</implementation-class>
+    </component>
+  </project-components>
+  <module-components>
+    <component>
+      <implementation-class>ch.raffael.doclets.pegdown.integrations.idea.ModuleConfiguration</implementation-class>
+    </component>
+  </module-components>
+
+  <extensions defaultExtensionNs="com.intellij">
+    <lang.documentationProvider language="JAVA" implementationClass="ch.raffael.doclets.pegdown.integrations.idea.PegdownDocumentationProvider" order="first"/>
+    <projectConfigurable instance="ch.raffael.doclets.pegdown.integrations.idea.PegdownConfigurable" id="PegdownDocletIdea.Config" displayName="Pegdown Doclet"/>
+  </extensions>
+</idea-plugin>
