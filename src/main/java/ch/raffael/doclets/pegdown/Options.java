@@ -50,6 +50,7 @@ public class Options {
      *
      * * {@link Extensions#AUTOLINKS}
      * * {@link Extensions#DEFINITIONS}
+     * * {@link Extensions#FENCED_CODE_BLOCKS}
      * * {@link Extensions#SMARTYPANTS}
      * * {@link Extensions#TABLES}
      * * {@link Extensions#WIKILINKS}

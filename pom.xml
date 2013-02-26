@@ -81,6 +81,18 @@
         </configuration>
       </plugin>
       <plugin>
+        <artifactId>maven-source-plugin</artifactId>
+        <version>2.2.1</version>
+        <executions>
+          <execution>
+            <id>source-jar</id>
+            <goals>
+              <goal>jar</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
         <artifactId>maven-surefire-plugin</artifactId>
         <version>2.13</version>
         <configuration>
@@ -124,18 +136,22 @@
           </dependency>
         </dependencies>
       </plugin>
-      <!--<plugin>-->
-        <!--<artifactId>maven-shade-plugin</artifactId>-->
-        <!--<version>2.0</version>-->
-        <!--<executions>-->
-          <!--<execution>-->
-            <!--<id>shade</id>-->
-            <!--<goals>-->
-              <!--<goal>shade</goal>-->
-            <!--</goals>-->
-          <!--</execution>-->
-        <!--</executions>-->
-      <!--</plugin>-->
+      <plugin>
+        <artifactId>maven-shade-plugin</artifactId>
+        <version>2.0</version>
+        <executions>
+          <execution>
+            <id>shade</id>
+            <goals>
+              <goal>shade</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <shadedArtifactAttached>true</shadedArtifactAttached>
+          <shadedClassifierName>all</shadedClassifierName>
+        </configuration>
+      </plugin>
       <plugin>
         <artifactId>maven-enforcer-plugin</artifactId>
         <version>1.2</version>
@@ -178,6 +194,29 @@
         </configuration>
       </plugin>
     </plugins>
+    <extensions>
+      <extension>
+        <artifactId>wagon-webdav-jackrabbit</artifactId>
+        <groupId>org.apache.maven.wagon</groupId>
+        <version>2.2</version>
+      </extension>
+    </extensions>
   </build>
+
+  <repositories>
+    <repository>
+      <id>maven.raffael.ch</id>
+      <name>maven.raffael.ch</name>
+      <url>http://maven.raffael.ch</url>
+    </repository>
+  </repositories>
+
+
+  <distributionManagement>
+    <repository>
+      <id>deploy.maven.raffael.ch</id>
+      <url>dav:http://maven.raffael.ch/</url>
+    </repository>
+  </distributionManagement>
 
 </project>

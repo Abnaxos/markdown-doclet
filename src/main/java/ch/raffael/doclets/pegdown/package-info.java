@@ -48,6 +48,9 @@
  * This may be important e.g. for code blocks, which should be indented by 4 spaces: Well,
  * it's 5 spaces now. ;)
  *
+ * *Note:** If an `overview.md` file is specified, leading spaces will be treated normally
+ * in this file. The first space will *not* be ignored.
+ *
  * This behaviour is currently *not* customisable.
  *
  *
@@ -66,8 +69,8 @@
  *
  * ### `@see` Tags
  *
- * The `@see` tag, is a special case, as there are several variants of this tag. These two
- * variants will be unchanged:
+ * The `@see` tag is a special case, as there are several variants of this tag. These two
+ * variants will remain unchanged:
  *
  * * Javadoc-Links: `@see Foo#bar()`
  * * Links: `@see <a href="http://www.example.com/">Example</a>`
@@ -88,8 +91,7 @@
  *
  * Tag handling can be customised by implementing your own `TagRenderer`s and registering
  * them with the PegdownDoclet. You'll have to write your own Doclet, though, there's
- * currently no way to do this using the command line. Extending the PegdownDoclet is
- * easy, though, it's been written with that in mind. See the JavaDocs and sources for
+ * currently no way to do this using the command line. See the JavaDocs and sources for
  * details on this.
  *
  *
