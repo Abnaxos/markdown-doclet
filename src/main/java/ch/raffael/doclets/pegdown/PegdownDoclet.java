@@ -38,7 +38,7 @@ import com.sun.tools.javadoc.Main;
 
 
 /**
- * The Doclet implementation. This implementation uses [[http://www.pegdown.org/ Pegdwon]]
+ * The Doclet implementation. This implementation uses [[http://www.pegdown.org/ Pegdown]]
  * to process the JavaDoc comments and tags, and sets a new JavaDoc comment using
  * {@link Doc#setRawCommentText(String)}. It then passes the `RootDoc` to the standard
  * Doclet.

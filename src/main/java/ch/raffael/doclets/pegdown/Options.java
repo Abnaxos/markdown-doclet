@@ -381,7 +381,7 @@ public class Options {
      *
      * @param extensions    A comma separated list of PegDown extensions.
      *
-     * @return An int represi
+     * @return An `int` representing the enabled Pegdown extensions.
      */
     public static int toExtensions(String extensions) {
         int result = 0;

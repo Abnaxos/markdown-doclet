@@ -1,7 +1,7 @@
 Pegdown Doclet
 ==============
 
-A Doclet that allows the use of Markdown and [PlantUML](http://plantuml.sourceforge.net/) in JavaDoc comments. It uses [Pegdown](http://www.pegdown.org/) as Markdown processor. It's a simple preprocessor to the standard Doclet: It processes all JavaDoc comments in the documentation tree and then forwards the result to the standard Doclet.
+A Doclet that allows the use of Markdown and [PlantUML](http://plantuml.sourceforge.net/) in JavaDoc comments. It uses [Pegdown](http://www.pegdown.org/) as Markdown processor. It's a simple preprocessor to the standard Doclet: It processes all JavaDoc comments in the documentation tree and then forwards the result to the standard Doclet. The JavaDoc output by this Doclet for this Doclet can be found [here](http://projects.raffael.ch/pegdown-doclet).
 
 This Doclet is released under the [Apache License 2.0](http://www.apache.org/licenses/LICENSE-2.0.html).
 

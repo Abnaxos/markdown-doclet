@@ -24,7 +24,7 @@
   <groupId>ch.raffael.pegdown-doclet</groupId>
   <artifactId>pegdown-doclet</artifactId>
   <packaging>jar</packaging>
-  <version>1.0-SNAPSHOT</version>
+  <version>1.0</version>
 
   <name>Pegdown Doclet</name>
   <description>
@@ -207,10 +207,20 @@
             <version>${project.version}</version>
           </docletArtifact>
 
+          <linksource>true</linksource>
+
           <links>
             <link>http://www.decodified.com/pegdown/api</link>
             <link>http://docs.oracle.com/javase/7/docs/jdk/api/javadoc/doclet</link>
           </links>
+
+          <footer>
+            <![CDATA[
+              <a href="https://github.com/Abnaxos/pegdown-doclet/" target="_top">
+                <img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png" alt="Fork me on GitHub">
+              </a>
+            ]]>
+          </footer>
         </configuration>
       </plugin>
     </plugins>
