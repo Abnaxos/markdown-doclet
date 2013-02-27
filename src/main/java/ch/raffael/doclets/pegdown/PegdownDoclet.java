@@ -73,6 +73,10 @@ public class PegdownDoclet implements DocErrorReporter {
         tagRenderers.put("@param", ParamTagRenderer.INSTANCE);
         tagRenderers.put("@throws", ThrowsTagRenderer.INSTANCE);
         tagRenderers.put("@see", SeeTagRenderer.INSTANCE);
+        UmlTagRenderer umlTagRenderer = new UmlTagRenderer();
+        tagRenderers.put("@uml", umlTagRenderer);
+        tagRenderers.put("@startuml", umlTagRenderer);
+        tagRenderers.put("@enduml", TagRenderer.ELIDE);
     }
 
     /**

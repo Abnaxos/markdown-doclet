@@ -68,6 +68,8 @@ public class Options {
     private Integer pegdownExtensions = null;
     private File overviewFile = null;
     private Charset encoding = null;
+    private File destinationDir = null;
+    private File plantUmlConfigFile = null;
 
     private LinkRenderer linkRenderer = null;
     private PegDownProcessor processor = null;
@@ -113,6 +115,13 @@ public class Options {
                 }
                 consumeOption(i);
             }
+            else if ( opt[0].equals("-plantuml-config") ) {
+                if ( plantUmlConfigFile != null ) {
+                    errorReporter.printError("Only one -plantuml-config option allowed");
+                    return false;
+                }
+                setPlantUmlConfigFile(new File(opt[1]));
+            }
             else if ( opt[0].equals("-encoding") ) {
                 try {
                     encoding = Charset.forName(opt[1]);
@@ -129,6 +138,12 @@ public class Options {
                 }
                 setOverviewFile(new File(opt[1]));
                 consumeOption(i);
+            }
+            else if ( opt[0].equals("-d") ) {
+                if ( destinationDir != null ) {
+                    errorReporter.printError("-d may only be specified once");
+                }
+                setDestinationDir(new File(opt[1]));
             }
         }
         if ( !customLoad(options, errorReporter) ) {
@@ -230,6 +245,45 @@ public class Options {
     }
 
     /**
+     * Gets the destination directory.
+     *
+     * @return The destination directory.
+     */
+    public File getDestinationDir() {
+        if ( destinationDir == null ) {
+            destinationDir = new File(System.getProperty("user.dir"));
+        }
+        return destinationDir;
+    }
+
+    /**
+     * Sets the destination directory.
+     *
+     * @param destinationDir    The destination directory
+     */
+    public void setDestinationDir(File destinationDir) {
+        this.destinationDir = destinationDir;
+    }
+
+    /**
+     * Gets the PlantUML configuration file.
+     *
+     * @return The PlantUML configuration file.
+     */
+    public File getPlantUmlConfigFile() {
+        return plantUmlConfigFile;
+    }
+
+    /**
+     * Sets the PlantUML configuration file.
+     *
+     * @param plantUmlConfigFile    The PlantUML configuration file.
+     */
+    public void setPlantUmlConfigFile(File plantUmlConfigFile) {
+        this.plantUmlConfigFile = plantUmlConfigFile;
+    }
+
+    /**
      * Gets the link renderer.
      *
      * @return The link renderer.
@@ -296,6 +350,9 @@ public class Options {
 
     public static int optionLength(String option) {
         if ( option.equals("-extensions") ) {
+            return 2;
+        }
+        if ( option.equals("-plantuml-config") ) {
             return 2;
         }
         else {

@@ -26,8 +26,16 @@
   <packaging>jar</packaging>
   <version>1.0-SNAPSHOT</version>
 
-  <name>${project.groupId}:${project.artifactId}</name>
-  <description></description>
+  <name>Pegdown Doclet</name>
+  <description>
+    A Doclet that allows the use of Markdown and PlantUML in JavaDoc comments.
+  </description>
+  <licenses>
+    <license>
+      <name>Apache License 2.0</name>
+      <url>http://www.apache.org/licenses/LICENSE-2.0.html</url>
+    </license>
+  </licenses>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -46,6 +54,11 @@
       <groupId>com.google.guava</groupId>
       <artifactId>guava</artifactId>
       <version>13.0.1</version>
+    </dependency>
+    <dependency>
+      <groupId>net.sourceforge.plantuml</groupId>
+      <artifactId>plantuml</artifactId>
+      <version>7958</version>
     </dependency>
 
     <dependency>

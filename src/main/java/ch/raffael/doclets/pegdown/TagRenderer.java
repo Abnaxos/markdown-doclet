@@ -34,6 +34,15 @@ public interface TagRenderer<T extends Tag> {
             target.append(tag.name()).append(" ").append(tag.text());
         }
     };
+    /**
+     * A renderer that completely elides the tag.
+     */
+    TagRenderer<Tag> ELIDE = new TagRenderer<Tag>() {
+        @Override
+        public void render(Tag tag, StringBuilder target, PegdownDoclet doclet) {
+            // do nothing
+        }
+    };
 
     /**
      * Render the tag to the given target {@link StringBuilder}.

@@ -1,7 +1,7 @@
 Pegdown Doclet
 ==============
 
-A Doclet that allows the use of Markdown in JavaDoc comments. It uses [Pegdown](http://www.pegdown.org/) as Markdown processor. It's a simple preprocessor to the standard Doclet: It processes all JavaDoc comments in the documentation tree and then forwards the result to the standard Doclet.
+A Doclet that allows the use of Markdown and [PlantUML](http://plantuml.sourceforge.net/) in JavaDoc comments. It uses [Pegdown](http://www.pegdown.org/) as Markdown processor. It's a simple preprocessor to the standard Doclet: It processes all JavaDoc comments in the documentation tree and then forwards the result to the standard Doclet.
 
 This Doclet is released under the [Apache License 2.0](http://www.apache.org/licenses/LICENSE-2.0.html).
 
@@ -64,12 +64,34 @@ These are all rendered as `@see <a href="http://www.example.com/">LABEL</a>`, wh
 Tag handling can be customised by implementing your own `TagRenderer`s and registering them with the PegdownDoclet. You'll have to write your own Doclet, though, there's currently no way to do this using the command line. See the JavaDocs and sources for details on this.
 
 
+PlantUML
+--------
+
+This Doclet has built-in support for PlantUML. Just use the `@uml` tag:
+
+```
+/**
+ * Description.
+ *
+ * ![Example Diagram](example.png)
+ *
+ * @uml example.png
+ * Alice -> Bob: Authentication Request
+ * Bob --> Alice: Authentication Response
+ */
+```
+
+It's also possible to use `@startuml` and `@enduml` instead, as usual. `@startuml` is simply a synonym for `@uml` and `@enduml` will be ignored entirely. Use this for compatibility with other tools, like e.g. the [PlantUML IDEA Plugin](https://github.com/esteinberg/plantuml4idea).
+
+
 Doclet Options
 --------------
 
 * *-extensions <ext>*: Specify the Pegdown extensions. The extensions list a comma separated list of constants as specified in [org.pegdown.Extensions](http://www.decodified.com/pegdown/api/org/pegdown/Extensions.html), converted to upper case and '-' replaced by '_'. The default is `autolinks,definitions,smartypants,tables,wikilinks`.
 
 * *-overview <page>*: Specify an overview page. This is basically the same as with the standard Doclet, however, the specified page will be rendered using Pegdown
+
+* *-plantuml-config <file>*: A configuration file that will be included before each diagram.
 
 
 Markdown Extensions
