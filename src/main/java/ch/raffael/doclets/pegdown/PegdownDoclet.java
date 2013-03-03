@@ -15,13 +15,18 @@
  */
 package ch.raffael.doclets.pegdown;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import com.google.common.io.ByteStreams;
 import com.google.common.io.Files;
 import com.sun.javadoc.AnnotationTypeDoc;
 import com.sun.javadoc.ClassDoc;
@@ -122,7 +127,7 @@ public class PegdownDoclet implements DocErrorReporter {
         if ( doclet.isError() ) {
             return false;
         }
-        return Standard.start(rootDoc);
+        return Standard.start(rootDoc) && doclet.postProcess();
     }
 
     /**
@@ -194,6 +199,28 @@ public class PegdownDoclet implements DocErrorReporter {
         for ( PackageDoc doc : packages ) {
             processPackage(doc);
         }
+    }
+
+    /**
+     * Called after the standard Doclet *successfully* did its work.
+     *
+     * @return `true` if postprocessing succeeded.
+     */
+    public boolean postProcess() {
+        if ( options.getStylesheetFile() == null ) {
+            try (
+                    InputStream in = PegdownDoclet.class.getResourceAsStream("stylesheet.css");
+                    OutputStream out = new FileOutputStream(new File(options.getDestinationDir(), "stylesheet.css"))
+            )
+            {
+                ByteStreams.copy(in, out);
+            }
+            catch ( IOException e ) {
+                printError("Error writing CSS stylesheet: " + e.getLocalizedMessage());
+                return false;
+            }
+        }
+        return true;
     }
 
     /**

@@ -69,6 +69,7 @@ public class Options {
     private File overviewFile = null;
     private Charset encoding = null;
     private File destinationDir = null;
+    private File stylesheetFile = null;
     private File plantUmlConfigFile = null;
 
     private LinkRenderer linkRenderer = null;
@@ -144,6 +145,12 @@ public class Options {
                     errorReporter.printError("-d may only be specified once");
                 }
                 setDestinationDir(new File(opt[1]));
+            }
+            else if ( opt[0].equals("-stylesheetfile") ) {
+                if ( stylesheetFile != null ) {
+                    errorReporter.printError("-stylesheetfile may only specified once");
+                }
+                setStylesheetFile(new File(opt[1]));
             }
         }
         if ( !customLoad(options, errorReporter) ) {
@@ -263,6 +270,24 @@ public class Options {
      */
     public void setDestinationDir(File destinationDir) {
         this.destinationDir = destinationDir;
+    }
+
+    /**
+     * Gets the CSS stylesheet file.
+     *
+     * @return The stylesheet file.
+     */
+    public File getStylesheetFile() {
+        return stylesheetFile;
+    }
+
+    /**
+     * Sets the CSS stylesheet file.
+     *
+     * @param stylesheetFile The stylesheet file.
+     */
+    public void setStylesheetFile(File stylesheetFile) {
+        this.stylesheetFile = stylesheetFile;
     }
 
     /**
