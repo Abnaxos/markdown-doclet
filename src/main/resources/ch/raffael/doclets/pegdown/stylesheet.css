@@ -60,14 +60,10 @@ h6 {
 ul {
     list-style-type:disc;
 }
+/* [MOD] See `additions` below
 code, tt {
     font-size:1.2em;
-    /*[MOD] taken from github*/
-    padding: 0 1px;
-    border: solid 1px rgb(234, 234, 234);
-    background: rgb(248, 248, 248);
-    border-radius: 3px;
-}
+}*/
 dt code {
     font-size:1.2em;
 }
@@ -548,8 +544,6 @@ h1.hidden {
 }
 .contentContainer pre {
     margin: 1em 2em;
-}
-.contentContainer pre {
     padding: 0 5px;
 }
 .contentContainer dl dt {
@@ -563,7 +557,26 @@ h1.hidden {
 .contentContainer dl dd p:first-child {
     margin-top: 0;
 }
+/* code block tweaks */
+code, tt {
+    font-size: 1.2em;
+}
+pre {
+    /* inspired by GitHub */
+    padding: 0 5px;
+    border: solid 1px rgb(234, 234, 234);
+    background: rgb(248, 248, 248);
+    border-radius: 3px;
+}
 li.blockList > pre {
     font-size: 1.3em;
+    padding: 0;
     margin: 0;
+    background: 0;
+    border: 0;
+}
+div.summary code {
+    background: none;
+    border: 0;
+    padding: 0;
 }
