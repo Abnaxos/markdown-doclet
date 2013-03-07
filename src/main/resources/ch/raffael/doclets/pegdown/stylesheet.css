@@ -580,3 +580,37 @@ div.summary code {
     border: 0;
     padding: 0;
 }
+
+/* @todo tag */
+body {
+    counter-reset: todo;
+}
+div.todo {
+    display: block;
+    margin: 1em;
+    border: solid 1px black;
+    border-radius: 3px;
+}
+div.todoTitle {
+    display: block;
+    background: #f6f30d;
+    padding: 5px;
+    border-bottom: solid 1px black;
+}
+span.todoTitle {
+    font-weight: bold;
+}
+span.todoTitle:before {
+    content: "ToDo"
+}
+span.todoCounter {
+    float: right;
+}
+span.todoCounter:before {
+    counter-increment: todo;
+    content: counter(todo);
+}
+div.todoText {
+    display: block;
+    padding: 5px;
+}
