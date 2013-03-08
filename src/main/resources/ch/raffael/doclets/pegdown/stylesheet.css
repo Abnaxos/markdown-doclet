@@ -601,14 +601,15 @@ span.todoTitle {
     font-weight: bold;
 }
 span.todoTitle:before {
-    content: "ToDo"
+    content: "To Do"
 }
 span.todoCounter {
     float: right;
+    font-size: .8em;
 }
 span.todoCounter:before {
     counter-increment: todo;
-    content: counter(todo);
+    content: '#' counter(todo);
 }
 div.todoText {
     display: block;
