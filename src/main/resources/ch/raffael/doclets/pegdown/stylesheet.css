@@ -5,6 +5,8 @@
  *
  * Modifications are tagged with [MOD]
  */
+/* [MOD] stylesheet for highlight.js style */
+@import url(highlight.css);
 
 /*
 Overall document style
@@ -567,6 +569,9 @@ pre {
     border: solid 1px rgb(234, 234, 234);
     background: rgb(248, 248, 248);
     border-radius: 3px;
+}
+pre code {
+    background: none;
 }
 li.blockList > pre {
     font-size: 1.3em;

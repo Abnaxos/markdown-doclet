@@ -208,20 +208,35 @@ public class PegdownDoclet implements DocErrorReporter {
      * @return `true` if postprocessing succeeded.
      */
     public boolean postProcess() {
+        boolean success = true;
         if ( options.getStylesheetFile() == null ) {
-            try (
-                    InputStream in = PegdownDoclet.class.getResourceAsStream("stylesheet.css");
-                    OutputStream out = new FileOutputStream(new File(options.getDestinationDir(), "stylesheet.css"))
-            )
-            {
-                ByteStreams.copy(in, out);
-            }
-            catch ( IOException e ) {
-                printError("Error writing CSS stylesheet: " + e.getLocalizedMessage());
-                return false;
-            }
+            success &= copyResource("stylesheet.css", "stylesheet.css", "CSS stylesheet");
         }
-        return true;
+        if ( options.isHighlightEnabled() ) {
+            success &= copyResource("highlight.pack.7.3.js", "highlight.pack.js", "highlight.js");
+            success &= copyResource("highlight-LICENSE.txt", "highlight-LICENSE.txt", "highlight.js license");
+            success &= copyResource("classref.txt", "classref.txt", "highlight.js class reference");
+            success &= copyResource("highlight-styles/" + options.getHighlightStyle() + ".css", "highlight.css", "highlight.js style '" + options.getHighlightStyle() + "'");
+        }
+        else {
+            success &= copyResource("no-highlight.css", "highlight.css", "no-highlight CSS");
+        }
+        return success;
+    }
+
+    private boolean copyResource(String resource, String destination, String description) {
+        try (
+                InputStream in = PegdownDoclet.class.getResourceAsStream(resource);
+                OutputStream out = new FileOutputStream(new File(options.getDestinationDir(), destination))
+        )
+        {
+            ByteStreams.copy(in, out);
+            return true;
+        }
+        catch ( IOException e ) {
+            printError("Error writing " + description + ": " + e.getLocalizedMessage());
+            return false;
+        }
     }
 
     /**
@@ -300,6 +315,10 @@ public class PegdownDoclet implements DocErrorReporter {
      */
     protected void defaultProcess(Doc doc, boolean fixLeadingSpaces) {
         StringBuilder buf = new StringBuilder();
+        if ( options.isHighlightEnabled() ) {
+            installHighlightJS(doc, buf);
+            buf.append('\n');
+        }
         buf.append(getOptions().toHtml(doc.commentText(), fixLeadingSpaces));
         buf.append('\n');
         for ( Tag tag : doc.tags() ) {
@@ -307,6 +326,40 @@ public class PegdownDoclet implements DocErrorReporter {
             buf.append('\n');
         }
         doc.setRawCommentText(buf.toString());
+    }
+
+    /**
+     * Adds the HTML required for highlight.js to the output.
+     *
+     * ```html
+     * <script type="text/javascript" src="highlight.pack.js"></script>
+     * <script type="text/javascript"><!--
+     * hljs.initHighlightingOnLoad();
+     * // -->
+     * </script>
+     * ```
+     *
+     *
+     * @param doc    The documented element.
+     * @param buf    A {@link StringBuilder} to add the HTML to.
+     */
+    protected void installHighlightJS(Doc doc, StringBuilder buf) {
+        String prefix = null;
+        if ( doc instanceof PackageDoc ) {
+            prefix = rootUrlPrefix((PackageDoc)doc);
+        }
+        else if ( doc instanceof ClassDoc ) {
+            prefix = rootUrlPrefix(((ClassDoc)doc).containingPackage());
+        }
+        else if ( doc instanceof RootDoc ) {
+            prefix = rootUrlPrefix(null);
+        }
+        if ( prefix != null ) {
+            buf.append("<script type=\"text/javascript\" src=\"")
+                    .append(prefix).append("highlight.pack.js")
+                    .append("\"></script>\n")
+                    .append("<script type=\"text/javascript\"><!--\nhljs.initHighlightingOnLoad();\n//--></script>");
+        }
     }
 
     /**
@@ -376,6 +429,37 @@ public class PegdownDoclet implements DocErrorReporter {
     @Override
     public void printNotice(SourcePosition pos, String msg) {
         rootDoc.printNotice(pos, msg);
+    }
+
+    /**
+     * Returns a prefix for relative URLs from a documentation element relative to the
+     * given package. This prefix can be used to refer to the root URL of the
+     * documentation:
+     *
+     * ```java
+     * doc = "<script type=\"text/javascript\" src=\""
+     *     + rootUrlPrefix(classDoc.containingPackage()) + "highlight.js"
+     *     + "\"></script>";
+     * ```
+     *
+     * @param doc    The package containing the element from where to reference the root.
+     *
+     * @return A URL prefix for URLs referring to the doc root.
+     */
+    public String rootUrlPrefix(PackageDoc doc) {
+        if ( doc == null || doc.name().isEmpty() ) {
+            return "";
+        }
+        else {
+            StringBuilder buf = new StringBuilder();
+            buf.append("../");
+            for ( int i = 0; i < doc.name().length(); i++ ) {
+                if ( doc.name().charAt(i) == '.' ) {
+                    buf.append("../");
+                }
+            }
+            return buf.toString();
+        }
     }
 
     /**

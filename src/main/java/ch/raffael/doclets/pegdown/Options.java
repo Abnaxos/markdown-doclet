@@ -71,6 +71,9 @@ public class Options {
     private File destinationDir = null;
     private File stylesheetFile = null;
     private File plantUmlConfigFile = null;
+    private boolean highlightEnabled = true;
+    private boolean autoHighlightEnabled = false;
+    private String highlightStyle = null;
 
     private LinkRenderer linkRenderer = null;
     private PegDownProcessor processor = null;
@@ -115,6 +118,21 @@ public class Options {
                     return false;
                 }
                 consumeOption(i);
+            }
+            else if ( opt[0].equals("-disable-highlight") ) {
+                highlightEnabled = false;
+                consumeOption(i);
+            }
+            else if ( opt[0].equals("-enable-auto-hightlight") ) {
+                autoHighlightEnabled = true;
+                consumeOption(i);
+            }
+            else if ( opt[0].equals("-highlight-style") ) {
+                if ( highlightStyle != null ) {
+                    errorReporter.printError("Only one -highlight-style option allowed");
+                    return false;
+                }
+                highlightStyle = opt[1];
             }
             else if ( opt[0].equals("-plantuml-config") ) {
                 if ( plantUmlConfigFile != null ) {
@@ -329,6 +347,30 @@ public class Options {
         this.linkRenderer = linkRenderer;
     }
 
+    public boolean isHighlightEnabled() {
+        return highlightEnabled;
+    }
+
+    public void setHighlightEnabled(boolean highlightEnabled) {
+        this.highlightEnabled = highlightEnabled;
+    }
+
+    public boolean isAutoHighlightEnabled() {
+        return autoHighlightEnabled;
+    }
+
+    public void setAutoHighlightEnabled(boolean autoHighlightEnabled) {
+        this.autoHighlightEnabled = autoHighlightEnabled;
+    }
+
+    public String getHighlightStyle() {
+        return firstNonNull(highlightStyle, "default");
+    }
+
+    public void setHighlightStyle(String highlightStyle) {
+        this.highlightStyle = highlightStyle;
+    }
+
     /**
      * Converts Markdown source to HTML according to this options object. Leading spaces
      * will be fixed.
@@ -360,7 +402,7 @@ public class Options {
         if ( fixLeadingSpaces ) {
             markup = LINE_START.matcher(markup).replaceAll("");
         }
-        return processor.markdownToHtml(markup, getLinkRenderer());
+        return new DocletSerializer(this, getLinkRenderer()).toHtml(processor.parseMarkdown(markup.toCharArray()));
     }
 
     /**
@@ -374,14 +416,16 @@ public class Options {
     }
 
     public static int optionLength(String option) {
-        if ( option.equals("-extensions") ) {
-            return 2;
-        }
-        if ( option.equals("-plantuml-config") ) {
-            return 2;
-        }
-        else {
-            return Standard.optionLength(option);
+        switch ( option ) {
+            case "-extensions":
+            case "-plantuml-config":
+            case "-highlight-style":
+                return 2;
+            case "-disable-highlight":
+            case "-enable-auto-highlight":
+                return 1;
+            default:
+                return Standard.optionLength(option);
         }
     }
 
