@@ -20,6 +20,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -303,6 +304,22 @@ public class PegdownDoclet implements DocErrorReporter {
      * @param doc    The package documentation.
      */
     protected void processPackage(PackageDoc doc) {
+        // (#1) Set foundDoc to false if possible.
+        // foundDoc will be set to true when setRawCommentText() is called, if the method
+        // is called again, JavaDoc will issue a warning about multiple sources for the
+        // package documentation. If there actually *are* multiple sources, the warning
+        // has already been issued at this point, we will, however, use it to set the
+        // resulting HTML. So, we're setting it back to false here, to suppress the
+        // warning.
+        try {
+            Field foundDoc = doc.getClass().getDeclaredField("foundDoc");
+            foundDoc.setAccessible(true);
+            foundDoc.set(doc, false);
+        }
+        catch ( Exception e ) {
+            printWarning(doc.position(), "Cannot suppress warning about multiple package sources: " + e + "\n"
+                    + "Please report this at https://github.com/Abnaxos/pegdown-doclet/issues with the exact JavaDoc version you're using");
+        }
         defaultProcess(doc, true);
     }
 
