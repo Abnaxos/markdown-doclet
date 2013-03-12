@@ -40,6 +40,7 @@ import com.sun.javadoc.SourcePosition;
 import com.sun.javadoc.Tag;
 import com.sun.tools.doclets.standard.Standard;
 import com.sun.tools.javadoc.Main;
+import org.parboiled.errors.ParserRuntimeException;
 
 
 /**
@@ -116,7 +117,7 @@ public class PegdownDoclet implements DocErrorReporter {
      *
      * @return `true`, if process was successful.
      *
-     * @see com.sun.javadoc.Doclet#start(com.sun.javadoc.RootDoc)
+     * @see com.sun.javadoc.Doclet#start(RootDoc)
      */
     public static boolean start(RootDoc rootDoc) {
         Options options = new Options();
@@ -314,18 +315,41 @@ public class PegdownDoclet implements DocErrorReporter {
      * @see Options#toHtml(String, boolean)
      */
     protected void defaultProcess(Doc doc, boolean fixLeadingSpaces) {
-        StringBuilder buf = new StringBuilder();
-        if ( options.isHighlightEnabled() ) {
-            installHighlightJS(doc, buf);
+        try {
+            StringBuilder buf = new StringBuilder();
+            if ( options.isHighlightEnabled() ) {
+                installHighlightJS(doc, buf);
+                buf.append('\n');
+            }
+            buf.append(getOptions().toHtml(doc.commentText(), fixLeadingSpaces));
             buf.append('\n');
+            for ( Tag tag : doc.tags() ) {
+                processTag(tag, buf);
+                buf.append('\n');
+            }
+            doc.setRawCommentText(buf.toString());
         }
-        buf.append(getOptions().toHtml(doc.commentText(), fixLeadingSpaces));
-        buf.append('\n');
-        for ( Tag tag : doc.tags() ) {
-            processTag(tag, buf);
-            buf.append('\n');
+        catch ( final ParserRuntimeException e ) {
+            if ( doc instanceof RootDoc ) {
+                printError(new SourcePosition() {
+                    @Override
+                    public File file() {
+                        return options.getOverviewFile();
+                    }
+                    @Override
+                    public int line() {
+                        return 0;
+                    }
+                    @Override
+                    public int column() {
+                        return 0;
+                    }
+                }, e.getMessage());
+            }
+            else {
+                printError(doc.position(), e.getMessage());
+            }
         }
-        doc.setRawCommentText(buf.toString());
     }
 
     /**

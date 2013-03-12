@@ -17,6 +17,7 @@ package ch.raffael.doclets.pegdown;
 
 import java.io.File;
 import java.lang.reflect.Field;
+import java.math.BigDecimal;
 import java.nio.charset.Charset;
 import java.nio.charset.IllegalCharsetNameException;
 import java.util.ArrayList;
@@ -74,6 +75,7 @@ public class Options {
     private boolean highlightEnabled = true;
     private boolean autoHighlightEnabled = false;
     private String highlightStyle = null;
+    private Long parseTimeout;
 
     private LinkRenderer linkRenderer = null;
     private PegDownProcessor processor = null;
@@ -140,6 +142,18 @@ public class Options {
                     return false;
                 }
                 setPlantUmlConfigFile(new File(opt[1]));
+            }
+            else if ( opt[0].equals("-parse-timeout") ) {
+                if ( parseTimeout != null ) {
+                    errorReporter.printError("Only one -parse-timeout option allowed");
+                    return false;
+                }
+                BigDecimal millis = new BigDecimal(opt[1]).movePointRight(3);
+                if ( millis.compareTo(BigDecimal.ZERO) <= 0 || millis.compareTo(new BigDecimal(Long.MAX_VALUE)) > 0 ) {
+                    errorReporter.printError("Invalid timeout value: " + opt[1]);
+                    return false;
+                }
+                parseTimeout = millis.longValue();
             }
             else if ( opt[0].equals("-encoding") ) {
                 try {
@@ -372,6 +386,29 @@ public class Options {
     }
 
     /**
+     * Gets the parse timeout in milliseconds for the Pegdown processor.
+     *
+     * @return The parse timeout.
+     *
+     * @see PegDownProcessor#PegDownProcessor(int, long)
+     */
+    public long getParseTimeout() {
+        processor = null;
+        return parseTimeout != null ? parseTimeout : PegDownProcessor.DEFAULT_MAX_PARSING_TIME;
+    }
+
+    /**
+     * Sets the parse timeout in milliseconds for the Pegdown processor.
+     *
+     * @param parseTimeout    The new parse timeout.
+     *
+     * @see PegDownProcessor#PegDownProcessor(int, long)
+     */
+    public void setParseTimeout(long parseTimeout) {
+        this.parseTimeout = parseTimeout;
+    }
+
+    /**
      * Converts Markdown source to HTML according to this options object. Leading spaces
      * will be fixed.
      *
@@ -412,7 +449,7 @@ public class Options {
      * @return A (possibly customised) Pegdown processor.
      */
     protected PegDownProcessor createProcessor() {
-        return new PegDownProcessor(firstNonNull(pegdownExtensions, DEFAULT_PEGDOWN_EXTENSIONS));
+        return new PegDownProcessor(firstNonNull(pegdownExtensions, DEFAULT_PEGDOWN_EXTENSIONS), getParseTimeout());
     }
 
     public static int optionLength(String option) {
