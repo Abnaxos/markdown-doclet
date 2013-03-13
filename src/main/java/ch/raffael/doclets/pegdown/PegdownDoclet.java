@@ -55,6 +55,10 @@ import org.parboiled.errors.ParserRuntimeException;
  */
 public class PegdownDoclet implements DocErrorReporter {
 
+    public static final String HIGHLIGHT_JS_HTML =
+            "<script type=\"text/javascript\" src=\"" + "{@docRoot}/highlight.pack.js" + "\"></script>\n"
+            + "<script type=\"text/javascript\"><!--\nhljs.initHighlightingOnLoad();\n//--></script>";
+
     private final Map<String, TagRenderer<?>> tagRenderers = new HashMap<>();
 
     private final Set<PackageDoc> packages = new HashSet<>();
@@ -130,7 +134,21 @@ public class PegdownDoclet implements DocErrorReporter {
         if ( doclet.isError() ) {
             return false;
         }
-        return Standard.start(rootDoc) && doclet.postProcess();
+        RootDocWrapper rootDocWrapper = new RootDocWrapper(rootDoc, options.forwardedOptions());
+        if ( options.isHighlightEnabled() ) {
+            // find the footer option
+            int i = 0;
+            for ( ; i < rootDocWrapper.options().length; i++ ) {
+                if ( rootDocWrapper.options()[i][0].equals("-footer") ) {
+                    rootDocWrapper.options()[i][1] += HIGHLIGHT_JS_HTML;
+                    break;
+                }
+            }
+            if ( i >= rootDocWrapper.options().length ) {
+                rootDocWrapper.appendOption("-footer", HIGHLIGHT_JS_HTML);
+            }
+        }
+        return Standard.start(rootDocWrapper) && doclet.postProcess();
     }
 
     /**
@@ -334,10 +352,6 @@ public class PegdownDoclet implements DocErrorReporter {
     protected void defaultProcess(Doc doc, boolean fixLeadingSpaces) {
         try {
             StringBuilder buf = new StringBuilder();
-            if ( options.isHighlightEnabled() ) {
-                installHighlightJS(doc, buf);
-                buf.append('\n');
-            }
             buf.append(getOptions().toHtml(doc.commentText(), fixLeadingSpaces));
             buf.append('\n');
             for ( Tag tag : doc.tags() ) {
@@ -366,40 +380,6 @@ public class PegdownDoclet implements DocErrorReporter {
             else {
                 printError(doc.position(), e.getMessage());
             }
-        }
-    }
-
-    /**
-     * Adds the HTML required for highlight.js to the output.
-     *
-     * ```html
-     * <script type="text/javascript" src="highlight.pack.js"></script>
-     * <script type="text/javascript"><!--
-     * hljs.initHighlightingOnLoad();
-     * // -->
-     * </script>
-     * ```
-     *
-     *
-     * @param doc    The documented element.
-     * @param buf    A {@link StringBuilder} to add the HTML to.
-     */
-    protected void installHighlightJS(Doc doc, StringBuilder buf) {
-        String prefix = null;
-        if ( doc instanceof PackageDoc ) {
-            prefix = rootUrlPrefix((PackageDoc)doc);
-        }
-        else if ( doc instanceof ClassDoc ) {
-            prefix = rootUrlPrefix(((ClassDoc)doc).containingPackage());
-        }
-        else if ( doc instanceof RootDoc ) {
-            prefix = rootUrlPrefix(null);
-        }
-        if ( prefix != null ) {
-            buf.append("<script type=\"text/javascript\" src=\"")
-                    .append(prefix).append("highlight.pack.js")
-                    .append("\"></script>\n")
-                    .append("<script type=\"text/javascript\"><!--\nhljs.initHighlightingOnLoad();\n//--></script>");
         }
     }
 
