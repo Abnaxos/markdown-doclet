@@ -559,6 +559,9 @@ h1.hidden {
 .contentContainer dl dd p:first-child {
     margin-top: 0;
 }
+div.block h2 {
+    padding: 0 !important; /* fixes rule for ul.blockList li.blockList h2 above */
+}
 /* code block tweaks */
 code, tt {
     font-size: 1.2em;
