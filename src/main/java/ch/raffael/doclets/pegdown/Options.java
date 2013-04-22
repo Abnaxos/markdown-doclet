@@ -23,6 +23,7 @@ import java.nio.charset.IllegalCharsetNameException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.regex.Pattern;
 
@@ -45,6 +46,7 @@ import static com.google.common.base.Objects.*;
 public class Options {
 
     private static final Pattern LINE_START = Pattern.compile("^ ", Pattern.MULTILINE);
+    private static final Pattern MARKERS = Pattern.compile("\\020[et]");
 
     /**
      * The default extensions for Pegdown. This includes the following extensions:
@@ -439,7 +441,9 @@ public class Options {
         if ( fixLeadingSpaces ) {
             markup = LINE_START.matcher(markup).replaceAll("");
         }
-        return new DocletSerializer(this, getLinkRenderer()).toHtml(processor.parseMarkdown(markup.toCharArray()));
+        List<String> tags = new ArrayList<>();
+        String html = new DocletSerializer(this, getLinkRenderer()).toHtml(processor.parseMarkdown(Tags.extractInlineTags(markup, tags).toCharArray()));
+        return Tags.insertInlineTags(html, tags);
     }
 
     /**

@@ -38,7 +38,7 @@
  *  * =====
  *  *
  *  * Text
- *  * /
+ *  *{@literal /}
  * ```
  *
  * In this example, each line has one leading space. Because of this, the title won't be
@@ -110,7 +110,7 @@
  *  * @uml example.png
  *  * Alice -> Bob: Authentication Request
  *  * Bob --> Alice: Authentication Response
- *  * /
+ *  *{@literal /}
  * ```
  *
  * It's also possible to use `@startuml` and `@enduml` instead, as usual. `@startuml` is

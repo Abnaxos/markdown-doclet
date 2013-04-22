@@ -45,13 +45,13 @@ import org.parboiled.errors.ParserRuntimeException;
 
 
 /**
- * The Doclet implementation. This implementation uses [[http://www.pegdown.org/ Pegdown]]
+ * The Doclet implementation. This implementation uses [Pegdown](http://www.pegdown.org/)
  * to process the JavaDoc comments and tags, and sets a new JavaDoc comment using
  * {@link Doc#setRawCommentText(String)}. It then passes the `RootDoc` to the standard
  * Doclet.
  *
  * @author <a href="mailto:herzog@raffael.ch">Raffael Herzog</a>
- * @see "[[http://docs.oracle.com/javase/1.5.0/docs/guide/javadoc/doclet/spec/index.html The Doclet Specification]]"
+ * @see "[The Doclet Specification](http://docs.oracle.com/javase/1.5.0/docs/guide/javadoc/doclet/spec/index.html)"
  */
 public class PegdownDoclet implements DocErrorReporter {
 
