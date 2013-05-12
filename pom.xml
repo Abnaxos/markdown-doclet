@@ -37,8 +37,21 @@
     <license>
       <name>GPL 3.0</name>
       <url>http://www.gnu.org/licenses/gpl-3.0-standalone.html</url>
+      <distribution>repo</distribution>
     </license>
   </licenses>
+  <developers>
+    <developer>
+      <id>Abnaxos</id>
+      <name>Raffael Herzog</name>
+      <email>herzog@raffael.ch</email>
+      <timezone>+1</timezone>
+    </developer>
+  </developers>
+  <scm>
+    <url>https://github.com/Abnaxos/pegdown-doclet</url>
+    <connection>scm:git:https://github.com/Abnaxos/pegdown-doclet.git</connection>
+  </scm>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -228,6 +241,32 @@
     </extensions>
   </build>
 
+  <profiles>
+    <profile>
+      <id>deploy</id>
+      <build>
+        <plugins>
+          <plugin>
+            <artifactId>maven-gpg-plugin</artifactId>
+            <version>1.4</version>
+            <executions>
+              <execution>
+                <id>sign-artifacts</id>
+                <phase>verify</phase>
+                <goals>
+                  <goal>sign</goal>
+                </goals>
+              </execution>
+            </executions>
+            <configuration>
+              <keyname>DF84F265</keyname>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
+
   <repositories>
     <repository>
       <id>maven.raffael.ch</id>
@@ -235,7 +274,6 @@
       <url>http://maven.raffael.ch</url>
     </repository>
   </repositories>
-
 
   <distributionManagement>
     <repository>
