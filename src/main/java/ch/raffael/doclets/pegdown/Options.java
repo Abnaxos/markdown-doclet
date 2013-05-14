@@ -48,6 +48,17 @@ import static com.google.common.base.Objects.*;
  */
 public class Options {
 
+    public static final String OPT_EXTENSIONS = "-extensions";
+    public static final String OPT_DISABLE_HIGHLIGHT = "-disable-highlight";
+    public static final String OPT_ENABLE_AUTO_HIGHLIGHT = "-enable-auto-highlight";
+    public static final String OPT_HIGHLIGHT_STYLE = "-highlight-style";
+    public static final String OPT_PLANTUML_CONFIG = "-plantuml-config";
+    public static final String OPT_PARSE_TIMEOUT = "-parse-timeout";
+    public static final String OPT_ENCODING = "-encoding";
+    public static final String OPT_OVERVIEW = "-overview";
+    public static final String OPT_OUTPUT_DIR = "-d";
+    public static final String OPT_STYLESHEETFILE = "-stylesheetfile";
+
     private static final Pattern LINE_START = Pattern.compile("^ ", Pattern.MULTILINE);
     private static final Pattern MARKERS = Pattern.compile("\\020[et]");
 
@@ -112,9 +123,9 @@ public class Options {
         consumedOptions.clear();
         for ( int i = 0; i < options.length; i++ ) {
             String[] opt = options[i];
-            if ( opt[0].equals("-extensions") ) {
+            if ( opt[0].equals(OPT_EXTENSIONS) ) {
                 if ( pegdownExtensions != null ) {
-                    errorReporter.printError("Only one -extensions option allowed");
+                    errorReporter.printError("Only one " + OPT_EXTENSIONS + " option allowed");
                     return false;
                 }
                 try {
@@ -126,29 +137,29 @@ public class Options {
                 }
                 consumeOption(i);
             }
-            else if ( opt[0].equals("-disable-highlight") ) {
+            else if ( opt[0].equals(OPT_DISABLE_HIGHLIGHT) ) {
                 highlightEnabled = false;
                 consumeOption(i);
             }
-            else if ( opt[0].equals("-enable-auto-hightlight") ) {
+            else if ( opt[0].equals(OPT_ENABLE_AUTO_HIGHLIGHT) ) {
                 autoHighlightEnabled = true;
                 consumeOption(i);
             }
-            else if ( opt[0].equals("-highlight-style") ) {
+            else if ( opt[0].equals(OPT_HIGHLIGHT_STYLE) ) {
                 if ( highlightStyle != null ) {
-                    errorReporter.printError("Only one -highlight-style option allowed");
+                    errorReporter.printError("Only one " + OPT_HIGHLIGHT_STYLE + " option allowed");
                     return false;
                 }
                 highlightStyle = opt[1];
             }
-            else if ( opt[0].equals("-plantuml-config") ) {
+            else if ( opt[0].equals(OPT_PLANTUML_CONFIG) ) {
                 if ( plantUmlConfigFile != null ) {
-                    errorReporter.printError("Only one -plantuml-config option allowed");
+                    errorReporter.printError("Only one " + OPT_PLANTUML_CONFIG + " option allowed");
                     return false;
                 }
                 setPlantUmlConfigFile(new File(opt[1]));
             }
-            else if ( opt[0].equals("-parse-timeout") ) {
+            else if ( opt[0].equals(OPT_PARSE_TIMEOUT) ) {
                 if ( parseTimeout != null ) {
                     errorReporter.printError("Only one -parse-timeout option allowed");
                     return false;
@@ -160,7 +171,7 @@ public class Options {
                 }
                 parseTimeout = millis.longValue();
             }
-            else if ( opt[0].equals("-encoding") ) {
+            else if ( opt[0].equals(OPT_ENCODING) ) {
                 try {
                     encoding = Charset.forName(opt[1]);
                 }
@@ -169,23 +180,23 @@ public class Options {
                     return false;
                 }
             }
-            else if ( opt[0].equals("-overview") ) {
+            else if ( opt[0].equals(OPT_OVERVIEW) ) {
                 if ( getOverviewFile() != null ) {
-                    errorReporter.printError("-overview may only be specified once");
+                    errorReporter.printError(OPT_OVERVIEW + " may only be specified once");
                     return false;
                 }
                 setOverviewFile(new File(opt[1]));
                 consumeOption(i);
             }
-            else if ( opt[0].equals("-d") ) {
+            else if ( opt[0].equals(OPT_OUTPUT_DIR) ) {
                 if ( destinationDir != null ) {
-                    errorReporter.printError("-d may only be specified once");
+                    errorReporter.printError(OPT_OUTPUT_DIR + " may only be specified once");
                 }
                 setDestinationDir(new File(opt[1]));
             }
-            else if ( opt[0].equals("-stylesheetfile") ) {
+            else if ( opt[0].equals(OPT_STYLESHEETFILE) ) {
                 if ( stylesheetFile != null ) {
-                    errorReporter.printError("-stylesheetfile may only specified once");
+                    errorReporter.printError(OPT_STYLESHEETFILE + " may only specified once");
                 }
                 setStylesheetFile(new File(opt[1]));
             }
@@ -461,12 +472,13 @@ public class Options {
 
     public static int optionLength(String option) {
         switch ( option ) {
-            case "-extensions":
-            case "-plantuml-config":
-            case "-highlight-style":
+            case OPT_EXTENSIONS:
+            case OPT_PLANTUML_CONFIG:
+            case OPT_HIGHLIGHT_STYLE:
+            case OPT_PARSE_TIMEOUT:
                 return 2;
-            case "-disable-highlight":
-            case "-enable-auto-highlight":
+            case OPT_DISABLE_HIGHLIGHT:
+            case OPT_ENABLE_AUTO_HIGHLIGHT:
                 return 1;
             default:
                 return Standard.optionLength(option);
