@@ -29,6 +29,12 @@
   <packaging>jar</packaging>
   <version>1.1-SNAPSHOT</version>
 
+  <parent>
+    <groupId>org.sonatype.oss</groupId>
+    <artifactId>oss-parent</artifactId>
+    <version>7</version>
+  </parent>
+  
   <name>Pegdown Doclet</name>
   <description>
     A Doclet that allows the use of Markdown and PlantUML in JavaDoc comments.
@@ -203,17 +209,23 @@
       <plugin>
         <artifactId>maven-javadoc-plugin</artifactId>
         <version>2.9</version>
+        <executions>
+          <execution>
+            <id>generate-javadocs</id>
+            <phase>package</phase>
+            <goals>
+              <goal>jar</goal>
+            </goals>
+          </execution>
+        </executions>
         <configuration>
           <source>1.7</source>
+          <attach>true</attach>
 
           <overview>src/main/javadoc/overview.md</overview>
 
           <doclet>ch.raffael.doclets.pegdown.PegdownDoclet</doclet>
-          <docletArtifact>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>${project.artifactId}</artifactId>
-            <version>${project.version}</version>
-          </docletArtifact>
+          <docletPath>${build.directory}/${project.artifactId}-${project.version}-all.jar</docletPath>
 
           <linksource>true</linksource>
 
@@ -266,20 +278,5 @@
       </build>
     </profile>
   </profiles>
-
-  <repositories>
-    <repository>
-      <id>maven.raffael.ch</id>
-      <name>maven.raffael.ch</name>
-      <url>http://maven.raffael.ch</url>
-    </repository>
-  </repositories>
-
-  <distributionManagement>
-    <repository>
-      <id>deploy.maven.raffael.ch</id>
-      <url>dav:http://maven.raffael.ch/</url>
-    </repository>
-  </distributionManagement>
 
 </project>
