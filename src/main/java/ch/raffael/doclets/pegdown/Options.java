@@ -153,6 +153,7 @@ public class Options {
                     return false;
                 }
                 highlightStyle = opt[1];
+                consumeOption(i);
             }
             else if ( opt[0].equals(OPT_PLANTUML_CONFIG) ) {
                 if ( plantUmlConfigFile != null ) {
@@ -160,6 +161,7 @@ public class Options {
                     return false;
                 }
                 setPlantUmlConfigFile(new File(opt[1]));
+                consumeOption(i);
             }
             else if ( opt[0].equals(OPT_PARSE_TIMEOUT) ) {
                 if ( parseTimeout != null ) {
@@ -172,6 +174,7 @@ public class Options {
                     return false;
                 }
                 parseTimeout = millis.longValue();
+                consumeOption(i);
             }
             else if ( opt[0].equals(OPT_ENCODING) ) {
                 try {
@@ -207,6 +210,7 @@ public class Options {
                     errorReporter.printError(OPT_TODO_TITLE + " may only specified once");
                 }
                 setTodoTitle(todoTitle);
+                consumeOption(i);
             }
         }
         if ( !customLoad(options, errorReporter) ) {
