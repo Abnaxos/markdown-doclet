@@ -18,11 +18,19 @@
  */
 package ch.raffael.doclets.pegdown;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import com.sun.javadoc.Doc;
+import com.sun.javadoc.MemberDoc;
 import com.sun.javadoc.Tag;
 
 
 /**
- * A renderer for the newly introduced `todo` tag.
+ * A renderer for the newly introduced `@todo` tag.
+ *
+ * **Note:** This tag renderer is stateful and shouldn't be reused across several JavaDoc
+ * runs.
  *
  * @todo This is just an example.
  *
@@ -42,6 +50,8 @@ public class TodoTagRenderer implements TagRenderer<Tag> {
 
     public static final TodoTagRenderer INSTANCE = new TodoTagRenderer();
 
+    private final Map<Doc, Counter> counters = new HashMap<>();
+
     /**
      * Render the tag.
      *
@@ -54,10 +64,38 @@ public class TodoTagRenderer implements TagRenderer<Tag> {
      */
     @Override
     public void render(Tag tag, StringBuilder target, PegdownDoclet doclet) {
+        Counter counter;
+        if ( tag.holder() instanceof MemberDoc ) {
+            counter = getCounter(((MemberDoc)tag.holder()).containingClass());
+        }
+        else {
+            counter = getCounter(tag.holder());
+        }
         target.append("<div class=\"todo\">");
-        target.append("<div class=\"todoTitle\"><span class=\"todoTitle\"></span><span class=\"todoCounter\"></span></div>");
+        target.append("<div class=\"todoTitle\"><span class=\"todoTitle\">")
+                .append(doclet.getOptions().getTodoTitle())
+                .append("</span><span class=\"todoCounter\">#")
+                .append(counter.next())
+                .append("</span></div>");
         target.append("<div class=\"todoText\">");
         target.append(doclet.toHtml(tag.text().trim()));
         target.append("</div></div>");
     }
+
+    private Counter getCounter(Doc doc) {
+        Counter counter = counters.get(doc);
+        if ( counter == null ) {
+            counter = new Counter();
+            counters.put(doc, counter);
+        }
+        return counter;
+    }
+
+    static final class Counter {
+        private int counter = 1;
+        int next() {
+            return counter++;
+        }
+    }
+
 }

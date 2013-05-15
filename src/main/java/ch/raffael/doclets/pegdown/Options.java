@@ -58,6 +58,7 @@ public class Options {
     public static final String OPT_OVERVIEW = "-overview";
     public static final String OPT_OUTPUT_DIR = "-d";
     public static final String OPT_STYLESHEETFILE = "-stylesheetfile";
+    public static final String OPT_TODO_TITLE = "-todo-title";
 
     private static final Pattern LINE_START = Pattern.compile("^ ", Pattern.MULTILINE);
     private static final Pattern MARKERS = Pattern.compile("\\020[et]");
@@ -92,6 +93,7 @@ public class Options {
     private boolean autoHighlightEnabled = false;
     private String highlightStyle = null;
     private Long parseTimeout;
+    private String todoTitle = null;
 
     private LinkRenderer linkRenderer = null;
     private PegDownProcessor processor = null;
@@ -199,6 +201,12 @@ public class Options {
                     errorReporter.printError(OPT_STYLESHEETFILE + " may only specified once");
                 }
                 setStylesheetFile(new File(opt[1]));
+            }
+            else if ( opt[0].equals(OPT_TODO_TITLE) ) {
+                if ( todoTitle != null ) {
+                    errorReporter.printError(OPT_TODO_TITLE + " may only specified once");
+                }
+                setTodoTitle(todoTitle);
             }
         }
         if ( !customLoad(options, errorReporter) ) {
@@ -401,6 +409,14 @@ public class Options {
         this.highlightStyle = highlightStyle;
     }
 
+    public String getTodoTitle() {
+        return firstNonNull(todoTitle, "To Do");
+    }
+
+    public void setTodoTitle(String todoTitle) {
+        this.todoTitle = todoTitle;
+    }
+
     /**
      * Gets the parse timeout in milliseconds for the Pegdown processor.
      *
@@ -443,6 +459,8 @@ public class Options {
      * `fixLeadingSpaces` is `true`, exactly one leading whitespace character ('\\u0020')
      * will be removed, if it exists.
      *
+     * @todo This method doesn't belong here, move it to {@link PegdownDoclet}.
+     *
      * @param markup           The Markdown source.
      * @param fixLeadingSpaces `true` if leading spaces should be fixed.
      *
@@ -476,6 +494,7 @@ public class Options {
             case OPT_PLANTUML_CONFIG:
             case OPT_HIGHLIGHT_STYLE:
             case OPT_PARSE_TIMEOUT:
+            case OPT_TODO_TITLE:
                 return 2;
             case OPT_DISABLE_HIGHLIGHT:
             case OPT_ENABLE_AUTO_HIGHLIGHT:

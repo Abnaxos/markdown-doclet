@@ -182,6 +182,9 @@
  * :   Enable auto-highlighting. If no language is specified in code blocks, the highlighter
  *     will try to guess the correct language.
  *
+ * `-todo-title`
+ * :   Set the title of TODO boxes.
+ *
  *
  * Markdown Extensions
  * -------------------

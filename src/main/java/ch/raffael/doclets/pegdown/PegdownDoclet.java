@@ -91,7 +91,7 @@ public class PegdownDoclet implements DocErrorReporter {
         tagRenderers.put("@uml", umlTagRenderer);
         tagRenderers.put("@startuml", umlTagRenderer);
         tagRenderers.put("@enduml", TagRenderer.ELIDE);
-        tagRenderers.put("@todo", TodoTagRenderer.INSTANCE);
+        tagRenderers.put("@todo", new TodoTagRenderer());
     }
 
     /**

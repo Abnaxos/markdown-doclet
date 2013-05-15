@@ -590,9 +590,6 @@ div.summary code {
 }
 
 /* @todo tag */
-body {
-    counter-reset: todo;
-}
 div.todo {
     display: block;
     margin: 1em;
@@ -608,16 +605,9 @@ div.todoTitle {
 span.todoTitle {
     font-weight: bold;
 }
-span.todoTitle:before {
-    content: "To Do"
-}
 span.todoCounter {
     float: right;
     font-size: .8em;
-}
-span.todoCounter:before {
-    counter-increment: todo;
-    content: '#' counter(todo);
 }
 div.todoText {
     display: block;
