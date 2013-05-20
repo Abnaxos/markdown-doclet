@@ -179,11 +179,42 @@
  * :   Disable syntax highlighting entirely.
  *
  * `-enable-auto-highlight`
- * :   Enable auto-highlighting. If no language is specified in code blocks, the highlighter
- *     will try to guess the correct language.
+ * :   Enable auto-highlighting. If no language is specified in code blocks, the
+ *     highlighter will try to guess the correct language.
  *
  * `-todo-title`
  * :   Set the title of TODO boxes.
+ *
+ * `-parse-timeout <seconds>`
+ * :   Set the parse timeout for Pegdown. The default is 2 seconds. Try raising the parse
+ *     timeout if you encounter timeout errors when generating your JavaDocs. You may also
+ *     specify fractions of seconds (e.g. 2.5).
+ *
+ * ### Maven
+ *
+ * Add the following to your POM to use the doclet with Maven:
+ *
+ * ```xml
+ * <build>
+ *   <plugins>
+ *     <plugin>
+ *       <artifactId>maven-javadoc-plugin</artifactId>
+ *       <version>2.9</version>
+ *       <configuration>
+ *         <doclet>ch.raffael.doclets.pegdown.PegdownDoclet</doclet>
+ *         <docletArtifact>
+ *           <groupId>ch.raffael.pegdown-doclet</groupId>
+ *           <artifactId>pegdown-doclet</artifactId>
+ *           <version>1.1</version>
+ *         </docletArtifact>
+ *         <useStandardDocletOptions>true</useStandardDocletOptions>
+ *       </configuration>
+ *     </plugin>
+ *   </plugins>
+ * </build>
+ * ```
+ *
+ * The doclet is available in Maven Central.
  *
  *
  * Markdown Extensions
