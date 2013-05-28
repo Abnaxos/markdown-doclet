@@ -1,35 +1,53 @@
+/*
+ * Copyright 2013 Raffael Herzog
+ *
+ * This file is part of pegdown-doclet.
+ *
+ * pegdown-doclet is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * pegdown-doclet is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with pegdown-doclet.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package ch.raffael.doclets.pegdown.integrations.idea;
 
 import java.util.List;
 
 import com.intellij.codeInsight.javadoc.JavaDocExternalFilter;
 import com.intellij.lang.ASTNode;
-import com.intellij.lang.documentation.DocumentationProvider;
+import com.intellij.lang.java.JavaDocumentationProvider;
 import com.intellij.lang.java.JavaLanguage;
-import com.intellij.openapi.module.Module;
-import com.intellij.openapi.roots.ProjectFileIndex;
-import com.intellij.openapi.roots.ProjectRootManager;
 import com.intellij.psi.JavaDirectoryService;
-import com.intellij.psi.JavaPsiFacade;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiField;
 import com.intellij.psi.PsiFile;
-import com.intellij.psi.PsiJavaFile;
 import com.intellij.psi.PsiManager;
+import com.intellij.psi.PsiMethod;
 import com.intellij.psi.PsiPackage;
+import com.intellij.psi.PsiParameter;
 import com.intellij.psi.impl.source.tree.JavaDocElementType;
-import com.intellij.psi.javadoc.PsiDocComment;
-import com.intellij.psi.javadoc.PsiDocTag;
+import org.intellij.lang.annotations.Language;
 import org.jetbrains.annotations.Nullable;
-
-import static com.intellij.lang.java.JavaDocumentationProvider.*;
 
 
 /**
  * @author <a href="mailto:herzog@raffael.ch">Raffael Herzog</a>
  */
-public class PegdownDocumentationProvider implements DocumentationProvider {
+public class PegdownDocumentationProvider extends JavaDocumentationProvider {
+
+    private final Class[] SUPPORTED_ELEMENT_TYPES = {
+            PsiPackage.class, PsiDirectory.class, PsiClass.class, // FIXME: PsiFile.class?
+            PsiMethod.class, PsiField.class, PsiParameter.class
+    };
 
     public PegdownDocumentationProvider() {
     }
@@ -51,6 +69,16 @@ public class PegdownDocumentationProvider implements DocumentationProvider {
     @Nullable
     @Override
     public String generateDoc(PsiElement element, @Nullable PsiElement originalElement) {
+        boolean process = false;
+        for ( Class supported: SUPPORTED_ELEMENT_TYPES ) {
+            if ( supported.isInstance(element) ) {
+                process = true;
+                break;
+            }
+        }
+        if ( !process ) {
+            return null;
+        }
         PsiFile file = null;
         if ( element instanceof PsiDirectory ) {
             // let's see whether we can map the directory to a package; if so, change the
@@ -93,23 +121,29 @@ public class PegdownDocumentationProvider implements DocumentationProvider {
                     file = element.getContainingFile();
                 }
             }
-
         }
         if ( file != null ) {
-            ProjectFileIndex fileIndex = ProjectRootManager.getInstance(element.getProject()).getFileIndex();
-            Module module = fileIndex.getModuleForFile(file.getVirtualFile());
-            if ( module == null ) {
+            DocCommentProcessor processor = new DocCommentProcessor(file);
+            if ( processor.isEnabled() ) {
+                String docHtml;
+                if ( element instanceof PsiMethod ) {
+                    docHtml = super.generateDoc(PsiProxy.forMethod((PsiMethod)element), originalElement);
+                }
+                else if ( element instanceof PsiParameter ) {
+                    docHtml = super.generateDoc(PsiProxy.forParameter((PsiParameter)element), originalElement);
+                }
+                else {
+                    PegdownJavaDocInfoGenerator javaDocInfoGenerator = new PegdownJavaDocInfoGenerator(element.getProject(), element, processor);
+                    List<String> docURLs = getExternalJavaDocUrl(element);
+                    docHtml = JavaDocExternalFilter.filterInternalDocInfo(javaDocInfoGenerator.generateDocInfo(docURLs));
+                }
+                docHtml = extendCss(docHtml);
+                Plugin.print("Final HTML output", docHtml);
+                return docHtml;
+            }
+            else {
                 return null;
             }
-            if ( !fileIndex.isInSourceContent(file.getVirtualFile()) ) {
-                return null;
-            }
-            if ( !Plugin.moduleConfiguration(module).isPegdownEnabled() ) {
-                return null;
-            }
-            final PegdownJavaDocInfoGenerator javaDocInfoGenerator = new PegdownJavaDocInfoGenerator(element.getProject(), element, Plugin.moduleConfiguration(module).getRenderingOptions());
-            final List<String> docURLs = getExternalJavaDocUrl(element);
-            return JavaDocExternalFilter.filterInternalDocInfo(javaDocInfoGenerator.generateDocInfo(docURLs));
         }
         else {
             return null;
@@ -130,50 +164,23 @@ public class PegdownDocumentationProvider implements DocumentationProvider {
         return null;
     }
 
-    private boolean isPegdownEnabled(PsiClass psiClass) {
-        if ( psiClass.getNavigationElement() instanceof PsiClass ) {
-            psiClass = (PsiClass)psiClass.getNavigationElement();
+    private static String extendCss(String html) {
+        @Language("CSS") String css = "\n"
+                // I know, these tables aren't beautiful; however, Swing CSS is so
+                // limited, this is about as good as it gets ...
+                +"table { /*unsupported: border-collapse: collapse;*/ border: 0; border-spacing: 0; }\n"
+                +"table td, table th { border: outset 1px black; padding-left: 5px; padding-right: 5px;}\n"
+                +"\n";
+        String upperHtml = html.toUpperCase();
+        int bodyPos = upperHtml.indexOf("<BODY>");
+        if ( bodyPos < 0 ) {
+            return html;
         }
-        PsiFile file = psiClass.getContainingFile();
-        if ( file instanceof PsiJavaFile ) {
-            return isPegdownEnabled(JavaPsiFacade.getInstance(psiClass.getProject()).findPackage(((PsiJavaFile)file).getPackageName()));
+        int stylePos = upperHtml.lastIndexOf("</STYLE>", bodyPos);
+        if ( stylePos < 0 ) {
+            return html;
         }
-        else {
-            return false;
-        }
-    }
-
-    private boolean isPegdownEnabled(PsiPackage pkg) {
-        if ( pkg == null || pkg.getName() == null || pkg.getName().isEmpty() ) {
-            return false;
-        }
-        if ( pkg.getNavigationElement() != null ) {
-            pkg = (PsiPackage)pkg.getNavigationElement();
-        }
-        System.out.println("Checking: " + pkg);
-        if ( pkg.getDirectories() != null ) {
-            for ( PsiDirectory dir : pkg.getDirectories() ) {
-                // FIXME: won't recognise package-info.java in source path of libraries
-                PsiFile info = dir.findFile("package-info.java");
-                if ( info != null ) {
-                    System.out.println("Scanning: " + pkg);
-                    for ( PsiElement child : info.getChildren() ) {
-                        if ( child instanceof PsiDocComment ) {
-                            for ( PsiElement tok : child.getChildren() ) {
-                                if ( tok instanceof PsiDocTag ) {
-                                    if ( ((PsiDocTag)tok).getName().equals("pegdown") ) {
-                                        return true;
-                                    }
-                                }
-                            }
-                            break;
-                        }
-                    }
-                    break;
-                }
-            }
-        }
-        return isPegdownEnabled(pkg.getParentPackage());
+        return html.substring(0, stylePos) + css + html.substring(stylePos);
     }
 
 }

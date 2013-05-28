@@ -18,21 +18,15 @@
  */
 package ch.raffael.doclets.pegdown.integrations.idea;
 
-import java.util.regex.Pattern;
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 
 import com.intellij.codeInsight.javadoc.JavaDocInfoGenerator;
 import com.intellij.openapi.project.Project;
-import com.intellij.psi.JavaDocTokenType;
-import com.intellij.psi.JavaPsiFacade;
+import com.intellij.psi.PsiDocCommentOwner;
 import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiElementFactory;
-import com.intellij.psi.PsiWhiteSpace;
 import com.intellij.psi.javadoc.PsiDocComment;
-import com.intellij.psi.javadoc.PsiDocToken;
-import com.intellij.psi.tree.IElementType;
-
-import ch.raffael.doclets.pegdown.Options;
-import ch.raffael.doclets.pegdown.PegdownDoclet;
 
 
 /**
@@ -40,17 +34,15 @@ import ch.raffael.doclets.pegdown.PegdownDoclet;
  */
 public class PegdownJavaDocInfoGenerator extends JavaDocInfoGenerator {
 
-    private final static Pattern CLEANUP_RE = Pattern.compile("^(\\s*\\*+) ?", Pattern.MULTILINE);
-
-    private final PegdownOptions.RenderingOptions pegdownOptions;
     private final Project project;
-    private final PsiElementFactory psiFactory;
+    private final PsiElement element;
+    private final DocCommentProcessor processor;
 
-    public PegdownJavaDocInfoGenerator(Project project, PsiElement element, PegdownOptions.RenderingOptions pegdownOptions) {
+    public PegdownJavaDocInfoGenerator(Project project, PsiElement element, DocCommentProcessor processor) {
         super(project, element);
-        this.pegdownOptions = pegdownOptions;
         this.project = project;
-        this.psiFactory = JavaPsiFacade.getInstance(project).getElementFactory();
+        this.element = element;
+        this.processor = processor;
     }
 
     @Override
@@ -58,28 +50,33 @@ public class PegdownJavaDocInfoGenerator extends JavaDocInfoGenerator {
         //for ( PsiElement elem : docComment.getDescriptionElements() ) {
         //    System.out.println(elem);
         //}
-        StringBuilder buf = new StringBuilder();
-        boolean start = true;
-        for ( PsiElement elem : docComment.getChildren() ) {
-            if ( elem instanceof PsiDocToken ) {
-                IElementType tokenType = ((PsiDocToken)elem).getTokenType();
-                if ( tokenType == JavaDocTokenType.DOC_COMMENT_START || tokenType == JavaDocTokenType.DOC_COMMENT_END ) {
-                    continue;
-                }
-            }
-            if ( start && elem instanceof PsiWhiteSpace ) {
-                continue;
-            }
-            else {
-                start = false;
-                buf.append(elem.getText());
-            }
-        }
-        String markdown = CLEANUP_RE.matcher(buf).replaceAll("");
-        Options options = new Options();
-        pegdownOptions.applyTo(options);
-        PegdownDoclet doclet = new PegdownDoclet(options, null);
-        super.generateCommonSection(buffer, psiFactory.createDocCommentFromText("/**\n" + doclet.toHtml(markdown) + "\n*/"));
+        docComment = processor.processDocComment(docComment);
+        super.generateCommonSection(buffer, docComment);
+    }
+
+    public PsiElement wrapElement() {
+        //checkArgument(delegate instanceof PsiElement, "delegate instanceof PsiElement");
+        //checkArgument(delegate instanceof PsiDocCommentOwner, "delegate instanceof PsiDocCommentOwner");
+
+        return (PsiElement)Proxy.newProxyInstance(
+                element.getClass().getClassLoader(), element.getClass().getInterfaces(),
+                new InvocationHandler() {
+                    private PsiDocComment docComment;
+                    @Override
+                    public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+                        if ( element instanceof PsiDocCommentOwner && method.getName().equals("getDocComment") && method.getParameterTypes().length == 0 ) {
+                            PsiDocCommentOwner dco = (PsiDocCommentOwner)element;
+                            if ( docComment == null && dco.getDocComment() != null ) {
+                                docComment = processor.processDocComment(dco.getDocComment());
+                            }
+                            return docComment;
+                        }
+                        if ( method.getName().equals("getNavigationElement") && method.getParameterTypes().length == 0 ) {
+                            return proxy;
+                        }
+                        return method.invoke(element, args);
+                    }
+                });
     }
 
 }

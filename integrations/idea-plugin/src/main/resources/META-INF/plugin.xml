@@ -1,3 +1,21 @@
+<!--
+  ~ Copyright 2013 Raffael Herzog
+  ~
+  ~ This file is part of pegdown-doclet.
+  ~
+  ~ pegdown-doclet is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ pegdown-doclet is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with pegdown-doclet.  If not, see <http://www.gnu.org/licenses/>.
+  -->
 <idea-plugin version="2">
   <id>PegdownDocletIdea</id>
   <name>Pegdown Doclet for IDEA</name>
@@ -5,8 +23,22 @@
   <vendor email="herzog@raffael.ch" url="https://github.com/Abnaxos/pegdown-doclet/">Raffael Herzog</vendor>
 
   <description><![CDATA[
-      Enables support for Quick Documentation (Ctrl-Q) for projects, modules and/or
-      libraries that use the Pegdown Doclet.
+      <p>Enables support for Quick Documentation (Ctrl-Q) for projects, modules and/or
+      libraries that use the Pegdown Doclet.</p>
+
+      <p><strong>Known Issues</strong></p>
+      <ul>
+        <li>Some formatting problems in certain constellations; the doc is still readable,
+            though</li>
+        <li>No support for UML diagrams and images</li>
+        <li>No option for Pegdown parse timeout</li>
+        <li>Will only process JavaDocs of project source files, external libraries won't
+            be processed (won't be fixed, attach external JavaDocs)</li>
+        <li>Works only if the class where Ctrl-Q was used is located in a Pegdown-enabled
+            module (probably not fixable)</li>
+        <li>May get confused on certain constellations of Pegdown-enabled and
+            Standard-JavaDoc modules (probably not fixable)</li>
+      </ul>
       ]]></description>
 
   <change-notes><![CDATA[
@@ -14,7 +46,7 @@
   </change-notes>
 
   <!-- please see http://confluence.jetbrains.net/display/IDEADEV/Build+Number+Ranges for description -->
-  <idea-version since-build="107.105"/>
+  <idea-version since-build="123.169"/>
 
   <!-- please see http://confluence.jetbrains.net/display/IDEADEV/Plugin+Compatibility+with+IntelliJ+Platform+Products
        on how to target different products -->
