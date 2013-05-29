@@ -30,7 +30,6 @@
       <ul>
         <li>Some formatting problems in certain constellations; the doc is still readable,
             though</li>
-        <li>No support for UML diagrams and images</li>
         <li>No option for Pegdown parse timeout</li>
         <li>Will only process JavaDocs of project source files, external libraries won't
             be processed (won't be fixed, attach external JavaDocs)</li>
@@ -55,8 +54,10 @@
   -->
 
   <application-components>
+    <component>
+      <implementation-class>ch.raffael.doclets.pegdown.integrations.idea.TempFileManager</implementation-class>
+    </component>
   </application-components>
-
   <project-components>
     <component>
       <implementation-class>ch.raffael.doclets.pegdown.integrations.idea.ProjectConfiguration</implementation-class>

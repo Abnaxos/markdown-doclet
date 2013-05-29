@@ -135,7 +135,9 @@ public class PegdownDocumentationProvider extends JavaDocumentationProvider {
                 else {
                     PegdownJavaDocInfoGenerator javaDocInfoGenerator = new PegdownJavaDocInfoGenerator(element.getProject(), element, processor);
                     List<String> docURLs = getExternalJavaDocUrl(element);
-                    docHtml = JavaDocExternalFilter.filterInternalDocInfo(javaDocInfoGenerator.generateDocInfo(docURLs));
+                    String text = javaDocInfoGenerator.generateDocInfo(docURLs);
+                    Plugin.print("Intermediate HTML output", text);
+                    docHtml = JavaDocExternalFilter.filterInternalDocInfo(text);
                 }
                 docHtml = extendCss(docHtml);
                 Plugin.print("Final HTML output", docHtml);

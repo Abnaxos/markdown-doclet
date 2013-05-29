@@ -37,6 +37,7 @@ import com.sun.tools.doclets.standard.Standard;
 import org.pegdown.Extensions;
 import org.pegdown.LinkRenderer;
 import org.pegdown.PegDownProcessor;
+import org.pegdown.ToHtmlSerializer;
 
 import static com.google.common.base.Objects.*;
 
@@ -478,7 +479,7 @@ public class Options {
             markup = LINE_START.matcher(markup).replaceAll("");
         }
         List<String> tags = new ArrayList<>();
-        String html = new DocletSerializer(this, getLinkRenderer()).toHtml(processor.parseMarkdown(Tags.extractInlineTags(markup, tags).toCharArray()));
+        String html = createDocletSerializer().toHtml(processor.parseMarkdown(Tags.extractInlineTags(markup, tags).toCharArray()));
         return Tags.insertInlineTags(html, tags);
     }
 
@@ -490,6 +491,16 @@ public class Options {
      */
     protected PegDownProcessor createProcessor() {
         return new PegDownProcessor(firstNonNull(pegdownExtensions, DEFAULT_PEGDOWN_EXTENSIONS), getParseTimeout());
+    }
+
+    /**
+     * Create a new serializer. If you need to further customize the HTML rendering, you
+     * can override this method.
+     *
+     * @return A (possibly customised) ToHtmlSerializer.
+     */
+    protected ToHtmlSerializer createDocletSerializer() {
+        return new DocletSerializer(this, getLinkRenderer());
     }
 
     public static int optionLength(String option) {

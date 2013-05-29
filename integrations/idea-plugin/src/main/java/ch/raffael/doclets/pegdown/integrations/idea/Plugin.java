@@ -18,6 +18,7 @@
  */
 package ch.raffael.doclets.pegdown.integrations.idea;
 
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
 
@@ -27,14 +28,19 @@ import com.intellij.openapi.project.Project;
  */
 public final class Plugin {
 
-    public static final boolean DEBUG = Boolean.getBoolean("ch.raffael.doclets.pegdown.integrations.idea");
+    public static final boolean DEBUG = Boolean.getBoolean("ch.raffael.doclets.pegdown.integrations.idea.debug");
 
     public static final String PLUGIN_NAME = "PegdownDocletIdea";
 
+    public static final String TEMP_FILE_MANAGER_NAME = PLUGIN_NAME + ".TempFileManager";
     public static final String PROJECT_CONFIG_NAME = PLUGIN_NAME + ".ProjectConfig";
     public static final String MODULE_CONFIG_NAME = PLUGIN_NAME + ".ModuleConfig";
 
     private Plugin() {
+    }
+
+    public static TempFileManager tempFileManager() {
+        return (TempFileManager)ApplicationManager.getApplication().getComponent(TEMP_FILE_MANAGER_NAME);
     }
 
     public static ProjectConfiguration projectConfiguration(Project project) {

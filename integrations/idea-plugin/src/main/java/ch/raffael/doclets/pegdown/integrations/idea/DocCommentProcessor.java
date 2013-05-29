@@ -18,12 +18,24 @@
  */
 package ch.raffael.doclets.pegdown.integrations.idea;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.regex.Pattern;
 
+import com.google.common.base.CharMatcher;
+import com.google.common.base.Objects;
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ProjectFileIndex;
 import com.intellij.openapi.roots.ProjectRootManager;
+import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.psi.JavaDocTokenType;
 import com.intellij.psi.JavaPsiFacade;
 import com.intellij.psi.PsiElement;
@@ -41,7 +53,11 @@ import com.sun.javadoc.PackageDoc;
 import com.sun.javadoc.SeeTag;
 import com.sun.javadoc.SourcePosition;
 import com.sun.javadoc.Tag;
+import net.sourceforge.plantuml.SourceStringReader;
+import org.pegdown.ToHtmlSerializer;
+import org.pegdown.ast.SuperNode;
 
+import ch.raffael.doclets.pegdown.DocletSerializer;
 import ch.raffael.doclets.pegdown.Options;
 import ch.raffael.doclets.pegdown.PegdownDoclet;
 import ch.raffael.doclets.pegdown.SeeTagRenderer;
@@ -53,12 +69,17 @@ import ch.raffael.doclets.pegdown.TagRendering;
  */
 public class DocCommentProcessor {
 
-    private final static Pattern CLEANUP_RE = Pattern.compile("^(\\s*\\*+) ?", Pattern.MULTILINE);
+    private static final Logger LOG = Logger.getInstance(DocCommentProcessor.class);
 
+    private final static Pattern LEADING_ASTERISK_RE = Pattern.compile("^[ \\t]*\\*+ ?", Pattern.MULTILINE);
+    public static final Pattern ABSOLUTE_IMG_RE = Pattern.compile("([a-zA-Z0-9+.-]+:|/).*");
+
+    private final PsiFile file;
     private final Project project;
     private final PegdownOptions.RenderingOptions pegdownOptions;
 
     public DocCommentProcessor(PsiFile file) {
+        this.file = file;
         if ( file == null ) {
             project = null;
             pegdownOptions = null;
@@ -90,7 +111,35 @@ public class DocCommentProcessor {
         if ( !isEnabled() || docComment == null ) {
             return docComment;
         }
-        Options options = new Options();
+        final Map<String, URL> umlDiagrams = generateUmlDiagrams(docComment);
+        Options options = new Options() {
+            @Override
+            protected ToHtmlSerializer createDocletSerializer() {
+                return new DocletSerializer(this, getLinkRenderer()) {
+                    @Override
+                    protected void printImageTag(SuperNode imageNode, String url) {
+                        URL diagram = umlDiagrams.get(url);
+                        if ( diagram != null ) {
+                            super.printImageTag(imageNode, diagram.toString());
+                        }
+                        else if ( !ABSOLUTE_IMG_RE.matcher(url).matches() || url.contains("{@}") ) {
+                            URL baseUrl = VfsUtil.convertToURL(file.getVirtualFile().getUrl());
+                            if ( baseUrl != null ) {
+                                try {
+                                    super.printImageTag(imageNode, baseUrl.toURI().resolve(new URI(url)).toString());
+                                }
+                                catch ( URISyntaxException e ) {
+                                    super.printImageTag(imageNode, url);
+                                }
+                            }
+                        }
+                        else {
+                            super.printImageTag(imageNode, url);
+                        }
+                    }
+                };
+            }
+        };
         pegdownOptions.applyTo(options);
         PegdownDoclet doclet = new PegdownDoclet(options, null);
         StringBuilder buf = new StringBuilder();
@@ -129,8 +178,10 @@ public class DocCommentProcessor {
                     case "param":
                     case "throws":
                     case "exception":
+                        renderSimpleTag(doclet, tagBlock, docTag, true);
+                        break;
                     case "return":
-                        renderSimpleTag(doclet, tagBlock, docTag);
+                        renderSimpleTag(doclet, tagBlock, docTag, false);
                         break;
                     case "todo":
                         renderTodoTag(doclet, tagBlock, docTag);
@@ -152,15 +203,55 @@ public class DocCommentProcessor {
         }
         String markdown = stripLead(buf.toString());
         Plugin.print("Markdown source", markdown);
+        String docCommentText = "/**\n" + escapeAsterisks(doclet.toHtml(markdown, false))
+                + "\n" + escapeAsterisks(tagBlock.toString()) + "\n*/";
+        Plugin.print("Processed DocComment", docCommentText);
         docComment = JavaPsiFacade.getInstance(project).getElementFactory().createDocCommentFromText(
-                "/**\n" + addLead(doclet.toHtml(markdown))
-                        + "\n" + addLead(tagBlock.toString()) + "\n */");
-        Plugin.print("Processed DocComment", docComment.getText());
+                docCommentText);
         return docComment;
     }
 
+    private Map<String, URL> generateUmlDiagrams(PsiDocComment docComment) {
+        TempFileManager tempFiles = Plugin.tempFileManager();
+        Map<String, URL> urls = null;
+        for ( PsiDocTag tag : docComment.getTags() ) {
+            if ( tag instanceof PsiInlineDocTag ) {
+                continue;
+            }
+            else if ( tag.getName().equals("uml") || tag.getName().equals("startuml") ) {
+                if ( urls == null ) {
+                    urls = new HashMap<>();
+                }
+                String text = stripLead(tag.getText());
+                text = stripFirstWord(text)[1];
+                String[] stripped = stripFirstWord(text);
+                String fileName = stripped[0];
+                text = stripped[1];
+                String plantUml = "@startuml " + fileName + "\n"
+                        + "skinparam backgroundColor transparent\n"
+                        + text
+                        + "\n@enduml";
+                Plugin.print("UML Diagram Source", plantUml);
+                ByteArrayOutputStream image = new ByteArrayOutputStream();
+                try {
+                    new SourceStringReader(plantUml).generateImage(image);
+                }
+                catch ( IOException e ) {
+                    LOG.error("Error generating UML", e, fileName, String.valueOf(docComment.toString()), String.valueOf(docComment.getContainingFile()));
+                }
+                try {
+                    urls.put(fileName, tempFiles.saveTempFile(image.toByteArray(), "png"));
+                }
+                catch ( IOException e ) {
+                    LOG.error("Error generating UML", e, fileName, String.valueOf(docComment.toString()), String.valueOf(docComment.getContainingFile()));
+                }
+            }
+        }
+        return Objects.firstNonNull(urls, Collections.<String, URL>emptyMap());
+    }
+
     private void renderSeeTag(PegdownDoclet doclet, StringBuilder tagBlock, PsiDocTag docTag) {
-        final String seeText = toString(null, docTag.getDataElements());
+        final String seeText = toString(docTag, false);
         if ( seeText.startsWith("\"") ) {
             SeeTag tag = new SeeTag() {
                 @Override
@@ -224,43 +315,65 @@ public class DocCommentProcessor {
         }
     }
 
-    private void renderSimpleTag(PegdownDoclet doclet, StringBuilder tagBlock, PsiDocTag docTag) {
-        tagBlock.append("\n@").append(docTag.getName());
-        if ( docTag.getValueElement() != null ) {
-            tagBlock.append(' ').append(docTag.getValueElement().getText());
+    private void renderSimpleTag(PegdownDoclet doclet, StringBuilder tagBlock, PsiDocTag docTag, boolean stripFirstWord) {
+        tagBlock.append("\n@").append(docTag.getName()).append(' ');
+        String firstWord = null;
+        String text = toString(docTag, false);
+        if ( stripFirstWord ) {
+            String[] stripped = stripFirstWord(text);
+            firstWord = stripped[0];
+            text = stripped[1].trim();
         }
-        tagBlock.append(' ').append(TagRendering.simplifySingleParagraph(
-                doclet.toHtml(toString(docTag.getValueElement(),
-                                       docTag.getDataElements()))));
+        text = escapeAsterisks(TagRendering.simplifySingleParagraph(doclet.toHtml(text, false)));
+        if ( firstWord != null ) {
+            tagBlock.append(firstWord).append(' ');
+        }
+        tagBlock.append(text).append('\n');
     }
 
     private void renderTodoTag(PegdownDoclet doclet, StringBuilder tagBlock, PsiDocTag docTag) {
         tagBlock.append("\n<DL style=\"border:solid 1px;padding:5px;\"><DT><B>To Do</B></DT><DD>");
-        tagBlock.append(toString(docTag.getNameElement(), docTag.getChildren()));
+        tagBlock.append(toString(docTag, false));
         tagBlock.append("\n</DD></DL>");
     }
 
     private static String stripLead(String doc) {
-        return CLEANUP_RE.matcher(doc).replaceAll("");
+        return LEADING_ASTERISK_RE.matcher(doc).replaceAll("");
     }
 
-    private static String addLead(String doc) {
-        return " * " + doc.replaceAll("\n", "\n * ");
+    private static String escapeAsterisks(String doc) {
+        return doc.replace("*", "&#42;");
     }
 
-    private static String toString(PsiElement value, PsiElement[] elements) {
-        // Start the comment with a "* ". This is necessary because stripLead() will strip
-        // leading asterisks. However, in this case, the leading asterisk was before the
-        // tag. E.g., in the comment "@return *Return value*" would strip the first
-        // asterisk, resultin in "@return Return value*" instead of
-        // "@return <em>Return value</em>", as intended.
-        StringBuilder buf = new StringBuilder("* ");
-        for ( PsiElement elem : elements ) {
-            if ( !elem.equals(value) ) {
-                buf.append(elem.getText());
-            }
+    private static String toString(PsiDocTag docTag, boolean stripFirstWord) {
+        String tagText = stripLead(docTag.getText());
+        tagText = stripFirstWord(tagText)[1]; // remove the tag itself
+        String first;
+        String doc;
+        if ( stripFirstWord ) {
+            String[] stripped = stripFirstWord(tagText);
+            return stripped[0] + " " + escapeAsterisks(stripped[1].trim());
         }
-        return stripLead(buf.toString()).trim();
+        else {
+            return escapeAsterisks(tagText.trim());
+        }
+    }
+
+    private static String[] stripFirstWord(String string) {
+        string = CharMatcher.WHITESPACE.trimLeadingFrom(string);
+        int pos = CharMatcher.WHITESPACE.indexIn(string);
+        if ( pos >= 0 ) {
+            return new String[] {
+                    string.substring(0, pos),
+                    CharMatcher.WHITESPACE.trimLeadingFrom(string.substring(pos))
+            };
+        }
+        else {
+            return new String[] {
+                    string.trim(),
+                    ""
+            };
+        }
     }
 
 }

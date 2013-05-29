@@ -413,6 +413,18 @@ public class PegdownDoclet implements DocErrorReporter {
     }
 
     /**
+     * Convert the given markup to HTML according to the {@link Options}.
+     *
+     * @param markup            The Markdown source.
+     * @param fixLeadingSpaces  `true` to strip one leading space if present.
+     *
+     * @return The resulting HTML.
+     */
+    public String toHtml(String markup, boolean fixLeadingSpaces) {
+        return options.toHtml(markup, fixLeadingSpaces);
+    }
+
+    /**
      * Indicate that an error occurred. This method will also be called by
      * {@link #printError(String)} and
      * {@link #printError(com.sun.javadoc.SourcePosition, String)}.
