@@ -41,6 +41,15 @@
       ]]></description>
 
   <change-notes><![CDATA[
+          <dl>
+            <dt>2013-05-31</dt>
+            <dd>
+              <ul>
+                <li>Add support for UML diagrams and images</li>
+                <li>Improve formatting of code blocks</li>
+              </ul>
+            </dd>
+          </dl>
       ]]>
   </change-notes>
 
