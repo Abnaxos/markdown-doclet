@@ -94,14 +94,12 @@ public class PegdownDocletOptionsForm {
             @Override
             public void itemStateChanged(ItemEvent e) {
                 synchronized ( PegdownDocletOptionsForm.this ) {
-                    optionsButton.getAction().setEnabled(enablePegdownDocletCheckBox.isSelected());
                     projectOptions.enabled = enablePegdownDocletCheckBox.isSelected();
                 }
             }
         });
         optionsAction = new RenderingOptionsForm.OptionsAction(projectOptions);
         optionsButton.setAction(optionsAction);
-        optionsButton.getAction().setEnabled(false);
         reset();
     }
 
