@@ -80,7 +80,7 @@
     <dependency>
       <groupId>net.sourceforge.plantuml</groupId>
       <artifactId>plantuml</artifactId>
-      <version>7963</version>
+      <version>7968</version>
     </dependency>
 
     <dependency>

@@ -1,3 +1,22 @@
+/*
+ * Copyright 2013 Raffael Herzog
+ *
+ * This file is part of pegdown-doclet.
+ *
+ * pegdown-doclet is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * pegdown-doclet is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with pegdown-doclet.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 /* Javadoc style sheet
  *
  * Taken from the standard doclet:
@@ -562,6 +581,28 @@ h1.hidden {
 div.block h2 {
     padding: 0 !important; /* fixes rule for ul.blockList li.blockList h2 above */
 }
+.block img {
+    margin-left: 2em;
+}
+
+/* tables */
+.block table {
+    border-collapse: collapse;
+    width: auto;
+    margin-left: 2em;
+    padding: 2em;
+    border: 0;
+}
+.block td, .block th {
+    padding: .25em .5em;
+}
+.block td {
+    border: solid 1px rgb(234, 234, 234);
+}
+.block tbody {
+    background: rgb(248, 248, 248);
+}
+
 /* code block tweaks */
 code, tt {
     font-size: 1.2em;
