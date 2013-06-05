@@ -33,6 +33,8 @@ import com.intellij.openapi.ui.DialogWrapper;
 
 
 /**
+ * The rendering options form.
+ *
  * @author <a href="mailto:herzog@raffael.ch">Raffael Herzog</a>
  */
 public class RenderingOptionsForm {

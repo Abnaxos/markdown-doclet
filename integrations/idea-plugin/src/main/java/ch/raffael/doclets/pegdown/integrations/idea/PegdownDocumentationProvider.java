@@ -40,6 +40,8 @@ import org.jetbrains.annotations.Nullable;
 
 
 /**
+ * A documentation provider that renders the JavaDoc comments using Pegdown.
+ *
  * @author <a href="mailto:herzog@raffael.ch">Raffael Herzog</a>
  */
 public class PegdownDocumentationProvider extends JavaDocumentationProvider {

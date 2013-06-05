@@ -24,6 +24,8 @@ import com.intellij.openapi.project.Project;
 
 
 /**
+ * Some utilities for the plugin.
+ *
  * @author <a href="mailto:herzog@raffael.ch">Raffael Herzog</a>
  */
 public final class Plugin {

@@ -18,20 +18,36 @@
  */
 package ch.raffael.doclets.pegdown.integrations.idea;
 
+import org.pegdown.Extensions;
+
 import ch.raffael.doclets.pegdown.Options;
 
 
 /**
+ * A holder for the pegdown options.
+ *
  * @author <a href="mailto:herzog@raffael.ch">Raffael Herzog</a>
  */
 public class PegdownOptions {
 
+    /**
+     * Flag indicating whether Pegdown is enabled or not. If `null`, inherit from project.
+     */
     public Boolean enabled;
+
+    /**
+     * The rendering options for Pegdown. If `null`, inherit from project.
+     */
     public RenderingOptions renderingOptions;
 
     public PegdownOptions() {
     }
 
+    /**
+     * Creates a deep copy from the given options.
+     *
+     * @param that    The options to copy.
+     */
     public PegdownOptions(PegdownOptions that) {
         this.enabled = that.enabled;
         if ( that.renderingOptions == null ) {
@@ -72,6 +88,9 @@ public class PegdownOptions {
         return result;
     }
 
+    /**
+     * Holds the rendering options.
+     */
     public static class RenderingOptions {
 
         public boolean autolinks = true;
@@ -88,6 +107,11 @@ public class PegdownOptions {
         public RenderingOptions() {
         }
 
+        /**
+         * Creates a copy of the given rendering options.
+         *
+         * @param that    The rendering options to copy.
+         */
         public RenderingOptions(RenderingOptions that) {
             this.autolinks = that.autolinks;
             this.definitions = that.definitions;
@@ -191,6 +215,19 @@ public class PegdownOptions {
         }
 
         public void applyTo(Options options) {
+            options.setPegdownExtensions(
+                    (autolinks ? Extensions.AUTOLINKS : 0)
+                            | (definitions ? Extensions.DEFINITIONS : 0)
+                            | (quotes ? Extensions.QUOTES : 0)
+                            | (smarts ? Extensions.SMARTS : 0)
+                            | (tables ? Extensions.TABLES : 0)
+                            | (wikiLinks ? Extensions.WIKILINKS : 0)
+                            | (fencedCodeBlocks ? Extensions.FENCED_CODE_BLOCKS : 0)
+                            | (abbreviations ? Extensions.ABBREVIATIONS : 0)
+                            | (noHtmlBlocks ? Extensions.SUPPRESS_HTML_BLOCKS : 0)
+                            | (noInlineHtml ? Extensions.SUPPRESS_INLINE_HTML : 0)
+            );
         }
     }
+
 }

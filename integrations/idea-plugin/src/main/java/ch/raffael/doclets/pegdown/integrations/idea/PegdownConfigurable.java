@@ -28,6 +28,8 @@ import org.jetbrains.annotations.Nullable;
 
 
 /**
+ * Adds the plugin's configuration panel to "Settings -- Pegdown Doclet".
+ *
  * @author <a href="mailto:herzog@raffael.ch">Raffael Herzog</a>
  */
 public class PegdownConfigurable implements Configurable {

@@ -23,33 +23,46 @@
   <vendor email="herzog@raffael.ch" url="https://github.com/Abnaxos/pegdown-doclet/">Raffael Herzog</vendor>
 
   <description><![CDATA[
-      <p>Enables support for Quick Documentation (Ctrl-Q) for projects, modules and/or
-      libraries that use the Pegdown Doclet.</p>
+      <p>Enables support for Quick Documentation (Ctrl-Q) for projects that use the
+      Pegdown Doclet. Enable and configure the plugin in "Settings &ndash; Pegdown
+      Doclet".</p>
 
-      <p><strong>Known Issues</strong></p>
+      <p><em>Tip:</em> Also install the the PlantUML integration plugin for live-previews
+      of your UML diagrams.</p>
+
+      <p><em>Known Issues</em></p>
       <ul>
         <li>Some formatting problems in certain constellations; the doc is still readable,
             though</li>
         <li>No option for Pegdown parse timeout</li>
-        <li>Will only process JavaDocs of project source files, external libraries won't
-            be processed (won't be fixed, attach external JavaDocs)</li>
-        <li>Works only if the class where Ctrl-Q was used is located in a Pegdown-enabled
-            module (probably not fixable)</li>
-        <li>May get confused on certain constellations of Pegdown-enabled and
-            Standard-JavaDoc modules (probably not fixable)</li>
+      </ul>
+      <p><em>Limitation that won't be fixed</em></p>
+      <ul>
+        <li>It will only process JavaDocs of project source files, external libraries
+            won't be processed; use generated JavaDocs for libraries</li>
+        <li>It works only if the class where Ctrl-Q was used is located in a
+            Pegdown-enabled module</li>
+        <li>It may get confused on certain constellations of Pegdown-enabled and
+            Standard-JavaDoc modules</li>
       </ul>
       ]]></description>
 
   <change-notes><![CDATA[
-          <dl>
-            <dt>2013-05-31</dt>
-            <dd>
-              <ul>
-                <li>Add support for UML diagrams and images</li>
-                <li>Improve formatting of code blocks</li>
-              </ul>
-            </dd>
-          </dl>
+      <dl>
+        <dt>1.0 (2013-06-05)</dt>
+        <dd>
+          <ul>
+            <li>Release IDEA plugin 1.0</li>
+          </ul>
+        </dd>
+        <dt>2013-05-31</dt>
+        <dd>
+          <ul>
+            <li>Add support for UML diagrams and images</li>
+            <li>Improve formatting of code blocks</li>
+          </ul>
+        </dd>
+      </dl>
       ]]>
   </change-notes>
 

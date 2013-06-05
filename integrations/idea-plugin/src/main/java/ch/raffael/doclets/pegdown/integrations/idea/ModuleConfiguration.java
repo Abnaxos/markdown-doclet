@@ -29,6 +29,8 @@ import org.jetbrains.annotations.Nullable;
 
 
 /**
+ * A module component holding the module-specific configuration.
+ *
  * @author <a href="mailto:herzog@raffael.ch">Raffael Herzog</a>
  */
 @State(name = Plugin.PLUGIN_NAME + ".ModuleConfiguration",

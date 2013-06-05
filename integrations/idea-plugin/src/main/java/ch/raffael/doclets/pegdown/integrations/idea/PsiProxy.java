@@ -41,6 +41,10 @@ import org.jetbrains.annotations.Nullable;
 
 
 /**
+ * Wraps PSI elements and intercepts certain methods. This is used to render method and
+ * parameter documentations, as there is no easy way to intercept this. It's a hack, but
+ * oh, well ...
+ *
  * @author <a href="mailto:herzog@raffael.ch">Raffael Herzog</a>
  */
 public abstract class PsiProxy<T> {

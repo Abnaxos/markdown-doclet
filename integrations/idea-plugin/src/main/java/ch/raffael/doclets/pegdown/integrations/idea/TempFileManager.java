@@ -37,6 +37,12 @@ import org.jetbrains.annotations.NotNull;
 
 
 /**
+ * An application component that manages temporary files used to display PlantUML diagrams
+ * in QuickDoc. It saves the content to a file
+ * `system/plugins/pegdown-doclet/<hash>.<extension>` and deletes that file after it
+ * hasn't been used for a while. Also cleans up the temporary directory on IDE startup
+ * and shutdown.
+ *
  * @author <a href="mailto:herzog@raffael.ch">Raffael Herzog</a>
  */
 public class TempFileManager implements ApplicationComponent {

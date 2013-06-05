@@ -65,6 +65,9 @@ import ch.raffael.doclets.pegdown.TagRendering;
 
 
 /**
+ * The work-horse, renders the JavaDoc comments using Pegdown and creates a new
+ * PsiDocComment that can be passed to IDEA's default QuickDoc implementation.
+ *
  * @author <a href="mailto:herzog@raffael.ch">Raffael Herzog</a>
  */
 public class DocCommentProcessor {
@@ -103,10 +106,24 @@ public class DocCommentProcessor {
         }
     }
 
+    /**
+     * Checks whether Pegdown is enabled for the current file.
+     *
+     * @return `true`, if Pegdown is enabled.
+     */
     public boolean isEnabled() {
         return pegdownOptions != null;
     }
 
+    /**
+     * Process the given `PsiDocComment` using Pegdown and return a new `PsiDocComment`
+     * representing the resulting HTML. The resulting `PsiDocComment` can then be passed
+     * to IDEA's default QuickDoc implementation.
+     *
+     * @param docComment    The `PsiDocComment` to process.
+     *
+     * @return A `PsiDocComment` representing the resulting HTML.
+     */
     public PsiDocComment processDocComment(PsiDocComment docComment) {
         if ( !isEnabled() || docComment == null ) {
             return docComment;
@@ -211,6 +228,17 @@ public class DocCommentProcessor {
         return docComment;
     }
 
+    /**
+     * Generates all PlantUML diagrams in the given `PsiDocComment`. It returns a Map of
+     * file names and the URLs where the image for that file has been saved to. Use this
+     * URL for the `<img>` tag.
+     *
+     * @param docComment    The `PsiDocComment`.
+     *
+     * @return A map mapping the file names to the image URLs.
+     *
+     * @see TempFileManager#saveTempFile(byte[], String)
+     */
     private Map<String, URL> generateUmlDiagrams(PsiDocComment docComment) {
         TempFileManager tempFiles = Plugin.tempFileManager();
         Map<String, URL> urls = null;
@@ -337,14 +365,41 @@ public class DocCommentProcessor {
         tagBlock.append("\n</DD></DL>");
     }
 
+    /**
+     * Strip leading asterisks as specified by the JavaDoc specification.
+     *
+     * @param doc    The JavaDoc comment.
+     *
+     * @return A JavaDoc comment with leading asterisks stripped.
+     */
     private static String stripLead(String doc) {
         return LEADING_ASTERISK_RE.matcher(doc).replaceAll("");
     }
 
+    /**
+     * HTML-escape all asterisks in the given doc comment. After all leading asterisks
+     * have been {@link #stripLead(String) stripped}, previously non-leading asterisks
+     * would now be interpreted as leading (and therefore be ignored). Escaping them
+     * avoids this confusion.
+     *
+     * @param doc    The doc comment where leading (ignorable) asterisks have been
+     *               stripped.
+     *
+     * @return A doc comment where all asterisks have been HTML-escaped.
+     */
     private static String escapeAsterisks(String doc) {
         return doc.replace("*", "&#42;");
     }
 
+    /**
+     * Convert a given `PsiDocTag` to a string.
+     *
+     * @param docTag            The `PsiDocTag` to be converted to a string.
+     * @param stripFirstWord    `true`, if the first word should be stripped (e.g. the
+     *                          parameter name of a `@param` tag.
+     *
+     * @return The `PsiDocTag` as string.
+     */
     private static String toString(PsiDocTag docTag, boolean stripFirstWord) {
         String tagText = stripLead(docTag.getText());
         tagText = stripFirstWord(tagText)[1]; // remove the tag itself

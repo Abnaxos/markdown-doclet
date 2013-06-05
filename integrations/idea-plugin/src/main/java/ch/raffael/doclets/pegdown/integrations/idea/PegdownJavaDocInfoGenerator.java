@@ -18,18 +18,16 @@
  */
 package ch.raffael.doclets.pegdown.integrations.idea;
 
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.Method;
-import java.lang.reflect.Proxy;
-
 import com.intellij.codeInsight.javadoc.JavaDocInfoGenerator;
 import com.intellij.openapi.project.Project;
-import com.intellij.psi.PsiDocCommentOwner;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.javadoc.PsiDocComment;
 
 
 /**
+ * Overrides `generateCommonSection()` to enable rendering of doc comments using the
+ * {@link DocCommentProcessor}.
+ *
  * @author <a href="mailto:herzog@raffael.ch">Raffael Herzog</a>
  */
 public class PegdownJavaDocInfoGenerator extends JavaDocInfoGenerator {
@@ -47,36 +45,8 @@ public class PegdownJavaDocInfoGenerator extends JavaDocInfoGenerator {
 
     @Override
     public void generateCommonSection(StringBuilder buffer, PsiDocComment docComment) {
-        //for ( PsiElement elem : docComment.getDescriptionElements() ) {
-        //    System.out.println(elem);
-        //}
         docComment = processor.processDocComment(docComment);
         super.generateCommonSection(buffer, docComment);
-    }
-
-    public PsiElement wrapElement() {
-        //checkArgument(delegate instanceof PsiElement, "delegate instanceof PsiElement");
-        //checkArgument(delegate instanceof PsiDocCommentOwner, "delegate instanceof PsiDocCommentOwner");
-
-        return (PsiElement)Proxy.newProxyInstance(
-                element.getClass().getClassLoader(), element.getClass().getInterfaces(),
-                new InvocationHandler() {
-                    private PsiDocComment docComment;
-                    @Override
-                    public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-                        if ( element instanceof PsiDocCommentOwner && method.getName().equals("getDocComment") && method.getParameterTypes().length == 0 ) {
-                            PsiDocCommentOwner dco = (PsiDocCommentOwner)element;
-                            if ( docComment == null && dco.getDocComment() != null ) {
-                                docComment = processor.processDocComment(dco.getDocComment());
-                            }
-                            return docComment;
-                        }
-                        if ( method.getName().equals("getNavigationElement") && method.getParameterTypes().length == 0 ) {
-                            return proxy;
-                        }
-                        return method.invoke(element, args);
-                    }
-                });
     }
 
 }

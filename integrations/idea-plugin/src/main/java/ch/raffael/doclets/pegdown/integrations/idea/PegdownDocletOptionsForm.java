@@ -53,6 +53,8 @@ import com.intellij.util.ui.UIUtil;
 
 
 /**
+ * The project options form.
+ *
  * @author <a href="mailto:herzog@raffael.ch">Raffael Herzog</a>
  */
 public class PegdownDocletOptionsForm {
