@@ -220,7 +220,7 @@
  * IDE support
  * -----------
  *
- * There is a plugin that enables *Ctrl-Q* in
+ * There is a [plugin](http://plugins.jetbrains.com/plugin/7253) that enables *Ctrl-Q* in
  * [IntelliJ IDEA](http://www.jetbrains.com/idea/). Just download it from the plugin
  * repository ("Settings -- Plugins -- Browse Repositories"), or build it yourself (see
  * `integrations/idea-plugin/README.md`).
