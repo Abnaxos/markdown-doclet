@@ -57,7 +57,7 @@ public final class Tags {
      * Returns the original name if the tag is unknown.
      *
      * @param name    The tag's name.
-     *                
+     *
      * @return The kind of the tag.
      *
      * @see com.sun.javadoc.Tag#kind()
@@ -117,7 +117,7 @@ public final class Tags {
      *
      * @return The String with all inline tags re-inserted.
      *
-     * @see #extractInlineTags(String, java.util.List) 
+     * @see #extractInlineTags(String, java.util.List)
      */
     public static String insertInlineTags(String comment, List<String> tags) {
         StringBuffer result = new StringBuffer();
@@ -131,7 +131,7 @@ public final class Tags {
             else {
                 tag = "{@}";
             }
-            matcher.appendReplacement(result, tag);
+            matcher.appendReplacement(result, Matcher.quoteReplacement(tag));
         }
         matcher.appendTail(result);
         return result.toString();
