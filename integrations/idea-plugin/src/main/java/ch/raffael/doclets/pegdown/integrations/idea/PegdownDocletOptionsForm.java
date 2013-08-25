@@ -51,6 +51,7 @@ import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.util.ui.UIUtil;
 
+import lombok.EqualsAndHashCode;
 
 /**
  * The project options form.
@@ -174,35 +175,12 @@ public class PegdownDocletOptionsForm {
         }
     }
 
+    @EqualsAndHashCode
     private class ModuleTableEntry {
         private final Module module;
         private PegdownOptions options;
         private ModuleTableEntry(Module module) {
             this.module = module;
-        }
-        @Override
-        public boolean equals(Object o) {
-            if ( this == o ) {
-                return true;
-            }
-            if ( o == null || getClass() != o.getClass() ) {
-                return false;
-            }
-
-            ModuleTableEntry that = (ModuleTableEntry)o;
-            if ( options != null ? !options.equals(that.options) : that.options != null ) {
-                return false;
-            }
-            if ( !module.equals(that.module) ) {
-                return false;
-            }
-            return true;
-        }
-        @Override
-        public int hashCode() {
-            int result = module.hashCode();
-            result = 31 * result + (options != null ? options.hashCode() : 0);
-            return result;
         }
     }
 

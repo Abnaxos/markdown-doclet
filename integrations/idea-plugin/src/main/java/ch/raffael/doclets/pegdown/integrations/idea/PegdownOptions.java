@@ -21,6 +21,7 @@ package ch.raffael.doclets.pegdown.integrations.idea;
 import org.pegdown.Extensions;
 
 import ch.raffael.doclets.pegdown.Options;
+import lombok.EqualsAndHashCode;
 
 
 /**
@@ -91,6 +92,7 @@ public class PegdownOptions {
     /**
      * Holds the rendering options.
      */
+    @EqualsAndHashCode
     public static class RenderingOptions {
 
         public boolean autolinks = true;
@@ -154,64 +156,6 @@ public class PegdownOptions {
             else {
                 return first;
             }
-        }
-
-
-        @Override
-        public boolean equals(Object o) {
-            if ( this == o ) {
-                return true;
-            }
-            if ( o == null || getClass() != o.getClass() ) {
-                return false;
-            }
-            RenderingOptions that = (RenderingOptions)o;
-            if ( abbreviations != that.abbreviations ) {
-                return false;
-            }
-            if ( autolinks != that.autolinks ) {
-                return false;
-            }
-            if ( definitions != that.definitions ) {
-                return false;
-            }
-            if ( fencedCodeBlocks != that.fencedCodeBlocks ) {
-                return false;
-            }
-            if ( noHtmlBlocks != that.noHtmlBlocks ) {
-                return false;
-            }
-            if ( noInlineHtml != that.noInlineHtml ) {
-                return false;
-            }
-            if ( quotes != that.quotes ) {
-                return false;
-            }
-            if ( smarts != that.smarts ) {
-                return false;
-            }
-            if ( tables != that.tables ) {
-                return false;
-            }
-            if ( wikiLinks != that.wikiLinks ) {
-                return false;
-            }
-            return true;
-        }
-
-        @Override
-        public int hashCode() {
-            int result = (autolinks ? 1 : 0);
-            result = 31 * result + (definitions ? 1 : 0);
-            result = 31 * result + (quotes ? 1 : 0);
-            result = 31 * result + (smarts ? 1 : 0);
-            result = 31 * result + (tables ? 1 : 0);
-            result = 31 * result + (wikiLinks ? 1 : 0);
-            result = 31 * result + (fencedCodeBlocks ? 1 : 0);
-            result = 31 * result + (abbreviations ? 1 : 0);
-            result = 31 * result + (noHtmlBlocks ? 1 : 0);
-            result = 31 * result + (noInlineHtml ? 1 : 0);
-            return result;
         }
 
         public void applyTo(Options options) {
