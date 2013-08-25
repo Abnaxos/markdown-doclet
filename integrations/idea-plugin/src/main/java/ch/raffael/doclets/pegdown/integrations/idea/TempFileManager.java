@@ -84,7 +84,7 @@ public class TempFileManager implements ApplicationComponent {
                     .build());
         }
     };
-    private final Map<String, Long> index = new HashMap<>();
+    private final Map<String, Long> index = new HashMap<String, Long>();
 
     public TempFileManager() {
     }

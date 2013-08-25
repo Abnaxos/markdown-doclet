@@ -69,7 +69,7 @@ public class PegdownDocletOptionsForm {
     private final Project project;
     private PegdownOptions projectOptions;
 
-    private final List<ModuleTableEntry> modules = new ArrayList<>();
+    private final List<ModuleTableEntry> modules = new ArrayList<ModuleTableEntry>();
     private final ModulesTableModel modulesTableModel = new ModulesTableModel();
 
     public PegdownDocletOptionsForm(Project project) {
@@ -208,13 +208,13 @@ public class PegdownDocletOptionsForm {
 
     private class CellRenderer extends JPanel implements TableCellRenderer, TableCellEditor {
         private final DefaultTableCellRenderer listRenderer = new DefaultTableCellRenderer();
-        private final JComboBox<String> confComboBox = new JComboBox<>();
+        private final JComboBox<String> confComboBox = new JComboBox<String>();
         private final JButton renderOptions = new JButton("Options...");
         private final RenderingOptionsForm.OptionsAction optionsAction = new RenderingOptionsForm.OptionsAction();
 
         private ModuleTableEntry entry;
 
-        private final CopyOnWriteArrayList<CellEditorListener> listeners = new CopyOnWriteArrayList<>();
+        private final CopyOnWriteArrayList<CellEditorListener> listeners = new CopyOnWriteArrayList<CellEditorListener>();
 
         private CellRenderer() {
             super(new BorderLayout());

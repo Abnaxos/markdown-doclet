@@ -49,18 +49,27 @@ import static com.google.common.base.Objects.*;
  */
 public class Options {
 
-    public static final String OPT_EXTENSIONS = "-extensions";
-    public static final String OPT_DISABLE_HIGHLIGHT = "-disable-highlight";
-    public static final String OPT_ENABLE_AUTO_HIGHLIGHT = "-enable-auto-highlight";
-    public static final String OPT_HIGHLIGHT_STYLE = "-highlight-style";
-    public static final String OPT_PLANTUML_CONFIG = "-plantuml-config";
-    public static final String OPT_PARSE_TIMEOUT = "-parse-timeout";
-    public static final String OPT_ENCODING = "-encoding";
-    public static final String OPT_OVERVIEW = "-overview";
-    public static final String OPT_OUTPUT_DIR = "-d";
-    public static final String OPT_STYLESHEETFILE = "-stylesheetfile";
-    public static final String OPT_TODO_TITLE = "-todo-title";
+    enum OptionsString {
+        OPT_EXTENSIONS("-extensions"),
+        OPT_DISABLE_HIGHLIGHT("-disable-highlight"),
+        OPT_ENABLE_AUTO_HIGHLIGHT("-enable-auto-highlight"),
+        OPT_HIGHLIGHT_STYLE("-highlight-style"),
+        OPT_PLANTUML_CONFIG("-plantuml-config"),
+        OPT_PARSE_TIMEOUT("-parse-timeout"),
+        OPT_ENCODING("-encoding"),
+        OPT_OVERVIEW("-overview"),
+        OPT_OUTPUT_DIR("-d"),
+        OPT_STYLESHEETFILE("-stylesheetfile"),
+        OPT_TODO_TITLE("-todo-title");
 
+        final private String value;
+
+        OptionsString(String s) {
+            value = s;
+        }
+
+    }
+    
     private static final Pattern LINE_START = Pattern.compile("^ ", Pattern.MULTILINE);
     private static final Pattern MARKERS = Pattern.compile("\\020[et]");
 
@@ -99,7 +108,7 @@ public class Options {
     private LinkRenderer linkRenderer = null;
     private PegDownProcessor processor = null;
 
-    private Set<Integer> consumedOptions = new HashSet<>();
+    private Set<Integer> consumedOptions = new HashSet<Integer>();
 
     public Options() {
     }
@@ -126,9 +135,9 @@ public class Options {
         consumedOptions.clear();
         for ( int i = 0; i < options.length; i++ ) {
             String[] opt = options[i];
-            if ( opt[0].equals(OPT_EXTENSIONS) ) {
+            if ( opt[0].equals(OptionsString.OPT_EXTENSIONS) ) {
                 if ( pegdownExtensions != null ) {
-                    errorReporter.printError("Only one " + OPT_EXTENSIONS + " option allowed");
+                    errorReporter.printError("Only one " + OptionsString.OPT_EXTENSIONS + " option allowed");
                     return false;
                 }
                 try {
@@ -140,31 +149,31 @@ public class Options {
                 }
                 consumeOption(i);
             }
-            else if ( opt[0].equals(OPT_DISABLE_HIGHLIGHT) ) {
+            else if ( opt[0].equals(OptionsString.OPT_DISABLE_HIGHLIGHT) ) {
                 highlightEnabled = false;
                 consumeOption(i);
             }
-            else if ( opt[0].equals(OPT_ENABLE_AUTO_HIGHLIGHT) ) {
+            else if ( opt[0].equals(OptionsString.OPT_ENABLE_AUTO_HIGHLIGHT) ) {
                 autoHighlightEnabled = true;
                 consumeOption(i);
             }
-            else if ( opt[0].equals(OPT_HIGHLIGHT_STYLE) ) {
+            else if ( opt[0].equals(OptionsString.OPT_HIGHLIGHT_STYLE) ) {
                 if ( highlightStyle != null ) {
-                    errorReporter.printError("Only one " + OPT_HIGHLIGHT_STYLE + " option allowed");
+                    errorReporter.printError("Only one " + OptionsString.OPT_HIGHLIGHT_STYLE + " option allowed");
                     return false;
                 }
                 highlightStyle = opt[1];
                 consumeOption(i);
             }
-            else if ( opt[0].equals(OPT_PLANTUML_CONFIG) ) {
+            else if ( opt[0].equals(OptionsString.OPT_PLANTUML_CONFIG) ) {
                 if ( plantUmlConfigFile != null ) {
-                    errorReporter.printError("Only one " + OPT_PLANTUML_CONFIG + " option allowed");
+                    errorReporter.printError("Only one " + OptionsString.OPT_PLANTUML_CONFIG + " option allowed");
                     return false;
                 }
                 setPlantUmlConfigFile(new File(opt[1]));
                 consumeOption(i);
             }
-            else if ( opt[0].equals(OPT_PARSE_TIMEOUT) ) {
+            else if ( opt[0].equals(OptionsString.OPT_PARSE_TIMEOUT) ) {
                 if ( parseTimeout != null ) {
                     errorReporter.printError("Only one -parse-timeout option allowed");
                     return false;
@@ -177,7 +186,7 @@ public class Options {
                 parseTimeout = millis.longValue();
                 consumeOption(i);
             }
-            else if ( opt[0].equals(OPT_ENCODING) ) {
+            else if ( opt[0].equals(OptionsString.OPT_ENCODING) ) {
                 try {
                     encoding = Charset.forName(opt[1]);
                 }
@@ -186,29 +195,29 @@ public class Options {
                     return false;
                 }
             }
-            else if ( opt[0].equals(OPT_OVERVIEW) ) {
+            else if ( opt[0].equals(OptionsString.OPT_OVERVIEW) ) {
                 if ( getOverviewFile() != null ) {
-                    errorReporter.printError(OPT_OVERVIEW + " may only be specified once");
+                    errorReporter.printError(OptionsString.OPT_OVERVIEW + " may only be specified once");
                     return false;
                 }
                 setOverviewFile(new File(opt[1]));
                 consumeOption(i);
             }
-            else if ( opt[0].equals(OPT_OUTPUT_DIR) ) {
+            else if ( opt[0].equals(OptionsString.OPT_OUTPUT_DIR) ) {
                 if ( destinationDir != null ) {
-                    errorReporter.printError(OPT_OUTPUT_DIR + " may only be specified once");
+                    errorReporter.printError(OptionsString.OPT_OUTPUT_DIR + " may only be specified once");
                 }
                 setDestinationDir(new File(opt[1]));
             }
-            else if ( opt[0].equals(OPT_STYLESHEETFILE) ) {
+            else if ( opt[0].equals(OptionsString.OPT_STYLESHEETFILE) ) {
                 if ( stylesheetFile != null ) {
-                    errorReporter.printError(OPT_STYLESHEETFILE + " may only specified once");
+                    errorReporter.printError(OptionsString.OPT_STYLESHEETFILE + " may only specified once");
                 }
                 setStylesheetFile(new File(opt[1]));
             }
-            else if ( opt[0].equals(OPT_TODO_TITLE) ) {
+            else if ( opt[0].equals(OptionsString.OPT_TODO_TITLE) ) {
                 if ( todoTitle != null ) {
-                    errorReporter.printError(OPT_TODO_TITLE + " may only specified once");
+                    errorReporter.printError(OptionsString.OPT_TODO_TITLE + " may only specified once");
                 }
                 setTodoTitle(todoTitle);
                 consumeOption(i);
@@ -221,7 +230,7 @@ public class Options {
             setPegdownExtensions(DEFAULT_PEGDOWN_EXTENSIONS);
         }
         if ( !consumedOptions.isEmpty() ) {
-            ArrayList<String[]> consuming = new ArrayList<>(Arrays.asList(options));
+            ArrayList<String[]> consuming = new ArrayList<String[]>(Arrays.asList(options));
             for ( int i : Ordering.natural().reverse().sortedCopy(consumedOptions) ) {
                 consuming.remove(i);
             }
@@ -478,7 +487,7 @@ public class Options {
         if ( fixLeadingSpaces ) {
             markup = LINE_START.matcher(markup).replaceAll("");
         }
-        List<String> tags = new ArrayList<>();
+        List<String> tags = new ArrayList<String>();
         String html = createDocletSerializer().toHtml(processor.parseMarkdown(Tags.extractInlineTags(markup, tags).toCharArray()));
         return Tags.insertInlineTags(html, tags);
     }
@@ -504,7 +513,13 @@ public class Options {
     }
 
     public static int optionLength(String option) {
-        switch ( option ) {
+        OptionsString optionsString;
+        try {
+            optionsString = OptionsString.valueOf(option);
+        } catch (IllegalArgumentException e){
+            return Standard.optionLength(option);
+        }
+        switch ( optionsString ) {
             case OPT_EXTENSIONS:
             case OPT_PLANTUML_CONFIG:
             case OPT_HIGHLIGHT_STYLE:
@@ -547,7 +562,7 @@ public class Options {
         for ( String ext : Splitter.on(',').trimResults().omitEmptyStrings().split(extensions) ) {
             try {
                 Field f = Extensions.class.getField(ext.replace('-', '_').toUpperCase());
-                result |= (int)f.get(null);
+                result |= ((Integer)f.get(null)).intValue();
             }
             catch ( NoSuchFieldException e ) {
                 throw new IllegalArgumentException("No such extension: " + ext);

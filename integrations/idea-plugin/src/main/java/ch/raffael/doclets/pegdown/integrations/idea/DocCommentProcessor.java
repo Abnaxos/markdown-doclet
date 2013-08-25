@@ -187,25 +187,20 @@ public class DocCommentProcessor {
             }
             else if ( elem instanceof PsiDocTag ) {
                 PsiDocTag docTag = (PsiDocTag)elem;
-                switch ( docTag.getName() ) {
-                    case "see":
-                        tagBlock.append('\n');
-                        renderSeeTag(doclet, tagBlock, docTag);
-                        break;
-                    case "param":
-                    case "throws":
-                    case "exception":
-                        renderSimpleTag(doclet, tagBlock, docTag, true);
-                        break;
-                    case "return":
-                        renderSimpleTag(doclet, tagBlock, docTag, false);
-                        break;
-                    case "todo":
-                        renderTodoTag(doclet, tagBlock, docTag);
-                        break;
-                    default:
-                        tagBlock.append('\n').append(stripLead(elem.getText()));
-                        break;
+                String docTagName = docTag.getName();
+                if ("see".equals(docTagName)) {
+                    tagBlock.append('\n');
+                    renderSeeTag(doclet, tagBlock, docTag);
+                } else if ("param".equals(docTagName) || "throws".equals(docTagName) || "exception"
+                    .equals(docTagName)) {
+                    renderSimpleTag(doclet, tagBlock, docTag, true);
+                } else if ("return".equals(docTagName)) {
+                    renderSimpleTag(doclet, tagBlock, docTag, false);
+
+                } else if ("todo".equals(docTagName)) {
+                    renderTodoTag(doclet, tagBlock, docTag);
+                } else {
+                    tagBlock.append('\n').append(stripLead(elem.getText()));
                 }
             }
             else {
@@ -248,7 +243,7 @@ public class DocCommentProcessor {
             }
             else if ( tag.getName().equals("uml") || tag.getName().equals("startuml") ) {
                 if ( urls == null ) {
-                    urls = new HashMap<>();
+                    urls = new HashMap<String, URL>();
                 }
                 String text = stripLead(tag.getText());
                 text = stripFirstWord(text)[1];

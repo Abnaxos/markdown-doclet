@@ -62,9 +62,9 @@ public class PegdownDoclet implements DocErrorReporter {
             "<script type=\"text/javascript\" src=\"" + "{@docRoot}/highlight.pack.js" + "\"></script>\n"
             + "<script type=\"text/javascript\"><!--\nhljs.initHighlightingOnLoad();\n//--></script>";
 
-    private final Map<String, TagRenderer<?>> tagRenderers = new HashMap<>();
+    private final Map<String, TagRenderer<?>> tagRenderers = new HashMap<String, TagRenderer<?>>();
 
-    private final Set<PackageDoc> packages = new HashSet<>();
+    private final Set<PackageDoc> packages = new HashSet<PackageDoc>();
     private final Options options;
     private final RootDoc rootDoc;
 
@@ -248,15 +248,10 @@ public class PegdownDoclet implements DocErrorReporter {
     }
 
     private boolean copyResource(String resource, String destination, String description) {
-        try (
-                InputStream in = PegdownDoclet.class.getResourceAsStream(resource);
-                OutputStream out = new FileOutputStream(new File(options.getDestinationDir(), destination))
-        )
-        {
-            ByteStreams.copy(in, out);
+        try {
+            Files.copy(new File(resource), new File(options.getDestinationDir(), destination));
             return true;
-        }
-        catch ( IOException e ) {
+        } catch (IOException e) {
             printError("Error writing " + description + ": " + e.getLocalizedMessage());
             return false;
         }
