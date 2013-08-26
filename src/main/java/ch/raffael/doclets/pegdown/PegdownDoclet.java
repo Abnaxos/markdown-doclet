@@ -68,6 +68,8 @@ public class PegdownDoclet implements DocErrorReporter {
     private final Options options;
     private final RootDoc rootDoc;
 
+    private final SeeTagRenderer seeTagRenderer = new SeeTagRenderer();
+
     private boolean error = false;
 
     /**
@@ -86,7 +88,7 @@ public class PegdownDoclet implements DocErrorReporter {
         tagRenderers.put("@since", SimpleTagRenderer.INSTANCE);
         tagRenderers.put("@param", ParamTagRenderer.INSTANCE);
         tagRenderers.put("@throws", ThrowsTagRenderer.INSTANCE);
-        tagRenderers.put("@see", SeeTagRenderer.INSTANCE);
+        tagRenderers.put("@see", seeTagRenderer);
         UmlTagRenderer umlTagRenderer = new UmlTagRenderer();
         tagRenderers.put("@uml", umlTagRenderer);
         tagRenderers.put("@startuml", umlTagRenderer);

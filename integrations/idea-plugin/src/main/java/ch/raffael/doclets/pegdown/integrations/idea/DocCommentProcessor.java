@@ -81,6 +81,8 @@ public class DocCommentProcessor {
     private final Project project;
     private final PegdownOptions.RenderingOptions pegdownOptions;
 
+    private final SeeTagRenderer seeTagRenderer = new SeeTagRenderer();
+
     public DocCommentProcessor(PsiFile file) {
         this.file = file;
         if ( file == null ) {
@@ -330,7 +332,7 @@ public class DocCommentProcessor {
                     return null;
                 }
             };
-            SeeTagRenderer.INSTANCE.render(tag, tagBlock, doclet);
+            seeTagRenderer.render(tag, tagBlock, doclet);
         }
         else {
             tagBlock.append("\n@").append(docTag.getName());

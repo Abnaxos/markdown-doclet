@@ -33,11 +33,19 @@ import org.pegdown.FastEncoder;
  */
 public class SeeTagRenderer implements TagRenderer<SeeTag> {
 
-    public static final SeeTagRenderer INSTANCE = new SeeTagRenderer();
+    private final Pattern SIMPLE_LINK;
+    private final Pattern FULL_LINK;
+    private final Pattern WIKI_LINK;
 
-    private static final Pattern SIMPLE_LINK = Pattern.compile("(?<label>[^<]*)<(?<url>[^>]+)>");
-    private static final Pattern FULL_LINK = Pattern.compile("\\[(?<label>[^)]+)\\]\\((?<url>[^]\\s]+)\\)");
-    private static final Pattern WIKI_LINK = Pattern.compile("\\[\\[\\s*(?<url>[^]\\s]+)(?<label>\\s+[^]]*)?\\]\\]");
+    public SeeTagRenderer() {
+//        SIMPLE_LINK = Pattern.compile("(?<label>[^<]*)<(?<url>[^>]+)>");
+//        FULL_LINK = Pattern.compile("\\[(?<label>[^)]+)\\]\\((?<url>[^]\\s]+)\\)");
+//        WIKI_LINK = Pattern.compile("\\[\\[\\s*(?<url>[^]\\s]+)(?<label>\\s+[^]]*)?\\]\\]");
+        SIMPLE_LINK = Pattern.compile("");
+        FULL_LINK = Pattern.compile("");
+        WIKI_LINK = Pattern.compile("");
+
+    }
 
     @Override
     public void render(SeeTag tag, StringBuilder target, PegdownDoclet doclet) {
