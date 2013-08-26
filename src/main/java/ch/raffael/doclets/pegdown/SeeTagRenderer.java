@@ -38,17 +38,14 @@ public class SeeTagRenderer implements TagRenderer<SeeTag> {
     private final Pattern WIKI_LINK;
 
     public SeeTagRenderer() {
-//        SIMPLE_LINK = Pattern.compile("(?<label>[^<]*)<(?<url>[^>]+)>");
-//        FULL_LINK = Pattern.compile("\\[(?<label>[^)]+)\\]\\((?<url>[^]\\s]+)\\)");
-//        WIKI_LINK = Pattern.compile("\\[\\[\\s*(?<url>[^]\\s]+)(?<label>\\s+[^]]*)?\\]\\]");
-        SIMPLE_LINK = Pattern.compile("");
-        FULL_LINK = Pattern.compile("");
-        WIKI_LINK = Pattern.compile("");
-
+        SIMPLE_LINK = Pattern.compile("([^<]*)<([^>]+)>");
+        FULL_LINK = Pattern.compile("\\[([^)]+)\\]\\(([^]\\s]+)\\)");
+        WIKI_LINK = Pattern.compile("\\[\\[\\s*([^]\\s]+)(\\s+[^]]*)?\\]\\]");
     }
 
     @Override
     public void render(SeeTag tag, StringBuilder target, PegdownDoclet doclet) {
+        boolean wikiLink = false;
         if ( tag.text().startsWith("\"") && tag.text().endsWith("\"") && tag.text().length() > 1 ) {
             String text = tag.text().substring(1, tag.text().length() - 1).trim();
             Matcher matcher = SIMPLE_LINK.matcher(text);
@@ -57,6 +54,7 @@ public class SeeTagRenderer implements TagRenderer<SeeTag> {
                 if ( !matcher.matches() ) {
                     if ( (doclet.getOptions().getPegdownExtensions() & Extensions.WIKILINKS) != 0 ) {
                         matcher = WIKI_LINK.matcher(text);
+                        wikiLink = matcher.matches();
                         if ( !matcher.matches() ) {
                             VERBATIM.render(tag, target, doclet);
                             return;
@@ -69,14 +67,22 @@ public class SeeTagRenderer implements TagRenderer<SeeTag> {
                 }
             }
             target.append(tag.name()).append(' ').append("<a href=\"");
-            FastEncoder.encode(matcher.group("url"), target);
+            int urlIndex, labelIndex;
+            if (wikiLink) {
+                urlIndex = 1;
+                labelIndex = 2;
+            } else {
+                urlIndex = 2;
+                labelIndex = 1;
+            }
+            FastEncoder.encode(matcher.group(urlIndex), target);
             target.append("\">");
-            String label = matcher.group("label");
+            String label = matcher.group(labelIndex);
             if ( label != null ) {
                 label = label.trim();
             }
             if ( label == null || label.isEmpty() ) {
-                label = matcher.group("url");
+                label = matcher.group(urlIndex);
             }
             FastEncoder.encode(label, target);
             target.append("</a>");
