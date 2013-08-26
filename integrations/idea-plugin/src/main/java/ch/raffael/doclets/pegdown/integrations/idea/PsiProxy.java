@@ -157,7 +157,7 @@ public abstract class PsiProxy<T> {
     @SafeVarargs
     @SuppressWarnings("unchecked")
     private static <T> T proxy(T delegate, Interceptor<? super T>... interceptors) {
-        Set<Class> interfaces = new HashSet<>();
+        Set<Class> interfaces = new HashSet<Class>();
         Class clazz = delegate.getClass();
         while ( !clazz.equals(Object.class) ) {
             interfaces.addAll(Arrays.asList(clazz.getInterfaces()));

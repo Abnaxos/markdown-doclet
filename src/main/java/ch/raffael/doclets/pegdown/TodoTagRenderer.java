@@ -50,7 +50,7 @@ public class TodoTagRenderer implements TagRenderer<Tag> {
 
     public static final TodoTagRenderer INSTANCE = new TodoTagRenderer();
 
-    private final Map<Doc, Counter> counters = new HashMap<>();
+    private final Map<Doc, Counter> counters = new HashMap<Doc, Counter>();
 
     /**
      * Render the tag.

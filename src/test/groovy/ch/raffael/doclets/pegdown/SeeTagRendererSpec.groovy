@@ -83,7 +83,8 @@ class SeeTagRendererSpec extends Specification {
     private String render(SeeTag tag, Options options=new Options()) {
         def doclet = new PegdownDoclet(options, Stub(RootDoc))
         def buf = new StringBuilder()
-        new SeeTagRenderer().render(tag, buf, doclet)
+        def renderer = new SeeTagRenderer()
+        renderer.render(tag, buf, doclet)
         result = buf.toString()
         return result
     }
