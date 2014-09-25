@@ -1,0 +1,21 @@
+version = '1.1-SNAPSHOT'
+
+dependencies {
+    compile project.ext.docletProject
+
+    provided fileTree(dir: "${ideaHome}/lib", include: '*.jar')
+    provided project.ext.jdkTools
+}
+
+tasks.jar {
+    from {
+        configurations.runtime.collect { p ->
+            p.isDirectory() ? p : zipTree(p)
+        }
+    }
+}
+
+tasks.processResources {
+    expand(version: project.version)
+    //filter(ReplaceTokens, [ version: project.version ])
+}

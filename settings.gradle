@@ -1,0 +1,3 @@
+include 'integrations:idea-plugin'
+
+rootProject.name = 'pegdown-doclet'

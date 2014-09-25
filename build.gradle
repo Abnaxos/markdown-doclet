@@ -1,0 +1,195 @@
+/*
+ * Copyright 2014 Raffael Herzog
+ *
+ * This file is part of pegdown-doclet.
+ *
+ * pegdown-doclet is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * pegdown-doclet is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with pegdown-doclet.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+apply plugin:'wrapper'
+apply plugin:'signing'
+
+allprojects {
+    group = 'ch.raffael.pegdown-doclet'
+}
+version = '1.2-SNAPSHOT'
+
+wrapper {
+    gradleVersion = '2.1'
+}
+
+allprojects {
+
+    apply plugin:'java'
+    apply plugin:'groovy'
+    apply plugin:'maven'
+    apply plugin:'idea'
+
+    repositories {
+        mavenLocal()
+        jcenter()
+    }
+
+    configurations {
+        provided
+    }
+
+    sourceSets {
+        main {
+            compileClasspath += configurations.provided
+        }
+        test {
+            compileClasspath += configurations.provided
+        }
+    }
+
+    tasks.test {
+        classpath += configurations.provided
+    }
+
+    dependencies {
+        testCompile group:'org.codehaus.groovy', name:'groovy-all', version:'2.3.4'
+        testCompile('org.spockframework:spock-core:0.7-groovy-2.0') {
+            exclude group:'org.codehaus.groovy'
+        }
+        testCompile group:'cglib', name:'cglib-nodep', version:'3.1'
+    }
+
+    ext {
+        docletProject = rootProject
+    }
+    project.ext.jdkTools = files("${System.properties['java.home']}/../lib/tools.jar")
+
+    sourceCompatibility = '1.7'
+    buildDir = 'target'
+    //archivesBaseName = 'pegdown-doclet'
+    if ( !project == rootProject ) {
+        archivesBaseName += "-${project.name}"
+    }
+
+    idea.module {
+        scopes.PROVIDED.plus += [project.configurations.provided]
+    }
+
+}
+
+
+dependencies {
+    compile group:'org.pegdown', name:'pegdown', version:'1.4.1'
+    compile group:'com.google.guava', name:'guava', version:'18.0'
+    compile group:'net.sourceforge.plantuml', name:'plantuml', version:'8007'
+
+    provided project.ext.jdkTools
+}
+
+task allJar(type: Jar, dependsOn: jar) {
+    classifier = 'all'
+    from {
+        zipTree(jar.archivePath)
+    }
+    from {
+        configurations.runtime.collect {
+            it.isDirectory() ? it : zipTree(it)
+        }
+    }
+}
+
+task javadocJar(type: Jar) {
+    classifier = 'javadoc'
+    from javadoc
+}
+
+task sourceJar(type: Jar) {
+    classifier = 'source'
+    from sourceSets.main.allSource
+}
+
+artifacts {
+    archives allJar, javadocJar, sourceJar
+}
+
+javadoc.dependsOn classes
+javadoc {
+
+    classpath += configurations.provided
+
+    options {
+        docletpath = (sourceSets.main.output + sourceSets.main.compileClasspath) as List
+        doclet = 'ch.raffael.doclets.pegdown.PegdownDoclet'
+        overview = file('src/main/javadoc/overview.md')
+        linkSource = true
+        links = [
+                'http://docs.oracle.com/javase/7/docs/api/',
+                'http://docs.oracle.com/javase/7/docs/jdk/api/javadoc/doclet',
+                'http://www.decodified.com/pegdown/api'
+        ]
+        footer = """
+              <a href="https://github.com/Abnaxos/pegdown-doclet/" target="_top">
+                <img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png" alt="Fork me on GitHub">
+              </a>
+              """
+    }
+}
+
+
+// OSSRH deployment
+
+signing {
+    sign configurations.archives
+}
+
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+
+            repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
+                authentication(userName: ossrhUsername, password: ossrhPassword)
+            }
+
+            snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
+                authentication(userName: ossrhUsername, password: ossrhPassword)
+            }
+
+            pom.project {
+                name 'Pegdown Doclet'
+                description 'A Doclet that allows the use of Markdown and PlantUML in JavaDoc comments.'
+                url 'https://github.com/Abnaxos/pegdown-doclet'
+                packaging 'jar'
+
+                developers {
+                    developer {
+                        id 'Abnaxos'
+                        name 'Raffael Herzog'
+                        email 'herzog@raffael.ch'
+                        timezone '+1'
+                    }
+                }
+
+                licenses {
+                    license {
+                        name 'GPL 3.0'
+                        url 'http://www.gnu.org/licenses/gpl-3.0-standalone.html'
+                        distribution 'repo'
+                    }
+                }
+
+                scm {
+                    url 'https://github.com/Abnaxos/pegdown-doclet'
+                    connection 'scm:git:https://github.com/Abnaxos/pegdown-doclet.git'
+                }
+            }
+        }
+    }
+}

@@ -39,7 +39,7 @@ import org.pegdown.LinkRenderer;
 import org.pegdown.PegDownProcessor;
 import org.pegdown.ToHtmlSerializer;
 
-import static com.google.common.base.Objects.*;
+import static com.google.common.base.MoreObjects.*;
 
 
 /**

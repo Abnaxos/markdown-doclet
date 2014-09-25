@@ -92,11 +92,11 @@ public class TempFileManager implements ApplicationComponent {
     public synchronized void initComponent() {
         baseDir = new File(PathManager.getPluginTempPath(), "pegdown-doclet-idea");
         cleanup();
-        cleanupService.start();
+        cleanupService.startAsync().awaitRunning();
     }
 
     public synchronized void disposeComponent() {
-        cleanupService.stopAndWait();
+        cleanupService.stopAsync().awaitTerminated();
         cleanup();
     }
 
