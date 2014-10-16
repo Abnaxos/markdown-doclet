@@ -1,3 +1,4 @@
 include 'integrations:idea-plugin'
+include 'integrations:gradle-plugin'
 
 rootProject.name = 'pegdown-doclet'
