@@ -5,17 +5,17 @@ import org.gradle.api.Project
 import org.gradle.api.tasks.javadoc.Javadoc
 
 class PegdownDocletPlugin implements Plugin<Project> {
-    final def CONFGURATION_NAME = "pegdownDoclet"
+    final def CONFIGURATION_NAME = "pegdownDoclet"
 
     void apply(Project project) {
         // make sure the java plugin is applied
         project.plugins.apply('java')
 
         // create a new configuration for the doclet dependency
-        def config = project.configurations.create(CONFGURATION_NAME)
+        def config = project.configurations.create(CONFIGURATION_NAME)
 
         // add the doclet dependency
-        project.dependencies.add(CONFGURATION_NAME, 'ch.raffael.pegdown-doclet:pegdown-doclet:1.1.1')
+        project.dependencies.add(CONFIGURATION_NAME, 'ch.raffael.pegdown-doclet:pegdown-doclet:1.1.1')
 
         // after the user buildscript is evaluated ...
         project.gradle.projectsEvaluated {
