@@ -59,6 +59,7 @@ public class Options {
     public static final String OPT_OVERVIEW = "-overview";
     public static final String OPT_OUTPUT_DIR = "-d";
     public static final String OPT_STYLESHEETFILE = "-stylesheetfile";
+    public static final String OPT_JAVADOCVERSION = "-javadocversion";
     public static final String OPT_TODO_TITLE = "-todo-title";
 
     private static final Pattern LINE_START = Pattern.compile("^ ", Pattern.MULTILINE);
@@ -89,6 +90,7 @@ public class Options {
     private Charset encoding = null;
     private File destinationDir = null;
     private File stylesheetFile = null;
+    private JavadocQuirks javadocVersion = null;
     private File plantUmlConfigFile = null;
     private boolean highlightEnabled = true;
     private boolean autoHighlightEnabled = false;
@@ -155,6 +157,7 @@ public class Options {
                 }
                 highlightStyle = opt[1];
                 consumeOption(i);
+                consumeOption(i + 1);
             }
             else if ( opt[0].equals(OPT_PLANTUML_CONFIG) ) {
                 if ( plantUmlConfigFile != null ) {
@@ -205,6 +208,17 @@ public class Options {
                     errorReporter.printError(OPT_STYLESHEETFILE + " may only specified once");
                 }
                 setStylesheetFile(new File(opt[1]));
+            }
+            else if ( opt[0].equals(OPT_JAVADOCVERSION) ) {
+                if ( javadocVersion != null ) {
+                    errorReporter.printError(OPT_JAVADOCVERSION + " may only specified once");
+                }
+                try {
+                    setJavadocVersion(JavadocQuirks.valueOf(opt[1].toUpperCase()));
+                }
+                catch ( IllegalArgumentException e ) {
+                    errorReporter.printError("Unknown value " + opt[1] + " for " + OPT_JAVADOCVERSION);
+                }
             }
             else if ( opt[0].equals(OPT_TODO_TITLE) ) {
                 if ( todoTitle != null ) {
@@ -349,6 +363,33 @@ public class Options {
      */
     public void setStylesheetFile(File stylesheetFile) {
         this.stylesheetFile = stylesheetFile;
+    }
+
+    /**
+     * Gets the Javadoc version.
+     *
+     * @return The Javadoc version.
+     */
+    public JavadocQuirks getJavadocVersion() {
+        if ( javadocVersion == null ) {
+            String javaVersion = System.getProperty("java.version");
+            if ( javaVersion != null && javaVersion.compareTo("1.8") >= 0 ) {
+                return JavadocQuirks.V8;
+            }
+            else {
+                return JavadocQuirks.V7;
+            }
+        }
+        return javadocVersion;
+    }
+
+    /**
+     * Sets the Javadoc version.
+     *
+     * @param javadocVersion    The Javadoc version or `null` to determine the version automatically.
+     */
+    public void setJavadocVersion(JavadocQuirks javadocVersion) {
+        this.javadocVersion = javadocVersion;
     }
 
     /**
@@ -557,6 +598,20 @@ public class Options {
             }
         }
         return result;
+    }
+
+    public enum JavadocQuirks {
+        V7("stylesheet.7.css"), V8("stylesheet.8.css");
+
+        private final String stylesheet;
+
+        JavadocQuirks(String stylesheet) {
+            this.stylesheet = stylesheet;
+        }
+
+        public String getStylesheet() {
+            return stylesheet;
+        }
     }
 
 }

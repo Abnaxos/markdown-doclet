@@ -233,7 +233,7 @@ public class PegdownDoclet implements DocErrorReporter {
     public boolean postProcess() {
         boolean success = true;
         if ( options.getStylesheetFile() == null ) {
-            success &= copyResource("stylesheet.css", "stylesheet.css", "CSS stylesheet");
+            success &= copyResource(options.getJavadocVersion().getStylesheet(), "stylesheet.css", "CSS stylesheet");
         }
         if ( options.isHighlightEnabled() ) {
             success &= copyResource("highlight.pack.7.3.js", "highlight.pack.js", "highlight.js");
