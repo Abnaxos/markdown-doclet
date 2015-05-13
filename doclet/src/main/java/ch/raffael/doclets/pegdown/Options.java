@@ -26,6 +26,8 @@ import java.nio.charset.IllegalCharsetNameException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.regex.Pattern;
@@ -101,8 +103,6 @@ public class Options {
     private LinkRenderer linkRenderer = null;
     private PegDownProcessor processor = null;
 
-    private Set<Integer> consumedOptions = new HashSet<>();
-
     public Options() {
     }
 
@@ -121,150 +121,124 @@ public class Options {
      * @param options          The command line options.
      * @param errorReporter    The error reporter for printing messages.
      *
-     * @return `true` if the options are valid.
+     * @return The options to be forwarded to the standard doclet.
      */
-    public boolean load(String[][] options, DocErrorReporter errorReporter) {
-        this.forwardedOptions = options;
-        consumedOptions.clear();
-        for ( int i = 0; i < options.length; i++ ) {
-            String[] opt = options[i];
-            if ( opt[0].equals(OPT_EXTENSIONS) ) {
-                if ( pegdownExtensions != null ) {
-                    errorReporter.printError("Only one " + OPT_EXTENSIONS + " option allowed");
-                    return false;
-                }
-                try {
-                    setPegdownExtensions(toExtensions(opt[1]));
-                }
-                catch ( IllegalArgumentException e ) {
-                    errorReporter.printError(e.getMessage());
-                    return false;
-                }
-                consumeOption(i);
+    public String[][] load(String[][] options, DocErrorReporter errorReporter) {
+        LinkedList<String[]> optionsList = new LinkedList<>(Arrays.asList(options));
+        Iterator<String[]> optionsIter = optionsList.iterator();
+        while ( optionsIter.hasNext() ) {
+            String[] opt = optionsIter.next();
+            if ( !handleOption(optionsIter, opt, errorReporter) ) {
+                return null;
             }
-            else if ( opt[0].equals(OPT_DISABLE_HIGHLIGHT) ) {
-                highlightEnabled = false;
-                consumeOption(i);
-            }
-            else if ( opt[0].equals(OPT_ENABLE_AUTO_HIGHLIGHT) ) {
-                autoHighlightEnabled = true;
-                consumeOption(i);
-            }
-            else if ( opt[0].equals(OPT_HIGHLIGHT_STYLE) ) {
-                if ( highlightStyle != null ) {
-                    errorReporter.printError("Only one " + OPT_HIGHLIGHT_STYLE + " option allowed");
-                    return false;
-                }
-                highlightStyle = opt[1];
-                consumeOption(i);
-                consumeOption(i + 1);
-            }
-            else if ( opt[0].equals(OPT_PLANTUML_CONFIG) ) {
-                if ( plantUmlConfigFile != null ) {
-                    errorReporter.printError("Only one " + OPT_PLANTUML_CONFIG + " option allowed");
-                    return false;
-                }
-                setPlantUmlConfigFile(new File(opt[1]));
-                consumeOption(i);
-            }
-            else if ( opt[0].equals(OPT_PARSE_TIMEOUT) ) {
-                if ( parseTimeout != null ) {
-                    errorReporter.printError("Only one -parse-timeout option allowed");
-                    return false;
-                }
-                BigDecimal millis = new BigDecimal(opt[1]).movePointRight(3);
-                if ( millis.compareTo(BigDecimal.ZERO) <= 0 || millis.compareTo(new BigDecimal(Long.MAX_VALUE)) > 0 ) {
-                    errorReporter.printError("Invalid timeout value: " + opt[1]);
-                    return false;
-                }
-                parseTimeout = millis.longValue();
-                consumeOption(i);
-            }
-            else if ( opt[0].equals(OPT_ENCODING) ) {
-                try {
-                    encoding = Charset.forName(opt[1]);
-                }
-                catch ( IllegalCharsetNameException e ) {
-                    errorReporter.printError("Illegal charset: " + opt[1]);
-                    return false;
-                }
-            }
-            else if ( opt[0].equals(OPT_OVERVIEW) ) {
-                if ( getOverviewFile() != null ) {
-                    errorReporter.printError(OPT_OVERVIEW + " may only be specified once");
-                    return false;
-                }
-                setOverviewFile(new File(opt[1]));
-                consumeOption(i);
-            }
-            else if ( opt[0].equals(OPT_OUTPUT_DIR) ) {
-                if ( destinationDir != null ) {
-                    errorReporter.printError(OPT_OUTPUT_DIR + " may only be specified once");
-                }
-                setDestinationDir(new File(opt[1]));
-            }
-            else if ( opt[0].equals(OPT_STYLESHEETFILE) ) {
-                if ( stylesheetFile != null ) {
-                    errorReporter.printError(OPT_STYLESHEETFILE + " may only specified once");
-                }
-                setStylesheetFile(new File(opt[1]));
-            }
-            else if ( opt[0].equals(OPT_JAVADOCVERSION) ) {
-                if ( javadocVersion != null ) {
-                    errorReporter.printError(OPT_JAVADOCVERSION + " may only specified once");
-                }
-                try {
-                    setJavadocVersion(JavadocQuirks.valueOf(opt[1].toUpperCase()));
-                }
-                catch ( IllegalArgumentException e ) {
-                    errorReporter.printError("Unknown value " + opt[1] + " for " + OPT_JAVADOCVERSION);
-                }
-            }
-            else if ( opt[0].equals(OPT_TODO_TITLE) ) {
-                if ( todoTitle != null ) {
-                    errorReporter.printError(OPT_TODO_TITLE + " may only specified once");
-                }
-                setTodoTitle(todoTitle);
-                consumeOption(i);
-            }
-        }
-        if ( !customLoad(options, errorReporter) ) {
-            return false;
         }
         if ( pegdownExtensions == null ) {
             setPegdownExtensions(DEFAULT_PEGDOWN_EXTENSIONS);
         }
-        if ( !consumedOptions.isEmpty() ) {
-            ArrayList<String[]> consuming = new ArrayList<>(Arrays.asList(options));
-            for ( int i : Ordering.natural().reverse().sortedCopy(consumedOptions) ) {
-                consuming.remove(i);
+        return optionsList.toArray(new String[optionsList.size()][]);
+    }
+
+    protected boolean handleOption(Iterator<String[]> optionsIter, String[] opt, DocErrorReporter errorReporter) {
+        if ( opt[0].equals(OPT_EXTENSIONS) ) {
+            if ( pegdownExtensions != null ) {
+                errorReporter.printError("Only one " + OPT_EXTENSIONS + " option allowed");
+                return false;
             }
-            forwardedOptions = consuming.toArray(new String[consuming.size()][]);
-            consumedOptions.clear();
+            try {
+                setPegdownExtensions(toExtensions(opt[1]));
+            }
+            catch ( IllegalArgumentException e ) {
+                errorReporter.printError(e.getMessage());
+                return false;
+            }
+            optionsIter.remove();
         }
-        return Standard.validOptions(forwardedOptions, errorReporter);
-    }
-
-    /**
-     * Hook to do some custom option processing.
-     *
-     * @param options          The command line options.
-     * @param errorReporter    An error reporter for printing messages.
-     *
-     * @return `true` if the options are valid.
-     */
-    protected boolean customLoad(String[][] options, DocErrorReporter errorReporter) {
+        else if ( opt[0].equals(OPT_DISABLE_HIGHLIGHT) ) {
+            highlightEnabled = false;
+            optionsIter.remove();
+        }
+        else if ( opt[0].equals(OPT_ENABLE_AUTO_HIGHLIGHT) ) {
+            autoHighlightEnabled = true;
+            optionsIter.remove();
+        }
+        else if ( opt[0].equals(OPT_HIGHLIGHT_STYLE) ) {
+            if ( highlightStyle != null ) {
+                errorReporter.printError("Only one " + OPT_HIGHLIGHT_STYLE + " option allowed");
+                return false;
+            }
+            highlightStyle = opt[1];
+            optionsIter.remove();
+        }
+        else if ( opt[0].equals(OPT_PLANTUML_CONFIG) ) {
+            if ( plantUmlConfigFile != null ) {
+                errorReporter.printError("Only one " + OPT_PLANTUML_CONFIG + " option allowed");
+                return false;
+            }
+            setPlantUmlConfigFile(new File(opt[1]));
+            optionsIter.remove();
+        }
+        else if ( opt[0].equals(OPT_PARSE_TIMEOUT) ) {
+            if ( parseTimeout != null ) {
+                errorReporter.printError("Only one -parse-timeout option allowed");
+                return false;
+            }
+            BigDecimal millis = new BigDecimal(opt[1]).movePointRight(3);
+            if ( millis.compareTo(BigDecimal.ZERO) <= 0 || millis.compareTo(new BigDecimal(Long.MAX_VALUE)) > 0 ) {
+                errorReporter.printError("Invalid timeout value: " + opt[1]);
+                return false;
+            }
+            parseTimeout = millis.longValue();
+            optionsIter.remove();
+        }
+        else if ( opt[0].equals(OPT_ENCODING) ) {
+            try {
+                encoding = Charset.forName(opt[1]);
+            }
+            catch ( IllegalCharsetNameException e ) {
+                errorReporter.printError("Illegal charset: " + opt[1]);
+                return false;
+            }
+        }
+        else if ( opt[0].equals(OPT_OVERVIEW) ) {
+            if ( getOverviewFile() != null ) {
+                errorReporter.printError(OPT_OVERVIEW + " may only be specified once");
+                return false;
+            }
+            setOverviewFile(new File(opt[1]));
+            optionsIter.remove();
+        }
+        else if ( opt[0].equals(OPT_OUTPUT_DIR) ) {
+            if ( destinationDir != null ) {
+                errorReporter.printError(OPT_OUTPUT_DIR + " may only be specified once");
+            }
+            setDestinationDir(new File(opt[1]));
+        }
+        else if ( opt[0].equals(OPT_STYLESHEETFILE) ) {
+            if ( stylesheetFile != null ) {
+                errorReporter.printError(OPT_STYLESHEETFILE + " may only specified once");
+            }
+            setStylesheetFile(new File(opt[1]));
+        }
+        else if ( opt[0].equals(OPT_JAVADOCVERSION) ) {
+            if ( javadocVersion != null ) {
+                errorReporter.printError(OPT_JAVADOCVERSION + " may only specified once");
+            }
+            try {
+                setJavadocVersion(JavadocQuirks.valueOf(opt[1].toUpperCase()));
+            }
+            catch ( IllegalArgumentException e ) {
+                errorReporter.printError("Unknown value " + opt[1] + " for " + OPT_JAVADOCVERSION);
+            }
+            optionsIter.remove();
+        }
+        else if ( opt[0].equals(OPT_TODO_TITLE) ) {
+            if ( todoTitle != null ) {
+                errorReporter.printError(OPT_TODO_TITLE + " may only specified once");
+            }
+            setTodoTitle(todoTitle);
+            optionsIter.remove();
+        }
         return true;
-    }
-
-    /**
-     * Consumes an option. The option will then be excluded from the result of
-     * {@link #forwardedOptions()}.
-     *
-     * @param index    The index of the consumed option.
-     */
-    protected void consumeOption(int index) {
-        consumedOptions.add(index);
     }
 
     /**
@@ -551,6 +525,7 @@ public class Options {
             case OPT_HIGHLIGHT_STYLE:
             case OPT_PARSE_TIMEOUT:
             case OPT_TODO_TITLE:
+            case OPT_JAVADOCVERSION:
                 return 2;
             case OPT_DISABLE_HIGHLIGHT:
             case OPT_ENABLE_AUTO_HIGHLIGHT:
@@ -571,7 +546,13 @@ public class Options {
      * @see com.sun.javadoc.Doclet#validOptions(String[][], com.sun.javadoc.DocErrorReporter)
      */
     public static boolean validOptions(String[][] options, DocErrorReporter errorReporter) {
-        return new Options().load(options, errorReporter);
+        options = new Options().load(options, errorReporter);
+        if ( options != null ) {
+            return Standard.validOptions(options, errorReporter);
+        }
+        else {
+            return false;
+        }
     }
 
     /**

@@ -129,7 +129,8 @@ public class PegdownDoclet implements DocErrorReporter {
      */
     public static boolean start(RootDoc rootDoc) {
         Options options = new Options();
-        if ( !options.load(rootDoc.options(), rootDoc) ) {
+        String[][] forwardedOptions = options.load(rootDoc.options(), rootDoc);
+        if ( forwardedOptions == null ) {
             return false;
         }
         PegdownDoclet doclet = new PegdownDoclet(options, rootDoc);
@@ -137,7 +138,7 @@ public class PegdownDoclet implements DocErrorReporter {
         if ( doclet.isError() ) {
             return false;
         }
-        RootDocWrapper rootDocWrapper = new RootDocWrapper(rootDoc, options.forwardedOptions());
+        RootDocWrapper rootDocWrapper = new RootDocWrapper(rootDoc, forwardedOptions);
         if ( options.isHighlightEnabled() ) {
             // find the footer option
             int i = 0;
@@ -163,7 +164,7 @@ public class PegdownDoclet implements DocErrorReporter {
      * @return `true`, if the options are valid.
      */
     public static boolean validOptions(String[][] options, DocErrorReporter errorReporter) {
-        return new Options().load(options, errorReporter);
+        return Options.validOptions(options, errorReporter);
     }
 
     /**

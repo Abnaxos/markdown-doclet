@@ -1,3 +1,4 @@
+include 'doclet'
 include 'integrations:idea-plugin'
 include 'integrations:gradle-plugin'
 

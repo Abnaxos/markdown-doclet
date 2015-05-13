@@ -1,0 +1,24 @@
+archivesBaseName = 'pegdown-doclet'
+
+dependencies {
+    compile group:'org.pegdown', name:'pegdown', version:'1.4.1'
+    compile group:'com.google.guava', name:'guava', version:'18.0'
+    compile group:'net.sourceforge.plantuml', name:'plantuml', version:'8007'
+
+    provided project.ext.jdkTools
+}
+
+task allJar(type: Jar, dependsOn: jar) {
+    classifier = 'all'
+    from {
+        zipTree(jar.archivePath)
+    }
+    from {
+        configurations.runtime.collect {
+            it.isDirectory() ? it : zipTree(it)
+        }
+    }
+}
+artifacts {
+    archives allJar
+}

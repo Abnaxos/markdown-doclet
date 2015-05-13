@@ -18,18 +18,18 @@
  */
 
 apply plugin:'wrapper'
-apply plugin:'signing'
+
+wrapper {
+    gradleVersion = '2.4'
+}
 
 allprojects {
     group = 'ch.raffael.pegdown-doclet'
-}
-version = '1.2-SNAPSHOT'
-
-wrapper {
-    gradleVersion = '2.1'
+    buildDir = 'target'
+    version = '1.2-SNAPSHOT'
 }
 
-allprojects {
+subprojects {
 
     apply plugin:'java'
     apply plugin:'groovy'
@@ -67,129 +67,117 @@ allprojects {
     }
 
     ext {
-        docletProject = rootProject
+        docletProject = project(':doclet')
     }
     project.ext.jdkTools = files("${System.properties['java.home']}/../lib/tools.jar")
 
     sourceCompatibility = '1.7'
-    buildDir = 'target'
-    //archivesBaseName = 'pegdown-doclet'
     if ( !project == rootProject ) {
         archivesBaseName += "-${project.name}"
     }
 
-    idea.module {
-        scopes.PROVIDED.plus += [project.configurations.provided]
-    }
-
-}
-
-
-dependencies {
-    compile group:'org.pegdown', name:'pegdown', version:'1.4.1'
-    compile group:'com.google.guava', name:'guava', version:'18.0'
-    compile group:'net.sourceforge.plantuml', name:'plantuml', version:'8007'
-
-    provided project.ext.jdkTools
-}
-
-task allJar(type: Jar, dependsOn: jar) {
-    classifier = 'all'
-    from {
-        zipTree(jar.archivePath)
-    }
-    from {
-        configurations.runtime.collect {
-            it.isDirectory() ? it : zipTree(it)
-        }
-    }
-}
-
-task javadocJar(type: Jar) {
-    classifier = 'javadoc'
-    from javadoc
-}
-
-task sourceJar(type: Jar) {
-    classifier = 'source'
-    from sourceSets.main.allSource
-}
-
-artifacts {
-    archives allJar, javadocJar, sourceJar
-}
-
-javadoc.dependsOn classes
-javadoc {
-
-    classpath += configurations.provided
-
-    options {
-        docletpath = (sourceSets.main.output + sourceSets.main.compileClasspath) as List
-        doclet = 'ch.raffael.doclets.pegdown.PegdownDoclet'
-        overview = file('src/main/javadoc/overview.md')
-        linkSource = true
-        links = [
-                'http://docs.oracle.com/javase/7/docs/api/',
-                'http://docs.oracle.com/javase/7/docs/jdk/api/javadoc/doclet',
-                'http://www.decodified.com/pegdown/api'
-        ]
-        footer = """
+    javadoc.dependsOn classes
+    afterEvaluate {
+        javadoc {
+            classpath += configurations.provided
+            options {
+                docletpath = (sourceSets.main.output + sourceSets.main.compileClasspath) as List
+                doclet = 'ch.raffael.doclets.pegdown.PegdownDoclet'
+                def overviewFile = file('src/main/javadoc/overview.md')
+                if ( overviewFile.exists() ) {
+                    file('src/main/javadoc/overview.md')
+                }
+                linkSource = true
+                links = [
+                        'http://docs.oracle.com/javase/7/docs/api/',
+                        'http://docs.oracle.com/javase/7/docs/jdk/api/javadoc/doclet',
+                        'http://www.decodified.com/pegdown/api'
+                ]
+                addStringOption 'javadocversion', 'v7'
+                footer = """
               <a href="https://github.com/Abnaxos/pegdown-doclet/" target="_top">
                 <img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png" alt="Fork me on GitHub">
               </a>
               """
+            }
+        }
+    }
+    task javadocJar(type: Jar) {
+        classifier = 'javadoc'
+        from javadoc
+    }
+
+    task sourceJar(type: Jar) {
+        classifier = 'source'
+        from sourceSets.main.allSource
+    }
+    artifacts {
+        archives javadocJar, sourceJar
+    }
+
+    idea.module {
+        scopes.PROVIDED.plus += [project.configurations.provided]
+        scopes.RUNTIME.plus += [configurations.detachedConfiguration(dependencies.create(files(sourceSets.main.output.resourcesDir)))]
+        scopes.TEST.plus += [configurations.detachedConfiguration(dependencies.create(files(sourceSets.test.output.resourcesDir)))]
+        inheritOutputDirs = false
     }
 }
 
-
 // OSSRH deployment
 
-signing {
-    sign configurations.archives
-}
+subprojects {
+    apply plugin:'signing'
 
-uploadArchives {
-    repositories {
-        mavenDeployer {
-            beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+    signing {
+        sign configurations.archives
+    }
 
-            repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
-                authentication(userName: properties.get('ossrhUsername'),
-                    password: properties.get('ossrhPassword'))
-            }
+    uploadArchives {
+        dependsOn build
+        repositories {
+            mavenDeployer {
+                def credentials = [
+                        userName: project.properties.get('ossrhUsername'),
+                        password: project.properties.get('ossrhPassword')
+                ]
 
-            snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
-                authentication(userName: properties.get('ossrhUsername'),
-                    password: properties.get('ossrhPassword'))
-            }
+                beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
 
-            pom.project {
-                name 'Pegdown Doclet'
-                description 'A Doclet that allows the use of Markdown and PlantUML in JavaDoc comments.'
-                url 'https://github.com/Abnaxos/pegdown-doclet'
-                packaging 'jar'
-
-                developers {
-                    developer {
-                        id 'Abnaxos'
-                        name 'Raffael Herzog'
-                        email 'herzog@raffael.ch'
-                        timezone '+1'
-                    }
+                repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
+                    authentication(credentials)
                 }
 
-                licenses {
-                    license {
-                        name 'GPL 3.0'
-                        url 'http://www.gnu.org/licenses/gpl-3.0-standalone.html'
-                        distribution 'repo'
-                    }
+                snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
+                    authentication(credentials)
                 }
 
-                scm {
+                pom.project {
+                    name 'Pegdown Doclet'
+                    description 'A Doclet that allows the use of Markdown and PlantUML in JavaDoc comments.'
                     url 'https://github.com/Abnaxos/pegdown-doclet'
-                    connection 'scm:git:https://github.com/Abnaxos/pegdown-doclet.git'
+                    packaging 'jar'
+
+                    developers {
+                        developer {
+                            id 'Abnaxos'
+                            name 'Raffael Herzog'
+                            email 'herzog@raffael.ch'
+                            timezone '+1'
+                        }
+                    }
+
+                    licenses {
+                        license {
+                            name 'GPL 3.0'
+                            url 'http://www.gnu.org/licenses/gpl-3.0-standalone.html'
+                            distribution 'repo'
+                        }
+                    }
+
+                    scm {
+                        url 'https://github.com/Abnaxos/pegdown-doclet'
+                        connection 'scm:git:https://github.com/Abnaxos/pegdown-doclet.git'
+                    }
                 }
             }
         }
