@@ -127,7 +127,7 @@ It supports all options the standard Doclet supports and some additional options
 
  *  *`-parse-timeout <seconds>`*: Set the parse timeout for Pegdown. The default is 2 seconds. Try raising the parse timeout if you encounter timeout errors when generating your JavaDocs. You may also specify fractions of seconds (e.g. 2.5).
  
- *  *`-javadoc-version <version>`*: Set the version of JavaDoc that's invoking this Doclet. This is used to adapt to some quirks, currently to use different default CSS files for JDK 7 and 8. The default is the version currently running JVM, which is usually the right thing. If you have to override it, currently supported values are *`v7`* or *`v8`*. 
+ *  *`-javadocversion <version>`*: Set the version of JavaDoc that's invoking this Doclet. This is used to adapt to some quirks, currently to use different default CSS files for JDK 7 and 8. The default is the version currently running JVM, which is usually the right thing. If you have to override it, currently supported values are *`v7`* or *`v8`*. 
 
 ### Maven
 
