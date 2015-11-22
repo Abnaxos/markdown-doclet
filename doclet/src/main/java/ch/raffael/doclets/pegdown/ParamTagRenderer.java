@@ -35,7 +35,16 @@ public class ParamTagRenderer implements TagRenderer<ParamTag> {
     @Override
     public void render(ParamTag tag, StringBuilder target, PegdownDoclet doclet) {
         target.append(tag.name())
-                .append(' ').append(tag.parameterName())
+                .append(' ').append(renderParameterName(tag))
                 .append(' ').append(simplifySingleParagraph(doclet.toHtml(tag.parameterComment())));
+    }
+
+    private static String renderParameterName(ParamTag tag) {
+        if (!tag.isTypeParameter()) {
+            return tag.parameterName();
+        }
+        else {
+            return '<' + tag.parameterName() + '>';
+        }
     }
 }
