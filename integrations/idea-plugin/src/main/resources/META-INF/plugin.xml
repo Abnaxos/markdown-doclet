@@ -19,7 +19,7 @@
 <idea-plugin version="2">
   <id>PegdownDocletIdea</id>
   <name>Pegdown Doclet for IDEA</name>
-  <version>${version}</version>
+  <version>@pegdown-doclet-version@</version>
   <vendor email="herzog@raffael.ch" url="https://github.com/Abnaxos/pegdown-doclet/">Raffael Herzog</vendor>
 
   <description><![CDATA[

@@ -1,4 +1,3 @@
-
 dependencies {
     compile project.ext.docletProject
 
@@ -12,9 +11,4 @@ tasks.jar {
             p.isDirectory() ? p : zipTree(p)
         }
     }
-}
-
-tasks.processResources {
-    expand(version: project.version)
-    //filter(ReplaceTokens, [ version: project.version ])
 }

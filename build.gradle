@@ -75,6 +75,13 @@ subprojects {
         archivesBaseName += "-${project.name}"
     }
 
+    processResources {
+        //noinspection UnnecessaryQualifiedReference
+        filter org.apache.tools.ant.filters.ReplaceTokens, tokens: [
+                "pegdown-doclet-version": project(':doclet').version
+        ]
+    }
+
     javadoc.dependsOn classes
     afterEvaluate {
         javadoc {
