@@ -1,3 +1,5 @@
+apply plugin:OSSRH
+
 archivesBaseName = 'pegdown-doclet'
 
 dependencies {
@@ -6,6 +8,15 @@ dependencies {
     compile group:'net.sourceforge.plantuml', name:'plantuml', version:'8032'
 
     provided project.ext.jdkTools
+}
+
+jar {
+    dependsOn project(':integrations:gradle-plugin').tasks.build
+
+    into('/') {
+        from { zipTree(project(':integrations:gradle-plugin').tasks.jar.archivePath) }
+        exclude 'META-INF/MANIFEST.MF'
+    }
 }
 
 task allJar(type: Jar, dependsOn: jar) {

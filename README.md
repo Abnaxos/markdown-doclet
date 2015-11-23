@@ -129,6 +129,23 @@ It supports all options the standard Doclet supports and some additional options
  
  *  *`-javadocversion <version>`*: Set the version of JavaDoc that's invoking this Doclet. This is used to adapt to some quirks, currently to use different default CSS files for JDK 7 and 8. The default is the version currently running JVM, which is usually the right thing. If you have to override it, currently supported values are *`v7`* or *`v8`*. 
 
+### Gradle
+
+Add the following to your `build.gradle` to use the doclet with Gradle:
+
+```groovy
+buildscript {
+    repositories {
+        mavenCentral() // or jcenter()
+    }
+    dependencies {
+        classpath 'ch.raffael.pegdown-doclet:pegdown-doclet:1.2'
+    }
+}
+
+apply plugin: 'ch.raffael.pegdown-doclet'
+```
+
 ### Maven
 
 Add the following to your POM to use the doclet with Maven:

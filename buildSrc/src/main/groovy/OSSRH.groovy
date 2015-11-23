@@ -1,0 +1,74 @@
+import org.gradle.api.Plugin
+import org.gradle.api.Project
+import org.gradle.api.artifacts.maven.MavenDeployment
+
+
+/**
+ * @author <a href="mailto:herzog@raffael.ch">Raffael Herzog</a>
+ */
+class OSSRH implements Plugin<Project> {
+
+    @Override
+    void apply(Project project) {
+        project.with {
+            apply plugin:'maven'
+            apply plugin:'signing'
+
+            signing {
+                sign configurations.archives
+            }
+
+            uploadArchives {
+                dependsOn build
+                repositories {
+                    mavenDeployer {
+                        def credentials = [
+                                userName: project.properties.get('ossrhUsername'),
+                                password: project.properties.get('ossrhPassword')
+                        ]
+
+                        beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+
+                        repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
+                            authentication(credentials)
+                        }
+
+                        snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
+                            authentication(credentials)
+                        }
+
+                        pom.project {
+                            name 'Pegdown Doclet'
+                            description 'A Doclet that allows the use of Markdown and PlantUML in JavaDoc comments.'
+                            url 'https://github.com/Abnaxos/pegdown-doclet'
+                            packaging 'jar'
+
+                            developers {
+                                developer {
+                                    id 'Abnaxos'
+                                    name 'Raffael Herzog'
+                                    email 'herzog@raffael.ch'
+                                    timezone '+1'
+                                }
+                            }
+
+                            licenses {
+                                license {
+                                    name 'GPL 3.0'
+                                    url 'http://www.gnu.org/licenses/gpl-3.0-standalone.html'
+                                    distribution 'repo'
+                                }
+                            }
+
+                            scm {
+                                url 'https://github.com/Abnaxos/pegdown-doclet'
+                                connection 'scm:git:https://github.com/Abnaxos/pegdown-doclet.git'
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+}
