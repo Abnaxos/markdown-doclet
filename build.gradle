@@ -114,7 +114,7 @@ subprojects {
     }
 
     task sourceJar(type: Jar) {
-        classifier = 'source'
+        classifier = 'sources'
         from sourceSets.main.allSource
     }
     artifacts {
