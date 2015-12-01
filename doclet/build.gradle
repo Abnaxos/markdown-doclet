@@ -7,6 +7,8 @@ dependencies {
     compile group:'com.google.guava', name:'guava', version:'18.0'
     compile group:'net.sourceforge.plantuml', name:'plantuml', version:'8032'
 
+    testCompile group:'org.jsoup', name:'jsoup', version:'1.8.3'
+
     provided project.ext.jdkTools
 }
 
@@ -32,4 +34,32 @@ task allJar(type: Jar, dependsOn: jar) {
 }
 artifacts {
     archives allJar
+}
+
+def testJavadocDir = file("$buildDir/test-javadocs")
+task testJavadoc(type:Javadoc) {
+    destinationDir = testJavadocDir
+    source sourceSets.main.java
+    source fileTree('src/test/javadoc').include('**/*.java')
+    title "Pegdown Doclet Test Javadoc"
+
+    options {
+        docletpath = (sourceSets.main.output + sourceSets.main.compileClasspath) as List
+        doclet = 'ch.raffael.doclets.pegdown.PegdownDoclet'
+        overview  = file('src/test/javadoc/overview.md')
+        //addStringOption 'javadocversion', 'v7'
+        links = [
+                'http://docs.oracle.com/javase/7/docs/api/',
+                'http://docs.oracle.com/javase/7/docs/jdk/api/javadoc/doclet',
+                'http://www.decodified.com/pegdown/api'
+        ]
+    }
+
+    tasks.testJavadoc.classpath += configurations.provided + configurations.compile
+}
+
+tasks.test.dependsOn tasks.testJavadoc
+
+idea.module {
+    testSourceDirs += file('src/test/javadoc')
 }
