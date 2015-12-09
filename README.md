@@ -103,10 +103,10 @@ The Pegdown Doclet integrates [highlight.js](http://softwaremaniacs.org/soft/hig
 Invoking
 --------
 
-Specify the Doclet on JavaDoc's command line:
+Download `pegdown-doclet-<version>-all.jar` from the [Maven repository](https://oss.sonatype.org/content/repositories/releases/ch/raffael/pegdown-doclet/pegdown-doclet/) and specify it on the command line:
 
 ```
-javadoc -doclet ch.raffael.doclets.pegdown.PegdownDoclet -docletpath /path/to/pegdown-doclet-1.1-all.jar
+javadoc -doclet ch.raffael.doclets.pegdown.PegdownDoclet -docletpath /path/to/pegdown-doclet-<version>-all.jar
 ```
 
 It supports all options the standard Doclet supports and some additional options:
