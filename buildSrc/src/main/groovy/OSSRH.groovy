@@ -68,6 +68,15 @@ class OSSRH implements Plugin<Project> {
                     }
                 }
             }
+
+            // disable signing when we're not uploading the archives to OSSRH
+            // this avoids errors for people who just want to do a local build and don't have the private key
+            gradle.taskGraph.whenReady { graph ->
+                if ( !graph.hasTask(tasks.uploadArchives) ) {
+                    logger.info 'Disabling JAR signing'
+                    tasks.signArchives.enabled = false
+                }
+            }
         }
     }
 
