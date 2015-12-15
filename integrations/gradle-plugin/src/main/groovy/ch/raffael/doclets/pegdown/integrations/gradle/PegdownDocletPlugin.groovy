@@ -18,7 +18,7 @@ class PegdownDocletPlugin implements Plugin<Project> {
         def pegdownVersion = new InputStreamReader(PegdownDocletPlugin.class.getResourceAsStream('version.txt')).withReader { reader ->
             reader.text.trim()
         }
-        project.dependencies.add(CONFIGURATION_NAME, "ch.raffael.pegdown-doclet:pegdown-doclet:$pegdownVersion")
+        project.dependencies.add(CONFIGURATION_NAME, "ch.raffael.pegdown-doclet:$project.name:$pegdownVersion")
 
         // after the user buildscript is evaluated ...
         project.gradle.projectsEvaluated {
