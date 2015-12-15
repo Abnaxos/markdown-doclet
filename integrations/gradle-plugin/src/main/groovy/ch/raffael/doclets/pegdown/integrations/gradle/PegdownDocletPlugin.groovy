@@ -8,8 +8,8 @@ class PegdownDocletPlugin implements Plugin<Project> {
     final def CONFIGURATION_NAME = "pegdownDoclet"
 
     void apply(Project project) {
-        // make sure the java plugin is applied
-        project.plugins.apply('java')
+        // make sure the java dependencies are available
+        ensureJavaAvailable(project)
 
         // create a new configuration for the doclet dependency
         def config = project.configurations.create(CONFIGURATION_NAME)
@@ -31,6 +31,15 @@ class PegdownDocletPlugin implements Plugin<Project> {
                     addStringOption("parse-timeout", "10")
                 }
             }
+        }
+    }
+
+    private void ensureJavaAvailable(Project project) {
+        boolean hasAndroidLib = project.pluginManager.hasPlugin('com.android.library')
+        boolean hasAndroidApp = project.pluginManager.hasPlugin('com.android.application')
+        boolean hasJava = project.pluginManager.hasPlugin('java')
+        if(!hasJava && !hasAndroidLib && !hasAndroidApp) {
+            throw new IllegalStateException("one of following plugins must be applied before pegdown-doclet: [java, com.android.library, com.android.application]")
         }
     }
 }
