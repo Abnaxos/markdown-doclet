@@ -20,7 +20,7 @@
 apply plugin:'wrapper'
 
 wrapper {
-    gradleVersion = '2.4'
+    gradleVersion = '2.12'
 }
 
 allprojects {
