@@ -47,9 +47,11 @@ subprojects {
     sourceSets {
         main {
             compileClasspath += configurations.provided
+            output.resourcesDir = output.classesDir
         }
         test {
             compileClasspath += configurations.provided
+            output.resourcesDir = output.classesDir
         }
     }
 

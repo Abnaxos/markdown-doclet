@@ -36,6 +36,8 @@ artifacts {
     archives allJar
 }
 
+sourceSets.test.java.srcDir 'src/test/javadoc'
+
 def testJavadocDir = file("$buildDir/test-javadocs")
 task testJavadoc(type:Javadoc) {
     destinationDir = testJavadocDir
@@ -59,7 +61,3 @@ task testJavadoc(type:Javadoc) {
 }
 
 tasks.test.dependsOn tasks.testJavadoc
-
-idea.module {
-    testSourceDirs += file('src/test/javadoc')
-}
