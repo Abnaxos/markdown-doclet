@@ -3,13 +3,12 @@ apply plugin:OSSRH
 archivesBaseName = 'pegdown-doclet'
 
 dependencies {
-    compile group:'org.pegdown', name:'pegdown', version:'1.4.1'
-    compile group:'com.google.guava', name:'guava', version:'18.0'
-    compile group:'net.sourceforge.plantuml', name:'plantuml', version:'8032'
+    compile libs.pegdown
+    compile libs.guava
+    compile libs.plantuml
+    compileOnly libs.jdkTools
 
-    testCompile group:'org.jsoup', name:'jsoup', version:'1.8.3'
-
-    provided project.ext.jdkTools
+    testCompile group: 'org.jsoup', name: 'jsoup', version: '1.8.3'
 }
 
 jar {
@@ -57,7 +56,7 @@ task testJavadoc(type:Javadoc) {
         ]
     }
 
-    tasks.testJavadoc.classpath += configurations.provided + configurations.compile
+    tasks.testJavadoc.classpath += configurations.compileOnly + configurations.compile
 }
 
 tasks.test.dependsOn tasks.testJavadoc

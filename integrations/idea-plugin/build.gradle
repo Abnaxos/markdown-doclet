@@ -1,14 +1,22 @@
+configurations {
+    packaged
+}
 dependencies {
-    compile project.ext.docletProject
+    compile docletProject
 
-    provided fileTree(dir: "${ideaHome}/lib", include: '*.jar')
-    provided project.ext.jdkTools
+    compileOnly files(
+            ['openapi', 'extensions', 'idea', 'util', 'annotations', 'forms_rt'].
+                    collect { baseName -> "$ideaHome/lib/${baseName}.jar" })
+    compileOnly libs.jdkTools
+
+    packaged docletProject
 }
 
 tasks.jar {
-    from {
-        configurations.runtime.collect { p ->
-            p.isDirectory() ? p : zipTree(p)
+    exclude 'com/intellij/uiDesigner/**'
+    configurations.packaged.collect { p ->
+        from(zipTree(p)) {
+            exclude 'META-INF/**'
         }
     }
 }

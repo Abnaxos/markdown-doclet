@@ -40,37 +40,32 @@ subprojects {
         jcenter()
     }
 
-    configurations {
-        provided
-    }
-
     sourceSets {
         main {
-            compileClasspath += configurations.provided
             output.resourcesDir = output.classesDir
         }
         test {
-            compileClasspath += configurations.provided
             output.resourcesDir = output.classesDir
         }
     }
 
-    tasks.test {
-        classpath += configurations.provided
-    }
-
     dependencies {
-        testCompile group:'org.codehaus.groovy', name:'groovy-all', version:'2.3.4'
-        testCompile('org.spockframework:spock-core:0.7-groovy-2.0') {
+        testCompile group:'org.codehaus.groovy', name:'groovy-all', version:'2.4.6'
+        testCompile('org.spockframework:spock-core:1.0-groovy-2.4') {
             exclude group:'org.codehaus.groovy'
         }
         testCompile group:'cglib', name:'cglib-nodep', version:'3.1'
     }
-
+    configurations { testCompile.extendsFrom compileOnly }
     ext {
+        libs = [
+                pegdown: [group:'org.pegdown', name:'pegdown', version:'1.4.1'],
+                guava: [group:'com.google.guava', name:'guava', version:'18.0'],
+                plantuml: [group:'net.sourceforge.plantuml', name:'plantuml', version:'8032'],
+                jdkTools: files("${System.properties['java.home']}/../lib/tools.jar"),
+        ]
         docletProject = project(':doclet')
     }
-    project.ext.jdkTools = files("${System.properties['java.home']}/../lib/tools.jar")
 
     sourceCompatibility = '1.7'
     if ( !project == rootProject ) {
@@ -84,10 +79,16 @@ subprojects {
         ]
     }
 
+    jar {
+        // needed for unified classes/resources output dir
+        // if this is missing, all classes and resources are included twice
+        duplicatesStrategy = org.gradle.api.file.DuplicatesStrategy.EXCLUDE
+    }
+
     javadoc.dependsOn classes
     afterEvaluate {
         javadoc {
-            classpath += configurations.provided
+            classpath += configurations.compileOnly
             options {
                 docletpath = (sourceSets.main.output + sourceSets.main.compileClasspath) as List
                 doclet = 'ch.raffael.doclets.pegdown.PegdownDoclet'
@@ -124,9 +125,6 @@ subprojects {
     }
 
     idea.module {
-        scopes.PROVIDED.plus += [project.configurations.provided]
-        scopes.RUNTIME.plus += [configurations.detachedConfiguration(dependencies.create(files(sourceSets.main.output.resourcesDir)))]
-        scopes.TEST.plus += [configurations.detachedConfiguration(dependencies.create(files(sourceSets.test.output.resourcesDir)))]
         inheritOutputDirs = false
     }
 }
