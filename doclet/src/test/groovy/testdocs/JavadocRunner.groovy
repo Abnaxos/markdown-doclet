@@ -34,12 +34,14 @@ final class JavadocRunner {
         def javadocTool = ToolProvider.systemDocumentationTool
         def fileManager = javadocTool.getStandardFileManager(null, null, null)
         def task = javadocTool.getTask(null, fileManager, null, PegdownDoclet,
-                                       [ '-d', OUTPUT_PATH.toString(),
+                                       [ '-locale', 'en',
+                                         '-d', OUTPUT_PATH.toString(),
                                          '-windowtitle', 'Pegdown Doclet Test Javado',
                                          '-overview', Paths.get('src', 'test', 'javadoc', 'overview.md').toString(),
                                          '-link', 'http://docs.oracle.com/javase/7/docs/api/',
                                          '-link', 'http://docs.oracle.com/javase/7/docs/jdk/api/javadoc/doclet',
-                                         '-link', 'http://www.decodified.com/pegdown/api'],
+                                         '-link', 'http://www.decodified.com/pegdown/api',
+                                       ],
                                        fileManager.getJavaFileObjectsFromFiles(sourceFiles))
         task.call()
     }

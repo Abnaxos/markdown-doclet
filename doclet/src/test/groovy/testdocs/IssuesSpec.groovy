@@ -1,7 +1,5 @@
 package testdocs
 
-import org.spockframework.runtime.ConditionNotSatisfiedError
-import spock.lang.FailsWith
 import testdocs.issue44_topTitleNotProcessed.Issue44_TopTitleNotProcessed
 
 
@@ -18,7 +16,6 @@ class IssuesSpec extends JavadocOutputSpecification {
         doc.select('div.contentContainer div.block h1').text() == 'November 2015, Java Users Group of Greater Louisville'
     }
 
-    @FailsWith(value = ConditionNotSatisfiedError, reason = 'As far as I could see, the first <h1> should be used as summary.')
     def "(#44) The first header should be used as documentation summary"() {
       given:
         def doc = packageDoc(Issue44_TopTitleNotProcessed)
