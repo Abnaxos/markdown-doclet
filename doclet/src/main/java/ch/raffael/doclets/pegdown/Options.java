@@ -25,15 +25,12 @@ import java.nio.charset.Charset;
 import java.nio.charset.IllegalCharsetNameException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 import java.util.regex.Pattern;
 
 import com.google.common.base.Splitter;
-import com.google.common.collect.Ordering;
 import com.sun.javadoc.DocErrorReporter;
 import com.sun.tools.doclets.standard.Standard;
 import org.pegdown.Extensions;
@@ -41,7 +38,7 @@ import org.pegdown.LinkRenderer;
 import org.pegdown.PegDownProcessor;
 import org.pegdown.ToHtmlSerializer;
 
-import static com.google.common.base.MoreObjects.*;
+import static com.google.common.base.MoreObjects.firstNonNull;
 
 
 /**
@@ -83,7 +80,8 @@ public class Options {
             | Extensions.FENCED_CODE_BLOCKS
             | Extensions.SMARTYPANTS
             | Extensions.TABLES
-            | Extensions.WIKILINKS;
+            | Extensions.WIKILINKS
+            | Extensions.STRIKETHROUGH;
 
     private String[][] forwardedOptions = new String[0][];
 

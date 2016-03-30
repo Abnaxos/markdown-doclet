@@ -59,7 +59,7 @@ subprojects {
     configurations { testCompile.extendsFrom compileOnly }
     ext {
         libs = [
-                pegdown: [group:'org.pegdown', name:'pegdown', version:'1.4.1'],
+                pegdown: [group:'org.pegdown', name:'pegdown', version:'1.6.0'],
                 guava: [group:'com.google.guava', name:'guava', version:'18.0'],
                 plantuml: [group:'net.sourceforge.plantuml', name:'plantuml', version:'8032'],
                 jdkTools: files("${System.properties['java.home']}/../lib/tools.jar"),

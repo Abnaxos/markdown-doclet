@@ -20,8 +20,7 @@ package ch.raffael.doclets.pegdown.integrations.idea;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Collections;
 import java.util.HashMap;
@@ -54,8 +53,8 @@ import com.sun.javadoc.SeeTag;
 import com.sun.javadoc.SourcePosition;
 import com.sun.javadoc.Tag;
 import net.sourceforge.plantuml.SourceStringReader;
+import org.pegdown.LinkRenderer;
 import org.pegdown.ToHtmlSerializer;
-import org.pegdown.ast.SuperNode;
 
 import ch.raffael.doclets.pegdown.DocletSerializer;
 import ch.raffael.doclets.pegdown.Options;
@@ -134,25 +133,31 @@ public class DocCommentProcessor {
             protected ToHtmlSerializer createDocletSerializer() {
                 return new DocletSerializer(this, getLinkRenderer()) {
                     @Override
-                    protected void printImageTag(SuperNode imageNode, String url) {
-                        URL diagram = umlDiagrams.get(url);
+                    protected void printImageTag(LinkRenderer.Rendering rendering) {
+                        URL diagram = umlDiagrams.get(rendering.href);
                         if ( diagram != null ) {
-                            super.printImageTag(imageNode, diagram.toString());
+                            super.printImageTag(mapHref(rendering, diagram.toString()));
                         }
-                        else if ( !ABSOLUTE_IMG_RE.matcher(url).matches() || url.contains("{@}") ) {
+                        else if ( !ABSOLUTE_IMG_RE.matcher(rendering.href).matches() || rendering.href.contains("{@}") ) {
                             URL baseUrl = VfsUtil.convertToURL(file.getVirtualFile().getUrl());
                             if ( baseUrl != null ) {
                                 try {
-                                    super.printImageTag(imageNode, baseUrl.toURI().resolve(new URI(url)).toString());
+                                    super.printImageTag(mapHref(rendering, new URL(baseUrl, rendering.href).toString()));
                                 }
-                                catch ( URISyntaxException e ) {
-                                    super.printImageTag(imageNode, url);
+                                catch ( MalformedURLException e ) {
+                                    super.printImageTag(rendering);
                                 }
                             }
                         }
                         else {
-                            super.printImageTag(imageNode, url);
+                            super.printImageTag(rendering);
                         }
+                    }
+                    private LinkRenderer.Rendering mapHref(LinkRenderer.Rendering rendering, String newHref) {
+                        LinkRenderer.Rendering mapped = new LinkRenderer.Rendering(
+                                newHref, rendering.text);
+                        mapped.attributes.addAll(rendering.attributes);
+                        return mapped;
                     }
                 };
             }
