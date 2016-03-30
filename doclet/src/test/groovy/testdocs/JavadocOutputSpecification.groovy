@@ -2,8 +2,9 @@ package testdocs
 
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
-import spock.lang.Shared
 import spock.lang.Specification
+
+import java.nio.file.Path
 
 
 /**
@@ -13,21 +14,25 @@ abstract class JavadocOutputSpecification extends Specification {
 
     final static String CHARSET = 'UTF-8'
 
-    @Shared
-    URI javadocBase
+    Path javadocBase
 
     def setupSpec() {
-        for ( path in [ 'target/test-javadocs', 'doclet/target/test-javadocs' ] ) {
-            def file = new File(path.replace('/', File.separator))
-            if ( file.isDirectory() ) {
-                javadocBase = file.toURI()
-                break
-            }
-        }
-        if ( javadocBase == null ) {
-            throw new IOException('Cannot determine Javadoc base URL')
-        }
-        println "Using Javadoc base URL $javadocBase"
+        JavadocRunner.instance.generateDocs()
+//        for ( path in [ 'target/test-javadocs', 'doclet/target/test-javadocs' ] ) {
+//            def file = new File(path.replace('/', File.separator))
+//            if ( file.isDirectory() ) {
+//                javadocBase = file.toURI()
+//                break
+//            }
+//        }
+//        if ( javadocBase == null ) {
+//            throw new IOException('Cannot determine Javadoc base URL')
+//        }
+//        println "Using Javadoc base URL $javadocBase"
+    }
+
+    def setup() {
+        javadocBase = JavadocRunner.OUTPUT_PATH
     }
 
     Document packageDoc(Class clazz) {
@@ -42,7 +47,7 @@ abstract class JavadocOutputSpecification extends Specification {
     }
 
     Document parse(String path) {
-        Jsoup.parse(new File(javadocBase.resolve(path.replace('.', '/') + '.html')), CHARSET)
+        Jsoup.parse(javadocBase.resolve(path.replace('.', File.separator) + '.html').toFile(), CHARSET)
 
     }
 

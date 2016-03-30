@@ -36,27 +36,3 @@ artifacts {
 }
 
 sourceSets.test.java.srcDir 'src/test/javadoc'
-
-def testJavadocDir = file("$buildDir/test-javadocs")
-task testJavadoc(type:Javadoc) {
-    destinationDir = testJavadocDir
-    source sourceSets.main.java
-    source fileTree('src/test/javadoc').include('**/*.java')
-    title "Pegdown Doclet Test Javadoc"
-
-    options {
-        docletpath = (sourceSets.main.output + sourceSets.main.compileClasspath) as List
-        doclet = 'ch.raffael.doclets.pegdown.PegdownDoclet'
-        overview  = file('src/test/javadoc/overview.md')
-        //addStringOption 'javadocversion', 'v7'
-        links = [
-                'http://docs.oracle.com/javase/7/docs/api/',
-                'http://docs.oracle.com/javase/7/docs/jdk/api/javadoc/doclet',
-                'http://www.decodified.com/pegdown/api'
-        ]
-    }
-
-    tasks.testJavadoc.classpath += configurations.compileOnly + configurations.compile
-}
-
-tasks.test.dependsOn tasks.testJavadoc
