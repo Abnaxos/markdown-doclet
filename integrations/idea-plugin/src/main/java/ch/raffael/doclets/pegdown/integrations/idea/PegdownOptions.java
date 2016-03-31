@@ -18,9 +18,27 @@
  */
 package ch.raffael.doclets.pegdown.integrations.idea;
 
-import org.pegdown.Extensions;
+import java.util.Objects;
 
 import ch.raffael.doclets.pegdown.Options;
+
+import static org.pegdown.Extensions.ABBREVIATIONS;
+import static org.pegdown.Extensions.ANCHORLINKS;
+import static org.pegdown.Extensions.ATXHEADERSPACE;
+import static org.pegdown.Extensions.AUTOLINKS;
+import static org.pegdown.Extensions.DEFINITIONS;
+import static org.pegdown.Extensions.EXTANCHORLINKS;
+import static org.pegdown.Extensions.FENCED_CODE_BLOCKS;
+import static org.pegdown.Extensions.FORCELISTITEMPARA;
+import static org.pegdown.Extensions.QUOTES;
+import static org.pegdown.Extensions.RELAXEDHRULES;
+import static org.pegdown.Extensions.SMARTS;
+import static org.pegdown.Extensions.STRIKETHROUGH;
+import static org.pegdown.Extensions.SUPPRESS_HTML_BLOCKS;
+import static org.pegdown.Extensions.SUPPRESS_INLINE_HTML;
+import static org.pegdown.Extensions.TABLES;
+import static org.pegdown.Extensions.TASKLISTITEMS;
+import static org.pegdown.Extensions.WIKILINKS;
 
 
 /**
@@ -93,16 +111,23 @@ public class PegdownOptions {
      */
     public static class RenderingOptions {
 
-        public boolean autolinks = true;
-        public boolean definitions = true;
-        public boolean quotes = true;
         public boolean smarts = true;
-        public boolean tables = true;
-        public boolean wikiLinks = true;
-        public boolean fencedCodeBlocks = true;
+        public boolean quotes = true;
         public boolean abbreviations = false;
-        public boolean noHtmlBlocks = false;
-        public boolean noInlineHtml = false;
+        public boolean autolinks = true;
+        public boolean tables = true;
+        public boolean definitions = true;
+        public boolean fencedCodeBlocks = true;
+        public boolean wikiLinks = true;
+        public boolean strikethrough = true;
+        public boolean anchorLinks = false;
+        public boolean suppressHtmlBlocks = false;
+        public boolean suppressInlineHtml = false;
+        public boolean atxHeaderSpace = false;
+        public boolean forceListItemPara = false;
+        public boolean relaxedHRules = false;
+        public boolean taskListItems = true;
+        public boolean extAnchorLinks = false;
 
         public RenderingOptions() {
         }
@@ -113,32 +138,46 @@ public class PegdownOptions {
          * @param that    The rendering options to copy.
          */
         public RenderingOptions(RenderingOptions that) {
-            this.autolinks = that.autolinks;
-            this.definitions = that.definitions;
             this.quotes = that.quotes;
             this.smarts = that.smarts;
-            this.tables = that.tables;
-            this.wikiLinks = that.wikiLinks;
-            this.fencedCodeBlocks = that.fencedCodeBlocks;
             this.abbreviations = that.abbreviations;
-            this.noHtmlBlocks = that.noHtmlBlocks;
-            this.noInlineHtml = that.noInlineHtml;
+            this.autolinks = that.autolinks;
+            this.tables = that.tables;
+            this.definitions = that.definitions;
+            this.fencedCodeBlocks = that.fencedCodeBlocks;
+            this.wikiLinks = that.wikiLinks;
+            this.strikethrough = that.strikethrough;
+            this.anchorLinks = that.anchorLinks;
+            this.suppressHtmlBlocks = that.suppressHtmlBlocks;
+            this.suppressInlineHtml = that.suppressInlineHtml;
+            this.atxHeaderSpace = that.atxHeaderSpace;
+            this.forceListItemPara = that.forceListItemPara;
+            this.relaxedHRules = that.relaxedHRules;
+            this.taskListItems = that.taskListItems;
+            this.extAnchorLinks = that.extAnchorLinks;
         }
 
         @Override
         public String toString() {
             StringBuilder buf = new StringBuilder("{");
             boolean first = true;
-            first = opt(buf, "autolinks", autolinks, first);
-            first = opt(buf, "definitions", definitions, first);
-            first = opt(buf, "quotes", quotes, first);
             first = opt(buf, "smarts", smarts, first);
-            first = opt(buf, "tables", tables, first);
-            first = opt(buf, "wikiLinks", wikiLinks, first);
-            first = opt(buf, "fencedCodeBlocks", fencedCodeBlocks, first);
+            first = opt(buf, "quotes", quotes, first);
             first = opt(buf, "abbreviations", abbreviations, first);
-            first = opt(buf, "noHtmlBlocks", noHtmlBlocks, first);
-            first = opt(buf, "noInlineHtml", noInlineHtml, first);
+            first = opt(buf, "autolinks", autolinks, first);
+            first = opt(buf, "tables", tables, first);
+            first = opt(buf, "definitions", definitions, first);
+            first = opt(buf, "fencedCodeBlocks", fencedCodeBlocks, first);
+            first = opt(buf, "wikiLinks", wikiLinks, first);
+            first = opt(buf, "strikethrough", strikethrough, first);
+            first = opt(buf, "anchorLinks", anchorLinks, first);
+            first = opt(buf, "suppressHtmlBlocks", suppressHtmlBlocks, first);
+            first = opt(buf, "suppressInlineHtml", suppressInlineHtml, first);
+            first = opt(buf, "atxHeaderSpace", atxHeaderSpace, first);
+            first = opt(buf, "forceListItemPara", forceListItemPara, first);
+            first = opt(buf, "relaxedHRules", relaxedHRules, first);
+            first = opt(buf, "taskListItems", taskListItems, first);
+            first = opt(buf, "extAnchorLinks", extAnchorLinks, first);
             buf.append('}');
             return buf.toString();
         }
@@ -156,7 +195,6 @@ public class PegdownOptions {
             }
         }
 
-
         @Override
         public boolean equals(Object o) {
             if ( this == o ) {
@@ -166,68 +204,63 @@ public class PegdownOptions {
                 return false;
             }
             RenderingOptions that = (RenderingOptions)o;
-            if ( abbreviations != that.abbreviations ) {
-                return false;
-            }
-            if ( autolinks != that.autolinks ) {
-                return false;
-            }
-            if ( definitions != that.definitions ) {
-                return false;
-            }
-            if ( fencedCodeBlocks != that.fencedCodeBlocks ) {
-                return false;
-            }
-            if ( noHtmlBlocks != that.noHtmlBlocks ) {
-                return false;
-            }
-            if ( noInlineHtml != that.noInlineHtml ) {
-                return false;
-            }
-            if ( quotes != that.quotes ) {
-                return false;
-            }
-            if ( smarts != that.smarts ) {
-                return false;
-            }
-            if ( tables != that.tables ) {
-                return false;
-            }
-            if ( wikiLinks != that.wikiLinks ) {
-                return false;
-            }
-            return true;
+            return smarts == that.smarts &&
+                    quotes == that.quotes &&
+                    abbreviations == that.abbreviations &&
+                    autolinks == that.autolinks &&
+                    tables == that.tables &&
+                    definitions == that.definitions &&
+                    fencedCodeBlocks == that.fencedCodeBlocks &&
+                    wikiLinks == that.wikiLinks &&
+                    strikethrough == that.strikethrough &&
+                    anchorLinks == that.anchorLinks &&
+                    suppressHtmlBlocks == that.suppressHtmlBlocks &&
+                    suppressInlineHtml == that.suppressInlineHtml &&
+                    atxHeaderSpace == that.atxHeaderSpace &&
+                    forceListItemPara == that.forceListItemPara &&
+                    relaxedHRules == that.relaxedHRules &&
+                    taskListItems == that.taskListItems &&
+                    extAnchorLinks == that.extAnchorLinks;
         }
 
         @Override
         public int hashCode() {
-            int result = (autolinks ? 1 : 0);
-            result = 31 * result + (definitions ? 1 : 0);
-            result = 31 * result + (quotes ? 1 : 0);
-            result = 31 * result + (smarts ? 1 : 0);
-            result = 31 * result + (tables ? 1 : 0);
-            result = 31 * result + (wikiLinks ? 1 : 0);
-            result = 31 * result + (fencedCodeBlocks ? 1 : 0);
-            result = 31 * result + (abbreviations ? 1 : 0);
-            result = 31 * result + (noHtmlBlocks ? 1 : 0);
-            result = 31 * result + (noInlineHtml ? 1 : 0);
-            return result;
+            return Objects.hash(smarts, quotes, abbreviations, autolinks, tables, definitions, fencedCodeBlocks,
+                    wikiLinks, strikethrough, anchorLinks, suppressHtmlBlocks, suppressInlineHtml, atxHeaderSpace,
+                    forceListItemPara, relaxedHRules, taskListItems, extAnchorLinks);
         }
 
         public void applyTo(Options options) {
-            options.setPegdownExtensions(
-                    (autolinks ? Extensions.AUTOLINKS : 0)
-                            | (definitions ? Extensions.DEFINITIONS : 0)
-                            | (quotes ? Extensions.QUOTES : 0)
-                            | (smarts ? Extensions.SMARTS : 0)
-                            | (tables ? Extensions.TABLES : 0)
-                            | (wikiLinks ? Extensions.WIKILINKS : 0)
-                            | (fencedCodeBlocks ? Extensions.FENCED_CODE_BLOCKS : 0)
-                            | (abbreviations ? Extensions.ABBREVIATIONS : 0)
-                            | (noHtmlBlocks ? Extensions.SUPPRESS_HTML_BLOCKS : 0)
-                            | (noInlineHtml ? Extensions.SUPPRESS_INLINE_HTML : 0)
-            );
+            int ext = 0;
+            ext = ext(ext, smarts, SMARTS);
+            ext = ext(ext, quotes, QUOTES);
+            ext = ext(ext, abbreviations, ABBREVIATIONS);
+            ext = ext(ext, autolinks, AUTOLINKS);
+            ext = ext(ext, tables, TABLES);
+            ext = ext(ext, definitions, DEFINITIONS);
+            ext = ext(ext, fencedCodeBlocks, FENCED_CODE_BLOCKS);
+            ext = ext(ext, wikiLinks, WIKILINKS);
+            ext = ext(ext, strikethrough, STRIKETHROUGH);
+            ext = ext(ext, anchorLinks, ANCHORLINKS);
+            ext = ext(ext, suppressHtmlBlocks, SUPPRESS_HTML_BLOCKS);
+            ext = ext(ext, suppressInlineHtml, SUPPRESS_INLINE_HTML);
+            ext = ext(ext, atxHeaderSpace, ATXHEADERSPACE);
+            ext = ext(ext, forceListItemPara, FORCELISTITEMPARA);
+            ext = ext(ext, relaxedHRules, RELAXEDHRULES);
+            ext = ext(ext, taskListItems, TASKLISTITEMS);
+            ext = ext(ext, extAnchorLinks, EXTANCHORLINKS);
+            options.setPegdownExtensions(ext);
         }
+
+        private int ext(int current, boolean flag, int ext) {
+            if ( flag ) {
+                return current | ext;
+            }
+            else {
+                return current;
+            }
+        }
+
     }
 
 }
