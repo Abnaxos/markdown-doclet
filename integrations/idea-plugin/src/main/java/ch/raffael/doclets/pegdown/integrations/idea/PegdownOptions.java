@@ -46,6 +46,7 @@ import static org.pegdown.Extensions.WIKILINKS;
  *
  * @author <a href="mailto:herzog@raffael.ch">Raffael Herzog</a>
  */
+@SuppressWarnings("WeakerAccess")
 public class PegdownOptions {
 
     /**
