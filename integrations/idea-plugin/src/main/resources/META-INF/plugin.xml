@@ -93,6 +93,7 @@
 
   <extensions defaultExtensionNs="com.intellij">
     <lang.documentationProvider language="JAVA" implementationClass="ch.raffael.doclets.pegdown.integrations.idea.PegdownDocumentationProvider" order="first"/>
-    <projectConfigurable instance="ch.raffael.doclets.pegdown.integrations.idea.PegdownConfigurable" id="PegdownDocletIdea.Config" displayName="Pegdown Doclet"/>
+    <projectConfigurable instance="ch.raffael.doclets.pegdown.integrations.idea.PegdownConfigurable"
+                         id="PegdownDocletIdea.Config" displayName="Pegdown Doclet" groupId="tools"/>
   </extensions>
 </idea-plugin>
