@@ -33,6 +33,7 @@ import org.jetbrains.annotations.Nullable;
  *
  * @author <a href="mailto:herzog@raffael.ch">Raffael Herzog</a>
  */
+// todo: for IJ 2016: @State(name = Plugin.PLUGIN_NAME + ".ProjectConfiguration", storages=@Storage("pegdown-doclet.xml"))
 @State(name = Plugin.PLUGIN_NAME + ".ProjectConfiguration",
        storages = {
                @Storage(file = StoragePathMacros.PROJECT_FILE),

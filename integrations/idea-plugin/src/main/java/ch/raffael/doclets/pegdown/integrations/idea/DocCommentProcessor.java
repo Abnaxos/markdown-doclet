@@ -28,13 +28,13 @@ import java.util.Map;
 import java.util.regex.Pattern;
 
 import com.google.common.base.CharMatcher;
-import com.google.common.base.Objects;
+import com.google.common.base.MoreObjects;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ProjectFileIndex;
 import com.intellij.openapi.roots.ProjectRootManager;
-import com.intellij.openapi.vfs.VfsUtil;
+import com.intellij.openapi.vfs.VfsUtilCore;
 import com.intellij.psi.JavaDocTokenType;
 import com.intellij.psi.JavaPsiFacade;
 import com.intellij.psi.PsiElement;
@@ -139,7 +139,7 @@ public class DocCommentProcessor {
                             super.printImageTag(mapHref(rendering, diagram.toString()));
                         }
                         else if ( !ABSOLUTE_IMG_RE.matcher(rendering.href).matches() || rendering.href.contains("{@}") ) {
-                            URL baseUrl = VfsUtil.convertToURL(file.getVirtualFile().getUrl());
+                            URL baseUrl = VfsUtilCore.convertToURL(file.getVirtualFile().getUrl());
                             if ( baseUrl != null ) {
                                 try {
                                     super.printImageTag(mapHref(rendering, new URL(baseUrl, rendering.href).toString()));
@@ -280,7 +280,7 @@ public class DocCommentProcessor {
                 }
             }
         }
-        return Objects.firstNonNull(urls, Collections.<String, URL>emptyMap());
+        return MoreObjects.firstNonNull(urls, Collections.<String, URL>emptyMap());
     }
 
     private void renderSeeTag(PegdownDoclet doclet, StringBuilder tagBlock, PsiDocTag docTag) {
