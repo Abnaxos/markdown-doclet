@@ -35,7 +35,6 @@ import com.intellij.psi.PsiMethod;
 import com.intellij.psi.PsiPackage;
 import com.intellij.psi.PsiParameter;
 import com.intellij.psi.impl.source.tree.JavaDocElementType;
-import org.intellij.lang.annotations.Language;
 import org.jetbrains.annotations.Nullable;
 
 
@@ -169,7 +168,7 @@ public class PegdownDocumentationProvider extends JavaDocumentationProvider {
     }
 
     private static String extendCss(String html) {
-        @Language("CSS") String css = "\n"
+        String css = "\n"
                 // I know, these tables aren't beautiful; however, Swing CSS is so
                 // limited, this is about as good as it gets ...
                 +"table { /*unsupported: border-collapse: collapse;*/ border: 0; border-spacing: 0; }\n"

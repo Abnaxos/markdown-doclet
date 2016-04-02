@@ -29,6 +29,7 @@ import java.util.regex.Pattern;
 
 import com.google.common.base.CharMatcher;
 import com.google.common.base.MoreObjects;
+import com.intellij.codeInsight.javadoc.JavaDocUtil;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
@@ -37,14 +38,19 @@ import com.intellij.openapi.roots.ProjectRootManager;
 import com.intellij.openapi.vfs.VfsUtilCore;
 import com.intellij.psi.JavaDocTokenType;
 import com.intellij.psi.JavaPsiFacade;
+import com.intellij.psi.PsiDocCommentOwner;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiElementFactory;
+import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.PsiFile;
+import com.intellij.psi.PsiManager;
 import com.intellij.psi.PsiWhiteSpace;
 import com.intellij.psi.javadoc.PsiDocComment;
 import com.intellij.psi.javadoc.PsiDocTag;
 import com.intellij.psi.javadoc.PsiDocToken;
 import com.intellij.psi.javadoc.PsiInlineDocTag;
 import com.intellij.psi.tree.IElementType;
+import com.intellij.psi.util.PsiTreeUtil;
 import com.sun.javadoc.ClassDoc;
 import com.sun.javadoc.Doc;
 import com.sun.javadoc.MemberDoc;
@@ -78,6 +84,7 @@ public class DocCommentProcessor {
 
     private final PsiFile file;
     private final Project project;
+    private final PsiElementFactory psiElementFactory;
     private final PegdownOptions.RenderingOptions pegdownOptions;
 
     public DocCommentProcessor(PsiFile file) {
@@ -85,9 +92,11 @@ public class DocCommentProcessor {
         if ( file == null ) {
             project = null;
             pegdownOptions = null;
+            psiElementFactory = null;
         }
         else {
             project = file.getProject();
+            psiElementFactory = JavaPsiFacade.getInstance(project).getElementFactory();
             ProjectFileIndex fileIndex = ProjectRootManager.getInstance(project).getFileIndex();
             Module module = fileIndex.getModuleForFile(file.getVirtualFile());
             if ( module == null ) {
@@ -162,6 +171,7 @@ public class DocCommentProcessor {
                 };
             }
         };
+        PsiDocCommentOwner context = PsiTreeUtil.getParentOfType(docComment, PsiDocCommentOwner.class);
         pegdownOptions.applyTo(options);
         PegdownDoclet doclet = new PegdownDoclet(options, null);
         StringBuilder buf = new StringBuilder();
@@ -228,9 +238,14 @@ public class DocCommentProcessor {
         String docCommentText = "/**\n" + escapeAsterisks(doclet.toHtml(markdown, false))
                 + "\n" + escapeAsterisks(tagBlock.toString()) + "\n*/";
         Plugin.print("Processed DocComment", docCommentText);
-        docComment = JavaPsiFacade.getInstance(project).getElementFactory().createDocCommentFromText(
-                docCommentText);
-        return docComment;
+        PsiDocComment processedDocComment = docCommentFromText(context, docCommentText);
+        LinkExpander linkExpander = new LinkExpander(context, processedDocComment, docCommentText);
+        processedDocComment = linkExpander.apply();
+        return processedDocComment;
+    }
+
+    private PsiDocComment docCommentFromText(PsiElement context, CharSequence text) {
+        return psiElementFactory.createDocCommentFromText(text.toString(), context);
     }
 
     /**
@@ -408,8 +423,6 @@ public class DocCommentProcessor {
     private static String toString(PsiDocTag docTag, boolean stripFirstWord) {
         String tagText = stripLead(docTag.getText());
         tagText = stripFirstWord(tagText)[1]; // remove the tag itself
-        String first;
-        String doc;
         if ( stripFirstWord ) {
             String[] stripped = stripFirstWord(tagText);
             return stripped[0] + " " + escapeAsterisks(stripped[1].trim());
@@ -434,6 +447,117 @@ public class DocCommentProcessor {
                     ""
             };
         }
+    }
+
+    /**
+     * Because the PsiDocComment returned is rooted in a method without any root, resolving relative
+     * links like `{{@literal @}link #myMethod}` won't be resolved correctly. It resolves from the
+     * {@link PsiDocTag} upwards using {@link PsiDocTag#getParent()}, completely ignoring the given
+     * `context` (this is probably a bug of IDEA, method
+     * {@link JavaDocUtil#findReferenceTarget(PsiManager, String, PsiElement, boolean)}).
+     *
+     * Expanding the links to absolute references before processing them fixes this. We can use the
+     * methods of {@link JavaDocUtil} to do this.
+     *
+     * @see "[Issue #39 on GitHub](https://github.com/Abnaxos/pegdown-doclet/issues/39)"
+     * @see JavaDocUtil#findReferenceTarget(PsiManager, String, PsiElement, boolean)
+     */
+    private class LinkExpander extends PsiElementVisitor {
+
+        private final PsiDocCommentOwner docContext;
+        private final PsiDocComment originalDocComment;
+        private final String docText;
+        private int docTextPosition = 0;
+        @SuppressWarnings("StringBufferField")
+        private StringBuilder buffer = null;
+        private int offset = 0;
+
+        LinkExpander(PsiDocCommentOwner docContext, PsiDocComment originalDocComment, String docText) {
+            this.docContext = docContext;
+            this.originalDocComment = originalDocComment;
+            this.docText = docText;
+        }
+
+        PsiDocComment apply() {
+            if ( docContext == null ) {
+                return originalDocComment;
+            }
+            docTextPosition = 0;
+            buffer = null;
+            offset = 0;
+            originalDocComment.acceptChildren(LinkExpander.this);
+            if ( buffer == null ) {
+                return originalDocComment;
+            }
+            else {
+                buffer.append(docText, docTextPosition, docText.length());
+                String text = buffer.toString();
+                Plugin.print("After expanding links", text);
+                return docCommentFromText(docContext, text);
+            }
+        }
+
+        @Override
+        public void visitElement(PsiElement element) {
+            if ( element instanceof PsiDocTag ) {
+                PsiDocTag tag = (PsiDocTag)element;
+                String tagName = null;
+                switch ( tag.getName() ) {
+                    case "link":
+                    case "linkplain":
+                    case "see":
+                        // todo: @ssee
+                        tagName = tag.getName();
+                }
+                if ( tagName != null ) {
+                    int inlineOffset = (tag instanceof PsiInlineDocTag) ? 1 : 0;
+                    String linkText = tag.getText().substring(inlineOffset + 1 + tagName.length(), tag.getTextLength() - inlineOffset).trim();
+                    if ( !linkText.startsWith("#") ) {
+                        return;
+                    }
+                    StringBuilder newLink = new StringBuilder(100);
+                    if ( inlineOffset > 0 ) {
+                        newLink.append('{');
+                    }
+                    newLink.append('@').append(tagName).append(' ');
+                    int refEndIndex = JavaDocUtil.extractReference(linkText);
+                    String refText = linkText.substring(0, refEndIndex);
+                    PsiElement target = JavaDocUtil.findReferenceTarget(docContext.getManager(), refText, docContext, true);
+                    if ( target == null ) {
+                        return;
+                    }
+                    newLink.append(JavaDocUtil.getReferenceText(project, target)).append(' ');
+                    String labelText = linkText.substring(refEndIndex).trim();
+                    if ( labelText.isEmpty() ) {
+                        labelText = JavaDocUtil.getLabelText(project, docContext.getManager(), refText, docContext);
+                    }
+                    newLink.append(labelText);
+                    if ( inlineOffset > 0 ) {
+                        newLink.append('}');
+                    }
+                    int start = getStartOffsetInComment(element);
+                    if ( buffer == null ) {
+                        buffer = new StringBuilder(docText.length() + 100);
+                    }
+                    buffer.append(docText, docTextPosition, start);
+                    buffer.append(newLink);
+                    docTextPosition += start - docTextPosition + element.getTextLength();
+                }
+            }
+            else {
+                element.acceptChildren(this);
+            }
+        }
+
+        private int getStartOffsetInComment(PsiElement element) {
+            int offset = 0;
+            while ( element != null && !(element instanceof PsiDocComment) ) {
+                offset += element.getStartOffsetInParent();
+                element = element.getParent();
+            }
+            return offset;
+        }
+
     }
 
 }
