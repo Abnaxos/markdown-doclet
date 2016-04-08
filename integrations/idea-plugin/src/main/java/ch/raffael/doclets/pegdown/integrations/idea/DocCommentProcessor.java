@@ -234,6 +234,7 @@ public class DocCommentProcessor {
             }
         }
         String markdown = stripLead(buf.toString());
+
         Plugin.print("Markdown source", markdown);
         String docCommentText = "/**\n" + escapeAsterisks(doclet.toHtml(markdown, false))
                 + "\n" + escapeAsterisks(tagBlock.toString()) + "\n*/";
@@ -372,7 +373,7 @@ public class DocCommentProcessor {
             firstWord = stripped[0];
             text = stripped[1].trim();
         }
-        text = escapeAsterisks(TagRendering.simplifySingleParagraph(doclet.toHtml(text, false)));
+        text = TagRendering.simplifySingleParagraph(doclet.toHtml(text, false));
         if ( firstWord != null ) {
             tagBlock.append(firstWord).append(' ');
         }
@@ -425,10 +426,10 @@ public class DocCommentProcessor {
         tagText = stripFirstWord(tagText)[1]; // remove the tag itself
         if ( stripFirstWord ) {
             String[] stripped = stripFirstWord(tagText);
-            return stripped[0] + " " + escapeAsterisks(stripped[1].trim());
+            return stripped[0] + " " + stripped[1].trim();
         }
         else {
-            return escapeAsterisks(tagText.trim());
+            return tagText.trim();
         }
     }
 
@@ -470,7 +471,6 @@ public class DocCommentProcessor {
         private int docTextPosition = 0;
         @SuppressWarnings("StringBufferField")
         private StringBuilder buffer = null;
-        private int offset = 0;
 
         LinkExpander(PsiDocCommentOwner docContext, PsiDocComment originalDocComment, String docText) {
             this.docContext = docContext;
@@ -484,7 +484,6 @@ public class DocCommentProcessor {
             }
             docTextPosition = 0;
             buffer = null;
-            offset = 0;
             originalDocComment.acceptChildren(LinkExpander.this);
             if ( buffer == null ) {
                 return originalDocComment;
@@ -544,9 +543,7 @@ public class DocCommentProcessor {
                     docTextPosition += start - docTextPosition + element.getTextLength();
                 }
             }
-            else {
-                element.acceptChildren(this);
-            }
+            element.acceptChildren(this);
         }
 
         private int getStartOffsetInComment(PsiElement element) {
