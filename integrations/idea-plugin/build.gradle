@@ -15,6 +15,13 @@ dependencies {
     packaged docletProject
 }
 
+processResources {
+    //noinspection UnnecessaryQualifiedReference
+    filter org.apache.tools.ant.filters.ReplaceTokens, tokens: [
+            "idea-plugin-version": project.version
+    ]
+}
+
 tasks.jar {
     exclude 'com/intellij/uiDesigner/**'
     configurations.packaged.collect { p ->
