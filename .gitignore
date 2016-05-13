@@ -2,3 +2,6 @@
 build/
 target/
 run/
+
+# exclude build settings
+local.properties

@@ -3,3 +3,36 @@ include 'integrations:idea-plugin'
 include 'integrations:gradle-plugin'
 
 rootProject.name = 'pegdown-doclet'
+
+gradle.projectsLoaded {
+    def loadProperties
+    loadProperties = { Project prj, Properties props ->
+        if ( prj.parent != null ) {
+            loadProperties(prj.parent, props)
+        }
+        File localProperties = new File(prj.projectDir, 'local.properties')
+        try {
+            if ( localProperties.isFile() ) {
+//                println "*** loading: $localProperties"
+                new FileInputStream(localProperties).with {
+                    props.load(it)
+                }
+                println props
+            }
+            else {
+//                println "*** not present: $localProperties"
+            }
+        }
+        catch ( Exception e ) {
+            throw new GradleException("Failed to load $localProperties: $e", e)
+        }
+    }
+    gradle.allprojects { prj ->
+        Properties props = new Properties()
+        loadProperties(prj, props)
+//        println "*** $props"
+        props.each { entry ->
+            prj[(String)entry.key] = entry.value
+        }
+    }
+}
