@@ -6,31 +6,30 @@ rootProject.name = 'pegdown-doclet'
 
 gradle.projectsLoaded {
     def loadProperties
-    loadProperties = { Project prj, Properties props ->
+    loadProperties = { Project prj, Properties props, Object prjPath->
         if ( prj.parent != null ) {
-            loadProperties(prj.parent, props)
+            loadProperties(prj.parent, props, prjPath)
         }
         File localProperties = new File(prj.projectDir, 'local.properties')
         try {
             if ( localProperties.isFile() ) {
-//                println "*** loading: $localProperties"
+                logger.info "local.properties: [$prjPath] Loading $localProperties"
                 new FileInputStream(localProperties).with {
                     props.load(it)
                 }
-                println props
             }
             else {
-//                println "*** not present: $localProperties"
+                logger.debug "local.properties: [$prjPath] Not present: $localProperties"
             }
         }
         catch ( Exception e ) {
-            throw new GradleException("Failed to load $localProperties: $e", e)
+            throw new GradleException("[$prjPath] Failed to load $localProperties: $e", e)
         }
     }
     gradle.allprojects { prj ->
         Properties props = new Properties()
-        loadProperties(prj, props)
-//        println "*** $props"
+        loadProperties(prj, props, prj.path)
+        logger.debug "local.properties: [$prj.path] Final property overrides: $props"
         props.each { entry ->
             prj[(String)entry.key] = entry.value
         }

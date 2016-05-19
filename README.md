@@ -129,6 +129,30 @@ It supports all options the standard Doclet supports and some additional options
  
  *  *`-javadocversion <version>`*: Set the version of JavaDoc that's invoking this Doclet. This is used to adapt to some quirks, currently to use different default CSS files for JDK 7 and 8. The default is the version currently running JVM, which is usually the right thing. If you have to override it, currently supported values are *`v7`* or *`v8`*. 
 
+
+### Locale
+
+There's an annoying issue with Javadoc: If the locale is not set to exactly `en`, it won't work with HTML tags correctly when determining the first sentence. For instance, of you start your comment with a title (which using Markdown actually encourages to do, at least in package descriptions), the closing `</h1>` tag will not be recognised:
+
+```java
+/**
+ * * My Title
+ *
+ * Text goes here. More details follow.
+ */
+```
+
+With a locale other than 'en', only the dot ('.') is recognised as sentence end resulting in the following summary:
+
+>   My Title Text goes here.
+
+If the locale is `en` and no break iterator is set, the `</h1>` after "My Title" is recognised as sentence end.
+
+I'd therefore recommend to set the locale explicitly to `en`.
+
+*See also:* [Issue #44](https://github.com/Abnaxos/pegdown-doclet/issues/44)
+
+
 ### Gradle
 
 Add the following to your `build.gradle` to use the doclet with Gradle:
