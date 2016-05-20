@@ -2,7 +2,7 @@ configurations {
     packaged
 }
 
-version = componentBaseVersion + '-0' + snapshot(false)
+version = componentBaseVersion + '-1' + snapshot(true)
 
 dependencies {
     compile docletProject
