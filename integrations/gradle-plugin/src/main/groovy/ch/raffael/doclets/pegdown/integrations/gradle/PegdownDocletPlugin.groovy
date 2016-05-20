@@ -8,9 +8,6 @@ class PegdownDocletPlugin implements Plugin<Project> {
     final def CONFIGURATION_NAME = "pegdownDoclet"
 
     void apply(Project project) {
-        // make sure the java plugin is applied
-        project.plugins.apply('java')
-
         // create a new configuration for the doclet dependency
         def config = project.configurations.create(CONFIGURATION_NAME)
 
