@@ -37,9 +37,13 @@ allprojects {
 
 subprojects {
 
-    apply plugin:'java'
-    apply plugin:'groovy'
-    apply plugin:'idea'
+    if ( !file('src').isDirectory() ) {
+        return
+    }
+
+    apply plugin: 'java'
+    apply plugin: 'groovy'
+    apply plugin: 'idea'
 
     repositories {
         mavenLocal()
@@ -117,18 +121,6 @@ subprojects {
               """
             }
         }
-    }
-    task javadocJar(type: Jar) {
-        classifier = 'javadoc'
-        from javadoc
-    }
-
-    task sourceJar(type: Jar) {
-        classifier = 'sources'
-        from sourceSets.main.allSource
-    }
-    artifacts {
-        archives javadocJar, sourceJar
     }
 
     idea.module {

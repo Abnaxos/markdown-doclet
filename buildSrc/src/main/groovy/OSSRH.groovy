@@ -1,6 +1,7 @@
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.artifacts.maven.MavenDeployment
+import org.gradle.api.tasks.bundling.Jar
 
 
 /**
@@ -67,6 +68,18 @@ class OSSRH implements Plugin<Project> {
                         }
                     }
                 }
+            }
+
+            task('javadocJar', type: Jar) {
+                classifier = 'javadoc'
+                from javadoc
+            }
+            task('sourceJar', type: Jar) {
+                classifier = 'sources'
+                from sourceSets.main.allSource
+            }
+            artifacts {
+                archives tasks.javadocJar, tasks.sourceJar
             }
 
             // disable signing when we're not uploading the archives to OSSRH
