@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Raffael Herzog
+ * Copyright 2013-2016 Raffael Herzog / Marko Umek
  *
  * This file is part of pegdown-doclet.
  *
@@ -18,33 +18,23 @@
  */
 package ch.raffael.doclets.pegdown;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.lang.reflect.Field;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-
 import com.google.common.io.ByteStreams;
 import com.google.common.io.Files;
-import com.sun.javadoc.AnnotationTypeDoc;
-import com.sun.javadoc.ClassDoc;
-import com.sun.javadoc.Doc;
-import com.sun.javadoc.DocErrorReporter;
-import com.sun.javadoc.LanguageVersion;
-import com.sun.javadoc.MemberDoc;
-import com.sun.javadoc.PackageDoc;
-import com.sun.javadoc.RootDoc;
-import com.sun.javadoc.SourcePosition;
-import com.sun.javadoc.Tag;
+import com.sun.javadoc.*;
 import com.sun.tools.doclets.standard.Standard;
 import com.sun.tools.javadoc.Main;
 import org.parboiled.errors.ParserRuntimeException;
+import org.pegdown.LinkRenderer;
+import org.pegdown.PegDownProcessor;
+import org.pegdown.ToHtmlSerializer;
+
+import java.io.*;
+import java.lang.reflect.Field;
+import java.util.*;
+import java.util.regex.Pattern;
+
+import static ch.raffael.doclets.pegdown.Options.DEFAULT_PEGDOWN_EXTENSIONS;
+import static com.google.common.base.MoreObjects.firstNonNull;
 
 
 /**
@@ -62,6 +52,8 @@ public class PegdownDoclet implements DocErrorReporter {
             "<script type=\"text/javascript\" src=\"" + "{@docRoot}/highlight.pack.js" + "\"></script>\n"
             + "<script type=\"text/javascript\"><!--\nhljs.initHighlightingOnLoad();\n//--></script>";
 
+    private static final Pattern LINE_START = Pattern.compile("^ ", Pattern.MULTILINE);
+
     private final Map<String, TagRenderer<?>> tagRenderers = new HashMap<>();
 
     private final Set<PackageDoc> packages = new HashSet<>();
@@ -69,6 +61,10 @@ public class PegdownDoclet implements DocErrorReporter {
     private final RootDoc rootDoc;
 
     private boolean error = false;
+
+    private LinkRenderer linkRenderer = null;
+    private PegDownProcessor processor = null;
+
 
     /**
      * Construct a new Pegdown Doclet.
@@ -351,12 +347,12 @@ public class PegdownDoclet implements DocErrorReporter {
      * @param doc              The documentation.
      * @param fixLeadingSpaces `true` if leading spaces should be fixed.
      *
-     * @see Options#toHtml(String, boolean)
+     * @see #toHtml(String, boolean)
      */
     protected void defaultProcess(Doc doc, boolean fixLeadingSpaces) {
         try {
             StringBuilder buf = new StringBuilder();
-            buf.append(getOptions().toHtml(doc.commentText(), fixLeadingSpaces));
+            buf.append(toHtml(doc.commentText(), fixLeadingSpaces));
             buf.append('\n');
             for ( Tag tag : doc.tags() ) {
                 processTag(tag, buf);
@@ -410,7 +406,7 @@ public class PegdownDoclet implements DocErrorReporter {
      * @return The resulting HTML.
      */
     public String toHtml(String markup) {
-        return options.toHtml(markup);
+        return toHtml(markup, true);
     }
 
     /**
@@ -422,8 +418,50 @@ public class PegdownDoclet implements DocErrorReporter {
      * @return The resulting HTML.
      */
     public String toHtml(String markup, boolean fixLeadingSpaces) {
-        return options.toHtml(markup, fixLeadingSpaces);
+        if ( processor == null ) {
+            processor = createProcessor();
+        }
+        if ( fixLeadingSpaces ) {
+            markup = LINE_START.matcher(markup).replaceAll("");
+        }
+
+        List<String> tags = new ArrayList<>();
+        String html = createDocletSerializer().toHtml(processor.parseMarkdown(Tags.extractInlineTags(markup, tags).toCharArray()));
+        return Tags.insertInlineTags(html, tags);
     }
+
+    /**
+     * Create a new processor. If you need to further customise the markup processing,
+     * you can override this method.
+     *
+     * @return A (possibly customised) Pegdown processor.
+     */
+    protected PegDownProcessor createProcessor() {
+        return new PegDownProcessor(firstNonNull(options.getPegdownExtensions(), DEFAULT_PEGDOWN_EXTENSIONS), options.getParseTimeout());
+    }
+
+    /**
+     * Create a new serializer. If you need to further customize the HTML rendering, you
+     * can override this method.
+     *
+     * @return A (possibly customised) ToHtmlSerializer.
+     */
+    protected ToHtmlSerializer createDocletSerializer() {
+        return new DocletSerializer(this.options, getLinkRenderer());
+    }
+
+    /**
+     * Gets the link renderer.
+     *
+     * @return The link renderer.
+     */
+    private LinkRenderer getLinkRenderer() {
+        if ( linkRenderer == null ) {
+            linkRenderer = new DocletLinkRenderer();
+        }
+        return linkRenderer;
+    }
+
 
     /**
      * Indicate that an error occurred. This method will also be called by

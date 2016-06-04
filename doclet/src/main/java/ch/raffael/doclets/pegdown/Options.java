@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Raffael Herzog
+ * Copyright 2013-2016 Raffael Herzog / Marko Umek
  *
  * This file is part of pegdown-doclet.
  *
@@ -18,18 +18,6 @@
  */
 package ch.raffael.doclets.pegdown;
 
-import java.io.File;
-import java.lang.reflect.Field;
-import java.math.BigDecimal;
-import java.nio.charset.Charset;
-import java.nio.charset.IllegalCharsetNameException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.regex.Pattern;
-
 import com.google.common.base.Splitter;
 import com.sun.javadoc.DocErrorReporter;
 import com.sun.tools.doclets.standard.Standard;
@@ -37,6 +25,14 @@ import org.pegdown.Extensions;
 import org.pegdown.LinkRenderer;
 import org.pegdown.PegDownProcessor;
 import org.pegdown.ToHtmlSerializer;
+
+import java.io.File;
+import java.lang.reflect.Field;
+import java.math.BigDecimal;
+import java.nio.charset.Charset;
+import java.nio.charset.IllegalCharsetNameException;
+import java.util.*;
+import java.util.regex.Pattern;
 
 import static com.google.common.base.MoreObjects.firstNonNull;
 
@@ -99,7 +95,6 @@ public class Options {
     private String todoTitle = null;
 
     private LinkRenderer linkRenderer = null;
-    private PegDownProcessor processor = null;
 
     public Options() {
     }
@@ -259,7 +254,6 @@ public class Options {
      */
     public void setPegdownExtensions(int pegdownExtensions) {
         this.pegdownExtensions = pegdownExtensions;
-        processor = null;
     }
 
     /**
@@ -443,7 +437,6 @@ public class Options {
      * @see PegDownProcessor#PegDownProcessor(int, long)
      */
     public long getParseTimeout() {
-        processor = null;
         return parseTimeout != null ? parseTimeout : PegDownProcessor.DEFAULT_MAX_PARSING_TIME;
     }
 
@@ -456,54 +449,6 @@ public class Options {
      */
     public void setParseTimeout(long parseTimeout) {
         this.parseTimeout = parseTimeout;
-    }
-
-    /**
-     * Converts Markdown source to HTML according to this options object. Leading spaces
-     * will be fixed.
-     *
-     * @param markup    The Markdown source.
-     *
-     * @return The resulting HTML.
-     *
-     * @see #toHtml(String, boolean)
-     */
-    public String toHtml(String markup) {
-        return toHtml(markup, true);
-    }
-
-    /**
-     * Converts Markdown source to HTML according to this options object. If
-     * `fixLeadingSpaces` is `true`, exactly one leading whitespace character ('\\u0020')
-     * will be removed, if it exists.
-     *
-     * @todo This method doesn't belong here, move it to {@link PegdownDoclet}.
-     *
-     * @param markup           The Markdown source.
-     * @param fixLeadingSpaces `true` if leading spaces should be fixed.
-     *
-     * @return The resulting HTML.
-     */
-    public String toHtml(String markup, boolean fixLeadingSpaces) {
-        if ( processor == null ) {
-            processor = createProcessor();
-        }
-        if ( fixLeadingSpaces ) {
-            markup = LINE_START.matcher(markup).replaceAll("");
-        }
-        List<String> tags = new ArrayList<>();
-        String html = createDocletSerializer().toHtml(processor.parseMarkdown(Tags.extractInlineTags(markup, tags).toCharArray()));
-        return Tags.insertInlineTags(html, tags);
-    }
-
-    /**
-     * Create a new processor. If you need to further customise the markup processing,
-     * you can override this method.
-     *
-     * @return A (possibly customised) Pegdown processor.
-     */
-    protected PegDownProcessor createProcessor() {
-        return new PegDownProcessor(firstNonNull(pegdownExtensions, DEFAULT_PEGDOWN_EXTENSIONS), getParseTimeout());
     }
 
     /**
