@@ -18,6 +18,8 @@
  */
 package ch.raffael.doclets.pegdown;
 
+import ch.raffael.doclets.pegdown.inlinetag.InlineTagRender;
+import ch.raffael.doclets.pegdown.inlinetag.InlineTagRenders;
 import com.google.common.io.ByteStreams;
 import com.google.common.io.Files;
 import com.sun.javadoc.*;
@@ -64,6 +66,7 @@ public class PegdownDoclet implements DocErrorReporter {
 
     private LinkRenderer linkRenderer = null;
     private PegDownProcessor processor = null;
+    private InlineTagRender inlineTagRenders = null;
 
 
     /**
@@ -425,9 +428,18 @@ public class PegdownDoclet implements DocErrorReporter {
             markup = LINE_START.matcher(markup).replaceAll("");
         }
 
+        markup = renderInlineTags(markup);
+
         List<String> tags = new ArrayList<>();
         String html = createDocletSerializer().toHtml(processor.parseMarkdown(Tags.extractInlineTags(markup, tags).toCharArray()));
         return Tags.insertInlineTags(html, tags);
+    }
+
+    private String renderInlineTags(String markup) {
+        if( this.inlineTagRenders==null ) {
+            this.inlineTagRenders = InlineTagRenders.standardRenders(this.options);
+        }
+        return this.inlineTagRenders.render(markup);
     }
 
     /**
