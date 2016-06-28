@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2016 Raffael Herzog / Marko Umek
+ * Copyright 2013-2016 Raffael Herzog, Marko Umek
  *
  * This file is part of pegdown-doclet.
  *
@@ -15,9 +15,13 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with pegdown-doclet.  If not, see <http://www.gnu.org/licenses/>.
+ *
  */
 package ch.raffael.doclets.pegdown;
 
+import ch.raffael.doclets.pegdown.mdtaglet.MarkdownTaglets;
+import ch.raffael.doclets.pegdown.pdrepair.PegdownRepair;
+import ch.raffael.doclets.pegdown.pdrepair.PegdownRepairKit;
 import com.google.common.base.Splitter;
 import com.sun.javadoc.DocErrorReporter;
 import com.sun.tools.doclets.standard.Standard;
@@ -95,6 +99,9 @@ public class Options {
     private String todoTitle = null;
 
     private LinkRenderer linkRenderer = null;
+    private PegDownProcessor processor = null;
+
+    private final MarkdownTaglets markdownTaglets=MarkdownTaglets.instance();
 
     public Options() {
     }
@@ -231,6 +238,10 @@ public class Options {
             setTodoTitle(todoTitle);
             optionsIter.remove();
         }
+        else if( markdownTaglets.handleOptions(opt, errorReporter) ) {
+            optionsIter.remove();
+        }
+
         return true;
     }
 
@@ -254,6 +265,7 @@ public class Options {
      */
     public void setPegdownExtensions(int pegdownExtensions) {
         this.pegdownExtensions = pegdownExtensions;
+        processor = null;
     }
 
     /**
@@ -437,6 +449,7 @@ public class Options {
      * @see PegDownProcessor#PegDownProcessor(int, long)
      */
     public long getParseTimeout() {
+        processor = null;
         return parseTimeout != null ? parseTimeout : PegDownProcessor.DEFAULT_MAX_PARSING_TIME;
     }
 
@@ -449,6 +462,61 @@ public class Options {
      */
     public void setParseTimeout(long parseTimeout) {
         this.parseTimeout = parseTimeout;
+    }
+
+    /**
+     * Converts Markdown source to HTML according to this options object. Leading spaces
+     * will be fixed.
+     *
+     * @param markup    The Markdown source.
+     *
+     * @return The resulting HTML.
+     *
+     * @see #toHtml(String, boolean)
+     */
+    public String toHtml(String markup) {
+        return toHtml(markup, true);
+    }
+
+    /**
+     * Converts Markdown source to HTML according to this options object. If
+     * `fixLeadingSpaces` is `true`, exactly one leading whitespace character ('\\u0020')
+     * will be removed, if it exists.
+     *
+     * @todo This method doesn't belong here, move it to {@link PegdownDoclet}.
+     *
+     * @param markup           The Markdown source.
+     * @param fixLeadingSpaces `true` if leading spaces should be fixed.
+     *
+     * @return The resulting HTML.
+     */
+    public String toHtml(String markup, boolean fixLeadingSpaces) {
+        final PegdownRepair pegdownRepairKit=new PegdownRepairKit(fixLeadingSpaces);
+        if ( processor == null ) {
+            processor = createProcessor();
+        }
+
+        String markdown = renderMarkdownTags(markup);
+
+        markdown=pegdownRepairKit.beforePegdownParser(markdown);
+        final String html = createDocletSerializer().toHtml(processor.parseMarkdown(markdown.toCharArray()));
+        return pegdownRepairKit.afterPegdownParser(html);
+    }
+
+    private String renderMarkdownTags(String markup) {
+        return this.markdownTaglets.apply(markup);
+    }
+
+
+
+    /**
+     * Create a new processor. If you need to further customise the markup processing,
+     * you can override this method.
+     *
+     * @return A (possibly customised) Pegdown processor.
+     */
+    protected PegDownProcessor createProcessor() {
+        return new PegDownProcessor(firstNonNull(pegdownExtensions, DEFAULT_PEGDOWN_EXTENSIONS), getParseTimeout());
     }
 
     /**
@@ -473,9 +541,14 @@ public class Options {
             case OPT_DISABLE_HIGHLIGHT:
             case OPT_ENABLE_AUTO_HIGHLIGHT:
                 return 1;
-            default:
-                return Standard.optionLength(option);
         }
+
+        final int optionLength = MarkdownTaglets.optionLengths(option);
+        if( optionLength>0 ) {
+            return optionLength;
+        }
+
+        return Standard.optionLength(option);
     }
 
     /**

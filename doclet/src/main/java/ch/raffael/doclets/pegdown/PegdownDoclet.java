@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2016 Raffael Herzog / Marko Umek
+ * Copyright 2013-2016 Raffael Herzog, Marko Umek
  *
  * This file is part of pegdown-doclet.
  *
@@ -15,28 +15,21 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with pegdown-doclet.  If not, see <http://www.gnu.org/licenses/>.
+ *
  */
 package ch.raffael.doclets.pegdown;
 
-import ch.raffael.doclets.pegdown.inlinetag.InlineTagRender;
-import ch.raffael.doclets.pegdown.inlinetag.InlineTagRenders;
+import ch.raffael.doclets.pegdown.mdtaglet.MarkdownTaglets;
 import com.google.common.io.ByteStreams;
 import com.google.common.io.Files;
 import com.sun.javadoc.*;
 import com.sun.tools.doclets.standard.Standard;
 import com.sun.tools.javadoc.Main;
 import org.parboiled.errors.ParserRuntimeException;
-import org.pegdown.LinkRenderer;
-import org.pegdown.PegDownProcessor;
-import org.pegdown.ToHtmlSerializer;
 
 import java.io.*;
 import java.lang.reflect.Field;
 import java.util.*;
-import java.util.regex.Pattern;
-
-import static ch.raffael.doclets.pegdown.Options.DEFAULT_PEGDOWN_EXTENSIONS;
-import static com.google.common.base.MoreObjects.firstNonNull;
 
 
 /**
@@ -54,8 +47,6 @@ public class PegdownDoclet implements DocErrorReporter {
             "<script type=\"text/javascript\" src=\"" + "{@docRoot}/highlight.pack.js" + "\"></script>\n"
             + "<script type=\"text/javascript\"><!--\nhljs.initHighlightingOnLoad();\n//--></script>";
 
-    private static final Pattern LINE_START = Pattern.compile("^ ", Pattern.MULTILINE);
-
     private final Map<String, TagRenderer<?>> tagRenderers = new HashMap<>();
 
     private final Set<PackageDoc> packages = new HashSet<>();
@@ -64,14 +55,8 @@ public class PegdownDoclet implements DocErrorReporter {
 
     private boolean error = false;
 
-    private LinkRenderer linkRenderer = null;
-    private PegDownProcessor processor = null;
-    private InlineTagRender inlineTagRenders = null;
-
-
     /**
      * Construct a new Pegdown Doclet.
-     *
      * @param options The command line options.
      * @param rootDoc The root document.
      */
@@ -127,12 +112,14 @@ public class PegdownDoclet implements DocErrorReporter {
      * @see com.sun.javadoc.Doclet#start(RootDoc)
      */
     public static boolean start(RootDoc rootDoc) {
+        final MarkdownTaglets markdownTaglets = MarkdownTaglets.instance();
         Options options = new Options();
         String[][] forwardedOptions = options.load(rootDoc.options(), rootDoc);
         if ( forwardedOptions == null ) {
             return false;
         }
         PegdownDoclet doclet = new PegdownDoclet(options, rootDoc);
+        markdownTaglets.setDocErrorReporter(doclet);
         doclet.process();
         if ( doclet.isError() ) {
             return false;
@@ -350,12 +337,12 @@ public class PegdownDoclet implements DocErrorReporter {
      * @param doc              The documentation.
      * @param fixLeadingSpaces `true` if leading spaces should be fixed.
      *
-     * @see #toHtml(String, boolean)
+     * @see Options#toHtml(String, boolean)
      */
     protected void defaultProcess(Doc doc, boolean fixLeadingSpaces) {
         try {
             StringBuilder buf = new StringBuilder();
-            buf.append(toHtml(doc.commentText(), fixLeadingSpaces));
+            buf.append(getOptions().toHtml(doc.commentText(), fixLeadingSpaces));
             buf.append('\n');
             for ( Tag tag : doc.tags() ) {
                 processTag(tag, buf);
@@ -409,7 +396,7 @@ public class PegdownDoclet implements DocErrorReporter {
      * @return The resulting HTML.
      */
     public String toHtml(String markup) {
-        return toHtml(markup, true);
+        return options.toHtml(markup);
     }
 
     /**
@@ -421,59 +408,8 @@ public class PegdownDoclet implements DocErrorReporter {
      * @return The resulting HTML.
      */
     public String toHtml(String markup, boolean fixLeadingSpaces) {
-        if ( processor == null ) {
-            processor = createProcessor();
-        }
-        if ( fixLeadingSpaces ) {
-            markup = LINE_START.matcher(markup).replaceAll("");
-        }
-
-        markup = renderInlineTags(markup);
-
-        List<String> tags = new ArrayList<>();
-        String html = createDocletSerializer().toHtml(processor.parseMarkdown(Tags.extractInlineTags(markup, tags).toCharArray()));
-        return Tags.insertInlineTags(html, tags);
+        return options.toHtml(markup, fixLeadingSpaces);
     }
-
-    private String renderInlineTags(String markup) {
-        if( this.inlineTagRenders==null ) {
-            this.inlineTagRenders = InlineTagRenders.standardRenders(this.options);
-        }
-        return this.inlineTagRenders.render(markup);
-    }
-
-    /**
-     * Create a new processor. If you need to further customise the markup processing,
-     * you can override this method.
-     *
-     * @return A (possibly customised) Pegdown processor.
-     */
-    protected PegDownProcessor createProcessor() {
-        return new PegDownProcessor(firstNonNull(options.getPegdownExtensions(), DEFAULT_PEGDOWN_EXTENSIONS), options.getParseTimeout());
-    }
-
-    /**
-     * Create a new serializer. If you need to further customize the HTML rendering, you
-     * can override this method.
-     *
-     * @return A (possibly customised) ToHtmlSerializer.
-     */
-    protected ToHtmlSerializer createDocletSerializer() {
-        return new DocletSerializer(this.options, getLinkRenderer());
-    }
-
-    /**
-     * Gets the link renderer.
-     *
-     * @return The link renderer.
-     */
-    private LinkRenderer getLinkRenderer() {
-        if ( linkRenderer == null ) {
-            linkRenderer = new DocletLinkRenderer();
-        }
-        return linkRenderer;
-    }
-
 
     /**
      * Indicate that an error occurred. This method will also be called by

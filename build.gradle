@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 Raffael Herzog
+ * Copyright 2013-2016 Raffael Herzog, Marko Umek
  *
  * This file is part of pegdown-doclet.
  *
@@ -15,6 +15,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with pegdown-doclet.  If not, see <http://www.gnu.org/licenses/>.
+ *
  */
 
 apply plugin:'wrapper'
@@ -69,9 +70,11 @@ subprojects {
     configurations { testCompile.extendsFrom compileOnly }
     ext {
         libs = [
-                pegdown: [group:'org.pegdown', name:'pegdown', version:'1.6.0'],
-                guava: [group:'com.google.guava', name:'guava', version:'18.0'],
-                plantuml: [group:'net.sourceforge.plantuml', name:'plantuml', version:'8032'],
+                pegdown : [group: 'org.pegdown', name: 'pegdown', version: '1.6.0'],
+                guava   : [group: 'com.google.guava', name: 'guava', version: '18.0'],
+                plantuml: [group: 'net.sourceforge.plantuml', name: 'plantuml', version: '8032'],
+                github:   [group: 'org.kohsuke', name: 'github-api', version: '1.76'],
+                jakartaCommonsLang3:   [group: 'org.apache.commons', name: 'commons-lang3', version: '3.4'],
                 jdkTools: files("${System.properties['java.home']}/../lib/tools.jar"),
         ]
         docletProject = project(':doclet')
