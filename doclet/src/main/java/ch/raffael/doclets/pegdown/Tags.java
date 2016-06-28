@@ -18,19 +18,22 @@
  */
 package ch.raffael.doclets.pegdown;
 
+import com.google.common.collect.ImmutableMap;
+
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import com.google.common.collect.ImmutableMap;
 
 
 /**
  * Utility class providing some helpers for working with tags.
  *
  * @author <a href="mailto:herzog@raffael.ch">Raffael Herzog</a>
+ *
+ * @deprecated Part of {@link ch.raffael.doclets.pegdown.pdrepair.PegdownRepairKit}
  */
+@Deprecated
 public final class Tags {
 
     /**
