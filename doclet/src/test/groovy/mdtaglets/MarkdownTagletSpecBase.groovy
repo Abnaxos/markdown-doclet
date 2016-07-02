@@ -28,6 +28,9 @@ import spock.lang.Specification
 import spock.lang.Subject
 
 import java.nio.file.Path
+
+import static ch.raffael.doclets.pegdown.mdtaglet.MarkdownTagletUtils.stripBlanksFromLineEnd
+import static ch.raffael.doclets.pegdown.mdtaglet.MarkdownTagletUtils.stripBlanksFromLineStart
 /**
  * MarkdownTagletSpecBase should be used for testing {@link ch.raffael.doclets.pegdown.mdtaglet.MarkdownTaglet}.
  */
@@ -39,7 +42,14 @@ abstract class MarkdownTagletSpecBase extends Specification {
     protected final javadocRunner = new MarkdownTagletJavadocRunner()
 
     void setup() {
+        reset()
+    }
+
+    static void reset() {
+        println("Reset javadoc runner")
         MarkdownTagletJavadocRunner.cleanTargetPath();
+
+        println("Reset markdown taglets")
         MarkdownTaglets.reset();
     }
 
@@ -68,7 +78,12 @@ abstract class MarkdownTagletSpecBase extends Specification {
 
 
     private static Document parse(String path) {
-        Jsoup.parse(JAVADOC_TARGET_PATH.resolve(
-                path.replace('.', File.separator) + '.html').toFile(), CHARSET)
+        Jsoup.parse(
+                JAVADOC_TARGET_PATH.resolve(path.replace('.', File.separator) + '.html').toFile(),
+                CHARSET)
+    }
+
+    protected static String normalize(String html) {
+        return stripBlanksFromLineEnd(stripBlanksFromLineStart(html))
     }
 }

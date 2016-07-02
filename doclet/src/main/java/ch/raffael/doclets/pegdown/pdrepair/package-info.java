@@ -15,11 +15,10 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with pegdown-doclet.  If not, see <http://www.gnu.org/licenses/>.
- *
  */
 
 /**
- * # The classes with this package repairs/corrects some issues of using the pegdown parser within javadoc.
+ * # The classes with this package repairs/corrects some issues of using a markdown parser with javadoc.
  *
  * 1. Correct the leading space issue. *Seems to be no issue anymore, but still in place*. (`SpaceCharacterRepair`)
  * 2. It's not really an issue, but I'd like to strip trailing whitespace characters from every line. (also `SpaceCharacterRepair`)
@@ -29,12 +28,12 @@
  *    further issue. `AtSymbolRepair`
  * 5. Within pegdown/markdown code block, the usage of html entities was not possible, this is fixed by `HtmlEntitiesRepair`.
  *
- * These are all part of `PegdownRepairKit` and are used by `Options.toHtml(java.lang.String, boolean)`.
+ * These are all part of `MarkdownRepairKit` and are used by `Options.toHtml(java.lang.String, boolean)`.
  *
- * All classes are implementing {@link ch.raffael.doclets.pegdown.pdrepair.PegdownRepair}.
+ * All classes are implementing {@link ch.raffael.doclets.pegdown.pdrepair.MarkdownRepair}.
  *
  * @see ch.raffael.doclets.pegdown.Options#toHtml(java.lang.String, boolean)
- * @see ch.raffael.doclets.pegdown.pdrepair.PegdownRepairKit
+ * @see ch.raffael.doclets.pegdown.pdrepair.MarkdownRepairKit
  * @see ch.raffael.doclets.pegdown.pdrepair.SpaceCharacterRepair
  * @see ch.raffael.doclets.pegdown.pdrepair.InlineTagletRepair
  * @see ch.raffael.doclets.pegdown.pdrepair.AtSymbolRepair

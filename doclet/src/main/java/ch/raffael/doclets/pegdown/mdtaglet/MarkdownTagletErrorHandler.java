@@ -27,6 +27,13 @@ import java.util.List;
  */
 public interface MarkdownTagletErrorHandler {
     /**
+     * # Called in case setting an option on a {@link MarkdownTaglet} throws an exception.
+     * @param markdownTaglet the markdown taglet
+     * @param exception the exception
+     */
+    void optionsSetError(MarkdownTaglet markdownTaglet, Throwable exception);
+
+    /**
      * # Called in case {@link MarkdownTaglet#afterOptionsSet()} throws an exception.
      * @param markdownTaglet the markdown taglet
      * @param exception the exception

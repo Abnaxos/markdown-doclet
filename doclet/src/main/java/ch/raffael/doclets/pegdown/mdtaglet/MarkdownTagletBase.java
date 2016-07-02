@@ -20,7 +20,10 @@
 package ch.raffael.doclets.pegdown.mdtaglet;
 
 import ch.raffael.doclets.pegdown.mdtaglet.argval.PredefinedArgumentValidators;
+import org.apache.commons.io.FileUtils;
 
+import java.io.File;
+import java.net.URL;
 import java.util.List;
 
 /**
@@ -28,23 +31,47 @@ import java.util.List;
  *
  * Every markdown taglet should be extend this base class. It provide some default implementation and protect your
  * taglet for further interface changes.
+ *
+ * Remark: See the helper methods.
+ *
+ * - {@link #fetchMarkdownTagletDescriptionFile(String)}
+ * - {@link #emptyLines(int)}
+ * - {@link #newline()}
+ * - {@link #htmlEmptyLines(int)}
+ * - {@link #htmlNewline()}
+ *
  */
+@SuppressWarnings({"WeakerAccess", "unused"})
 public abstract class MarkdownTagletBase implements MarkdownTaglet {
 
     /**
      * Default implementation.
      *
      * @return empty string (no description).
+     *
+     * @see #fetchMarkdownTagletDescriptionFile(String)
      */
     @Override
     public String getDescription() {
         return "";
     }
 
-
+    /**
+     * Default implementation does nothing.
+     * @throws Exception will never happen
+     */
     @Override
     public void afterOptionsSet() throws Exception {
         // do nothing.
+    }
+
+    /**
+     * Default implementation dos not create a new instance, it returns itself.
+     * @return this
+     */
+    @Override
+    public MarkdownTaglet createNewInstance() {
+        return this;
     }
 
     /**
@@ -112,8 +139,61 @@ public abstract class MarkdownTagletBase implements MarkdownTaglet {
     }
 
 
+    /**
+     * Fetch the markdown taglet description from a resource within your classpath.
+     * @param resourceName the resourceName
+     * @return the content of the resource file or *empty string*.
+     */
+    protected String fetchMarkdownTagletDescriptionFile(String resourceName) {
+        final URL url = this.getClass().getResource(resourceName);
+        if( url!=null ) {
+            try {
+                return FileUtils.readFileToString(new File(url.toURI()));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        return "";
+    }
+
+    /**
+     * Create number of empty html lines (line breaks).
+     * @param numberOfEmptyLines number of empty lines
+     * @return #`\n<br>`
+     */
+    protected static String htmlEmptyLines(int numberOfEmptyLines) {
+        final String lineSeparator = "\n<br>";
+        return generateLineBreaks(numberOfEmptyLines, lineSeparator);
+    }
+
+    /**
+     * A (HTML) line break.
+     * @return a html line break.
+     */
+    protected static String htmlNewline() {
+        return htmlEmptyLines(0);
+    }
+
+    /**
+     * Create number of empty lines (line breaks).
+     * @param numberOfEmptyLines number of empty lines
+     * @return #`\n`
+     */
     protected static String emptyLines(int numberOfEmptyLines) {
-        final String lineSeparator = System.lineSeparator();
+        final String lineSeparator = "\n";
+        return generateLineBreaks(numberOfEmptyLines, lineSeparator);
+    }
+
+    /**
+     * A line break.
+     * @return a line break.
+     */
+    protected static String newline() {
+        return emptyLines(0);
+    }
+
+
+    private static String generateLineBreaks(int numberOfEmptyLines, String lineSeparator) {
         String lines="";
 
         for (int i = 0; i <= numberOfEmptyLines; i++) {
@@ -122,10 +202,5 @@ public abstract class MarkdownTagletBase implements MarkdownTaglet {
 
         return lines;
     }
-
-    protected static String newline() {
-        return emptyLines(0);
-    }
-
 
 }

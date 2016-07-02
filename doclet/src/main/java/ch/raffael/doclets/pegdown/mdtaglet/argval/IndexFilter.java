@@ -28,7 +28,7 @@ import java.util.Set;
  *
  * @see PredefinedArgumentValidators#argumentTypeValidator(String, IndexFilter, ArgumentPredicate)
  */
-abstract class IndexFilter {
+public abstract class IndexFilter {
 
     private final String name;
 

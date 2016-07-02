@@ -265,6 +265,11 @@ public final class MarkdownTagletExecutor {
                 + STR_TRAILWS_REGEX;
     }
 
+    /**
+     * Creates the taglet pattern from `tagNames`.
+     * @param tagNames the tag names
+     * @return the regex for the known taglets.
+     */
     private static String createTagletPattern(String tagNames) {
         final StringBuilder regex = new StringBuilder();
         final int size = STR_TAGS_REGEX_LIST.size();

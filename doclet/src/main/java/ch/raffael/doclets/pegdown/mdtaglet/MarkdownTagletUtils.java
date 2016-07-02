@@ -25,7 +25,8 @@ import java.util.regex.Pattern;
  * MarkdownTagletUtils is an utility class.
  */
 public final class MarkdownTagletUtils {
-    private static final Pattern STRIP_BLANKS_FROM_LINE_END_PATTERN = Pattern.compile("\\p{Blank}*$", Pattern.MULTILINE);
+    private static final Pattern STRIP_BLANKS_FROM_LINE_START_PATTERN = Pattern.compile("^\\p{Blank}+", Pattern.MULTILINE);
+    private static final Pattern STRIP_BLANKS_FROM_LINE_END_PATTERN = Pattern.compile("\\p{Blank}+$", Pattern.MULTILINE);
 
 
     /**
@@ -35,5 +36,13 @@ public final class MarkdownTagletUtils {
      */
     public static String stripBlanksFromLineEnd(String input) {
         return STRIP_BLANKS_FROM_LINE_END_PATTERN.matcher(input).replaceAll("");
+    }
+    /**
+     * Remove blank characters from start of every line.
+     * @param input the input
+     * @return stripped input.
+     */
+    public static String stripBlanksFromLineStart(String input) {
+        return STRIP_BLANKS_FROM_LINE_START_PATTERN.matcher(input).replaceAll("");
     }
 }

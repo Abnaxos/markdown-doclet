@@ -1,0 +1,13 @@
+<h1>Title.</h1>
+<p>Multiple files within</p>
+<blockquote>
+<p>Gist description: <em>Sample public gist for GistMarkdownTaglet in pegdown-doclet.</em></p>
+<pre><code class="java">// Sample1.java
+</code></pre>
+<p>(Visit <b><a href="https://gist.github.com/4c5cbc8021fccde63d709ec56c4e997a" target="_blank">Gist on Github</a></b> or <b><a href="https://gist.githubusercontent.com/loddar/4c5cbc8021fccde63d709ec56c4e997a/raw/d2a0944e01cf115b119e61aefa1682c5f0aaeabf/Sample1.java" target="_blank">Sample1.java</a></b>)</p>
+<br>
+<pre><code class="java">// Sample2.java
+</code></pre>
+<p>(Visit <b><a href="https://gist.github.com/4c5cbc8021fccde63d709ec56c4e997a" target="_blank">Gist on Github</a></b> or <b><a href="https://gist.githubusercontent.com/loddar/4c5cbc8021fccde63d709ec56c4e997a/raw/686584a340e4a4fd2ccfdc8886126d06e3263026/Sample2.java" target="_blank">Sample2.java</a></b>)</p>
+</blockquote>
+<p>to render.</p>

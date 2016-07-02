@@ -29,8 +29,8 @@ class SpaceCharacterRepairSpec extends PegdownRepairSpecBase {
         given: "a space character repair instance"
         def repairPegdown = new SpaceCharacterRepair();
 
-        when: "apply before pegdown parser"
-        def repaired = repairPegdown.beforePegdownParser(markdown)
+        when: "apply before any markdown taglet"
+        def repaired = repairPegdown.beforeMarkdownTaglets(markdown)
 
         then: "should be corrected"
         repaired == expected
@@ -50,7 +50,7 @@ class SpaceCharacterRepairSpec extends PegdownRepairSpecBase {
         def repairPegdown = new SpaceCharacterRepair();
 
         when: "apply after pegdown parser"
-        def repaired = repairPegdown.afterPegdownParser(markdown)
+        def repaired = repairPegdown.afterMarkdownParser(markdown)
 
         then: "should be corrected"
         repaired == expected

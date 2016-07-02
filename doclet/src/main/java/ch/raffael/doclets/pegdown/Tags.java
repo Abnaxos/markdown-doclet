@@ -18,6 +18,7 @@
  */
 package ch.raffael.doclets.pegdown;
 
+import ch.raffael.doclets.pegdown.pdrepair.MarkdownRepairKit;
 import com.google.common.collect.ImmutableMap;
 
 import java.util.List;
@@ -31,7 +32,7 @@ import java.util.regex.Pattern;
  *
  * @author <a href="mailto:herzog@raffael.ch">Raffael Herzog</a>
  *
- * @deprecated Part of {@link ch.raffael.doclets.pegdown.pdrepair.PegdownRepairKit}
+ * @deprecated Part of {@link MarkdownRepairKit}
  */
 @Deprecated
 public final class Tags {

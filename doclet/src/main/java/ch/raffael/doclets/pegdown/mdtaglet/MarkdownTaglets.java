@@ -23,7 +23,6 @@ import com.google.common.collect.Multimap;
 import com.google.common.collect.MultimapBuilder;
 import com.sun.javadoc.DocErrorReporter;
 
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.text.MessageFormat;
 import java.util.*;
@@ -195,6 +194,7 @@ public final class MarkdownTaglets {
                 executor.register(setup(markdownTaglet));
             } catch (Exception e) {
                 this.errorHandler.afterOptionsSetError(markdownTaglet, e);
+                e.printStackTrace();
             }
         }
     }
@@ -214,7 +214,8 @@ public final class MarkdownTaglets {
     private void invokeOptionMethod(MarkdownTaglet markdownTaglet, Method method, String value) {
         try {
             method.invoke(markdownTaglet, value);
-        } catch (IllegalAccessException | InvocationTargetException e) {
+        } catch (Exception e) {
+            this.errorHandler.optionsSetError(markdownTaglet, e.getCause());
             e.printStackTrace();
         }
     }
@@ -258,15 +259,15 @@ public final class MarkdownTaglets {
         public void invalidTagletArguments(MarkdownTaglet markdownTaglet, String errorDescription) {
             final String description = markdownTaglet.getDescription();
             if (description.isEmpty()) {
-                errorReporter.printError(
+                errorReporter.printWarning(
                         MessageFormat.format("Invalid taglet arguments for taglet {0}: {1}",
                                 markdownTaglet.getName(),
                                 errorDescription
                         )
                 );
             } else {
-                errorReporter.printError(
-                        MessageFormat.format("Invalid taglet arguments for taglet {0}: {1}\n\nTaglet's description: {2}",
+                errorReporter.printWarning(
+                        MessageFormat.format("Invalid taglet arguments for taglet {0}: {1}\n\nTaglet''s description: {2}",
                                 markdownTaglet.getName(),
                                 errorDescription,
                                 description
@@ -278,8 +279,8 @@ public final class MarkdownTaglets {
 
         @Override
         public void caughtUnexpectedException(MarkdownTaglet markdownTaglet, String tag, Exception exception) {
-            errorReporter.printError(
-                    MessageFormat.format("Caught unexpected exception ({1}) for taglet {0}: {2}\n\nTag: '{3}'",
+            errorReporter.printWarning(
+                    MessageFormat.format("Caught unexpected exception ({1}) for taglet {0}: {2}\n\nTag: {3}",
                             markdownTaglet.getName(),
                             exception.getClass().getName(),
                             exception.getMessage(),
@@ -296,6 +297,19 @@ public final class MarkdownTaglets {
                             exception.getClass().getName(),
                             exception.getMessage(),
                             "The taglet will not be applied."
+                    )
+            );
+
+        }
+
+        @Override
+        public void optionsSetError(MarkdownTaglet markdownTaglet, Throwable exception) {
+            errorReporter.printWarning(
+                    MessageFormat.format("Options set: Caught exception ({1}) for taglet {0}: {2}\n\n{3}",
+                            markdownTaglet.getName(),
+                            exception.getClass().getName(),
+                            exception.getMessage(),
+                            "The taglet is no correctly set, but still applicable."
                     )
             );
 

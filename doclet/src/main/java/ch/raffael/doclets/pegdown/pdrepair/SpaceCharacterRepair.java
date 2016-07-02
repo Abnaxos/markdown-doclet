@@ -28,13 +28,13 @@ import java.util.regex.Pattern;
  *   will be interpreted as a code block.
  * + Not actually an issue, but a little bit cleaner, to strip all trailing whitespace characters from end of line.
  */
-final class SpaceCharacterRepair implements PegdownRepair {
+final class SpaceCharacterRepair extends DefaultMarkdownRepair {
     private static final Pattern LINE_START = Pattern.compile("^ ", Pattern.MULTILINE);
     private static final Pattern LINE_END = Pattern.compile("\\p{Blank}+$", Pattern.MULTILINE);
 
     @Override
-    public String beforePegdownParser(String markdown) {
-        return stripBlanksFromLineEnd(stripSingleSpaceFromLineStart(markdown));
+    public String beforeMarkdownTaglets(String markdown) {
+        return stripSingleSpaceFromLineStart(markdown);
     }
 
     private String stripSingleSpaceFromLineStart(String markdown) {
@@ -42,7 +42,7 @@ final class SpaceCharacterRepair implements PegdownRepair {
     }
 
     @Override
-    public String afterPegdownParser(String markup) {
+    public String afterMarkdownParser(String markup) {
         return stripBlanksFromLineEnd(markup);
     }
 

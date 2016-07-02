@@ -28,7 +28,7 @@ import java.util.regex.Pattern;
 /**
  * InlineTagletRepair handle issues with inline taglets like &#123;@link ...&#125; .
  */
-final class InlineTagletRepair implements PegdownRepair {
+final class InlineTagletRepair extends DefaultMarkdownRepair {
 
     private static final String STORED_MARKER = "-?-";
     private static final String MARKER = "{" + STORED_MARKER +"}";
@@ -50,7 +50,7 @@ final class InlineTagletRepair implements PegdownRepair {
 
 
     @Override
-    public String beforePegdownParser(String markdown) {
+    public String beforeMarkdownParser(String markdown) {
         final StringBuffer result=new StringBuffer();
         final Matcher matcher=SUBST_REGEX.matcher(markdown);
         while ( matcher.find() )  {
@@ -76,7 +76,7 @@ final class InlineTagletRepair implements PegdownRepair {
     }
 
     @Override
-    public String afterPegdownParser(String markup) {
+    public String afterMarkdownParser(String markup) {
         final StringBuffer result=new StringBuffer();
         final Matcher matcher= RESTORE_REGEX.matcher(markup);
         while ( matcher.find() )  {

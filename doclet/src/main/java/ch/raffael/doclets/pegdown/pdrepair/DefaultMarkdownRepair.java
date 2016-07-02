@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2016 Raffael Herzog / Marko Umek
+ * Copyright 2013-2016 Raffael Herzog, Marko Umek
  *
  * This file is part of pegdown-doclet.
  *
@@ -15,18 +15,27 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with pegdown-doclet.  If not, see <http://www.gnu.org/licenses/>.
+ *
  */
-package ch.raffael.doclets.pegdown.inlinetag;
+package ch.raffael.doclets.pegdown.pdrepair;
 
 /**
- * InlineTagRender is responsible for render the markup (searching the custom inline tag) and convert it to markdown.
+ * DefaultMarkdownRepair provides default implementation.
  */
-public interface InlineTagRender {
-    /**
-     * Renders the markup to markdown using a taglets content.
-     *
-     * @param markup the markup
-     * @return the markdown or if there is no taglet the orgin markup will be returned.
-     */
-    String render(String markup);
+abstract class DefaultMarkdownRepair implements MarkdownRepair {
+
+    @Override
+    public String afterMarkdownParser(String markup) {
+        return markup;
+    }
+
+    @Override
+    public String beforeMarkdownTaglets(String markdown) {
+        return markdown;
+    }
+
+    @Override
+    public String beforeMarkdownParser(String markdown) {
+        return markdown;
+    }
 }

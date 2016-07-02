@@ -27,22 +27,22 @@ import spock.lang.Unroll
 /**
  * PegdownRepairKitSpec contains specification for ... .
  */
-@Subject(PegdownRepairKit)
+@Subject(MarkdownRepairKit)
 @Unroll
 class PegdownRepairKitSpec extends PegdownRepairSpecBase {
     @SuppressWarnings("GroovyAssignabilityCheck")
     def "How to use all PegdownRepair instances? - #markdown"() {
         given: "a repair kit"
-        def repairKit = new PegdownRepairKit(stripSpace);
+        def repairKit = new MarkdownRepairKit(stripSpace);
 
-        when: "apply beforePegdownParser"
-        def markup = repairKit.beforePegdownParser(markdown)
+        when: "apply beforeMarkdownParser"
+        def markup = repairKit.beforeMarkdownParser(markdown)
 
         and: "apply pegdown parser"
         markup = applyPegdownParser(markup)
 
-        and: "apply afterPegdownParser"
-        markup = repairKit.afterPegdownParser(markup)
+        and: "apply afterMarkdownParser"
+        markup = repairKit.afterMarkdownParser(markup)
 
         then: ""
         markup == expected
@@ -52,7 +52,7 @@ class PegdownRepairKitSpec extends PegdownRepairSpecBase {
         'This is a {@link MyClass#anyMethod(String)}'                                       | true       || "<p>This is a {@link MyClass#anyMethod(String)}</p>"
         ' This is a {@link MyClass#anyMethod(String)}'                                      | true       || "<p>This is a {@link MyClass#anyMethod(String)}</p>"
         ' This is a {@link MyClass#anyMethod(String)}'                                      | false      || "<p>This is a {@link MyClass#anyMethod(String)}</p>"
-        'This is a {@link MyClass#anyMethod(String)}    '                                   | true       || "<p>This is a {@link MyClass#anyMethod(String)}</p>"
+        'This is a {@link MyClass#anyMethod(String)}    '                                   | true       || "<p>This is a {@link MyClass#anyMethod(String)} </p>"
         'This is at symbol @ test'                                                          | true       || "<p>This is at symbol &#64; test</p>"
         '```java\n// This is an annotation test\n@Annotation\n```'                          | true       || "<pre><code class=\"java\">// This is an annotation test\n&#64;Annotation\n</code></pre>"
         'Use html entity &#64; test'                                                        | true       || "<p>Use html entity &#64; test</p>"

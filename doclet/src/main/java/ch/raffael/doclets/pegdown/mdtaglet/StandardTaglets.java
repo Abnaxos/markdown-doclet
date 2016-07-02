@@ -31,8 +31,8 @@ import java.util.List;
  * @see GistMarkdownTaglet
  */
 public final class StandardTaglets {
-    private static final List<MarkdownTaglet> STANDARD_TAGLETS=new ArrayList<MarkdownTaglet>() {{
-        add(new GistMarkdownTaglet());
+    private static final List<Class<? extends MarkdownTaglet>> STANDARD_TAGLETS= new ArrayList<Class<? extends MarkdownTaglet>>() {{
+        add(GistMarkdownTaglet.class);
     }};
 
     /**
@@ -40,9 +40,14 @@ public final class StandardTaglets {
      *
      * @param markdownTaglets the markdownTaglets instance.
      */
-    static void registerStandardTaglets(MarkdownTaglets markdownTaglets) {
-        for (MarkdownTaglet standardTaglet : STANDARD_TAGLETS) {
-            markdownTaglets.registerMarkdownTaglet(standardTaglet);
+    static void registerStandardTaglets(MarkdownTaglets markdownTaglets)  {
+        for (Class<? extends MarkdownTaglet> standardTaglet : STANDARD_TAGLETS) {
+            try {
+                markdownTaglets.registerMarkdownTaglet(standardTaglet.newInstance());
+            } catch (Exception e) {
+                e.printStackTrace();
+                throw new RuntimeException("Could no create instance of " + standardTaglet, e);
+            }
         }
     }
 }

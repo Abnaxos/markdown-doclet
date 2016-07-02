@@ -74,7 +74,10 @@ subprojects {
                 guava   : [group: 'com.google.guava', name: 'guava', version: '18.0'],
                 plantuml: [group: 'net.sourceforge.plantuml', name: 'plantuml', version: '8032'],
                 github:   [group: 'org.kohsuke', name: 'github-api', version: '1.76'],
+                findbugs:  [group: 'com.google.code.findbugs', name : 'findbugs-annotations', version :'3.0.1'],
+                okhttp:   [group: 'com.squareup.okhttp', name: 'okhttp-urlconnection', version: '2.7.5'],
                 jakartaCommonsLang3:   [group: 'org.apache.commons', name: 'commons-lang3', version: '3.4'],
+                velocity:   [group: 'org.apache.velocity', name: 'velocity', version: '1.7'],
                 jdkTools: files("${System.properties['java.home']}/../lib/tools.jar"),
         ]
         docletProject = project(':doclet')

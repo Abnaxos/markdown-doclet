@@ -6,13 +6,16 @@ dependencies {
     compile libs.pegdown
     compile libs.guava
     compile libs.plantuml
-    compile libs.github
-    compile libs.jakartaCommonsLang3
     compileOnly libs.jdkTools
 
-// TODO Drop me
-    compile group: 'org.codehaus.groovy', name: 'groovy-all', version: '2.4.6'
+    // MARKDOWN TAGLET
+    compile libs.jakartaCommonsLang3
 
+    // GIST MARKDOWN TAGLET
+    compile libs.github
+    compileOnly libs.findbugs
+    compile libs.okhttp
+    compile libs.velocity
 
     testCompile group: 'org.jsoup', name: 'jsoup', version: '1.8.3'
 }

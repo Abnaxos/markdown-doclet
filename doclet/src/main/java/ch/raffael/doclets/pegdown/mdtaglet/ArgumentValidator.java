@@ -32,8 +32,9 @@ import java.util.List;
  *
  * It's possible to create your own, but it's not recommended. Use {@link PredefinedArgumentValidators} methods instead.
  *
- * @see MarkdownTagletExecutor#apply(String)
+ * @see MarkdownTaglet#getArgumentValidator()
  * @see PredefinedArgumentValidators
+ * @see MarkdownTagletExecutor#apply(String) `
  */
 public interface ArgumentValidator {
 

@@ -35,7 +35,7 @@ class InlineTagletRepairSpec extends PegdownRepairSpecBase {
         def repairInlineTags = new InlineTagletRepair();
 
         when: "apply repair"
-        def repaired = repairInlineTags.beforePegdownParser(markdown)
+        def repaired = repairInlineTags.beforeMarkdownParser(markdown)
 
         and: "apply the pegdown parser"
         def parsed = applyPegdownParser(repaired)
@@ -68,7 +68,7 @@ class InlineTagletRepairSpec extends PegdownRepairSpecBase {
         def parsed = applyPegdownParser(markdown)
 
         when: "apply repairInlineTags"
-        def restored = repairInlineTags.afterPegdownParser(parsed)
+        def restored = repairInlineTags.afterMarkdownParser(parsed)
 
         then: "the inline tags should be back again"
         restored == expected
@@ -90,14 +90,14 @@ class InlineTagletRepairSpec extends PegdownRepairSpecBase {
         given: "a repair instance"
         def pegdownRepair = new InlineTagletRepair();
 
-        when: "apply beforePegdownParser"
-        def markup = pegdownRepair.beforePegdownParser(markdown)
+        when: "apply beforeMarkdownParser"
+        def markup = pegdownRepair.beforeMarkdownParser(markdown)
 
         and: "apply pegdown parser"
         markup = applyPegdownParser(markup)
 
-        and: "apply afterPegdownParser"
-        markup = pegdownRepair.afterPegdownParser(markup)
+        and: "apply afterMarkdownParser"
+        markup = pegdownRepair.afterMarkdownParser(markup)
 
         then: ""
         markup == expected

@@ -36,7 +36,7 @@ class AtSymbolRepairSpec extends PegdownRepairSpecBase {
         def repairPegdown = new AtSymbolRepair();
 
         when: "apply before pegdown parser"
-        def repaired = repairPegdown.beforePegdownParser(markdown)
+        def repaired = repairPegdown.beforeMarkdownParser(markdown)
 
         then: "should be corrected"
         repaired == expected
@@ -57,7 +57,7 @@ class AtSymbolRepairSpec extends PegdownRepairSpecBase {
         def parsed = applyPegdownParser(markdown)
 
         when: "apply after pegdown parser"
-        def repaired = repairPegdown.afterPegdownParser(parsed)
+        def repaired = repairPegdown.afterMarkdownParser(parsed)
 
         then: "should use the html entity code for @"
         repaired == expected
@@ -79,13 +79,13 @@ class AtSymbolRepairSpec extends PegdownRepairSpecBase {
         def repairPegdown = new AtSymbolRepair();
 
         when: "apply before pegdown parser"
-        def before = repairPegdown.beforePegdownParser(markdown)
+        def before = repairPegdown.beforeMarkdownParser(markdown)
 
         and: "apply the pegdown parser"
         def parsed = applyPegdownParser(before)
 
         and: "apply after pegdown parser"
-        def after = repairPegdown.afterPegdownParser(parsed)
+        def after = repairPegdown.afterMarkdownParser(parsed)
 
 
         then: "should be corrected"

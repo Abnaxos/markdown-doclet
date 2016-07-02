@@ -17,23 +17,12 @@
  * along with pegdown-doclet.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-package ch.raffael.doclets.pegdown.pdrepair;
+
+package mdtaglets;
 
 /**
- * PegdownRepair provides two methods to _repair_ the markdown/markup of {@link org.pegdown.PegDownProcessor}.
+ * # Title.
+ * This is a simple {{gist -indent feafcf888d949627001948b8346e0da7}} to render.
  */
-public interface PegdownRepair {
-    /**
-     * Applied before the Pegdown parser will be applied.
-     * @param markdown the markdown
-     * @return the corrected markup.
-     */
-    String beforePegdownParser(String markdown);
-
-    /**
-     * Applied after the Pegdown parser has been applied.
-     * @param markup the (converted) markup.
-     * @return the corrected markup.
-     */
-    String afterPegdownParser(String markup);
+public class UseGistTagSimpleNoIndent {
 }

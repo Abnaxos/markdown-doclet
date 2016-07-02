@@ -27,7 +27,7 @@ import java.util.regex.Pattern;
 /**
  * AtSymbolRepair corrects the &#64; symbol issue, by replacing it with `&#64;`.
  */
-final class AtSymbolRepair implements PegdownRepair {
+final class AtSymbolRepair extends DefaultMarkdownRepair {
     static final String MARKER = "{-at-}";
     static final String AT_HTML_ENTITY = "&#64;";
 
@@ -45,7 +45,7 @@ final class AtSymbolRepair implements PegdownRepair {
     }
 
     @Override
-    public String beforePegdownParser(String markdown) {
+    public String beforeMarkdownParser(String markdown) {
         final StringBuffer result=new StringBuffer();
         final Matcher matcher= SUBST_REGEX.matcher(markdown);
         while ( matcher.find() )  {
@@ -69,7 +69,7 @@ final class AtSymbolRepair implements PegdownRepair {
     }
 
     @Override
-    public String afterPegdownParser(String markup) {
+    public String afterMarkdownParser(String markup) {
         final StringBuffer result=new StringBuffer();
         final Matcher matcher= RESTORE_REGEX.matcher(markup);
         while ( matcher.find() )  {

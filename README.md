@@ -67,50 +67,13 @@ Tag handling can be customised by implementing your own `TagRenderer`s and regis
 
 This currently only works for block tags.
 
-### Custom MarkdownTaglet
+### Custom Markdown Taglet
 
-#### Gist Inline Tag ({@gist _gistid_})
+[How to define your own Markdown Taglet](markdown-taglet-description.md) 
 
-The custom Gist tag embed the Github's gists content within your javadoc.
- 
-    /**
-     * Usage: {@gist feafcf888d949627001948b8346e0da7}
-     */
-    // ...    
+#### Gist Markdown Taglet ({{gist _gistid_}})
 
-
-becomes the markdown ... 
-
-    Usage:
-    ```java
-    // This is the content of Gist feafcf888d949627001948b8346e0da7
-    @AnyAnnotation
-    public class MyClass {
-      // Any method
-    }
-    ```
-    
-    See [Gist on Github](https://gist.github.com/feafcf888d949627001948b8346e0da7) and [Raw File GistTest.java](https://gist.githubusercontent.com/loddar/feafcf888d949627001948b8346e0da7/raw/6f28c97ad74d8dea71eeb3373623261c74d66067/GistTest.java)
-
-
-which will look like this
-
-Usage:
-```java
-// This is the content of Gist feafcf888d949627001948b8346e0da7
-@AnyAnnotation
-public class MyClass {
-  // Any method
-}
-```
-
-See [Gist on Github](https://gist.github.com/feafcf888d949627001948b8346e0da7) and [Raw File GistTest.java](https://gist.githubusercontent.com/loddar/feafcf888d949627001948b8346e0da7/raw/6f28c97ad74d8dea71eeb3373623261c74d66067/GistTest.java)
-
-### Inline Tags
-
-Inline tags will be removed before processing the Markdown source and re-inserted afterwards. Therefore, markup within inline tags won't work.
-
-There's currently no way to customise this behaviour or customize the way inline tags are rendered back into the processed doc comment.
+see [Description Of Gist Taglet](gist-taglet-description.md)
 
 
 PlantUML

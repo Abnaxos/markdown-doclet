@@ -20,8 +20,8 @@
 package ch.raffael.doclets.pegdown;
 
 import ch.raffael.doclets.pegdown.mdtaglet.MarkdownTaglets;
-import ch.raffael.doclets.pegdown.pdrepair.PegdownRepair;
-import ch.raffael.doclets.pegdown.pdrepair.PegdownRepairKit;
+import ch.raffael.doclets.pegdown.pdrepair.MarkdownRepair;
+import ch.raffael.doclets.pegdown.pdrepair.MarkdownRepairKit;
 import com.google.common.base.Splitter;
 import com.sun.javadoc.DocErrorReporter;
 import com.sun.tools.doclets.standard.Standard;
@@ -491,16 +491,16 @@ public class Options {
      * @return The resulting HTML.
      */
     public String toHtml(String markup, boolean fixLeadingSpaces) {
-        final PegdownRepair pegdownRepairKit=new PegdownRepairKit(fixLeadingSpaces);
+        final MarkdownRepair markdownRepairKit =new MarkdownRepairKit(fixLeadingSpaces);
         if ( processor == null ) {
             processor = createProcessor();
         }
 
-        String markdown = renderMarkdownTags(markup);
+        String markdown = renderMarkdownTags(markdownRepairKit.beforeMarkdownTaglets(markup));
 
-        markdown=pegdownRepairKit.beforePegdownParser(markdown);
+        markdown= markdownRepairKit.beforeMarkdownParser(markdown);
         final String html = createDocletSerializer().toHtml(processor.parseMarkdown(markdown.toCharArray()));
-        return pegdownRepairKit.afterPegdownParser(html);
+        return markdownRepairKit.afterMarkdownParser(html);
     }
 
     private String renderMarkdownTags(String markup) {

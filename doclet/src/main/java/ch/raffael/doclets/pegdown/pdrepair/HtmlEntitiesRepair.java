@@ -27,7 +27,7 @@ import java.util.regex.Pattern;
 /**
  * HtmlEntitiesRepair support the possibility of escaping html entities, even in code blocks - `{&any code;}`.
  */
-final class HtmlEntitiesRepair implements PegdownRepair {
+final class HtmlEntitiesRepair extends DefaultMarkdownRepair {
     private static final String STORED_MARKER = "-he-";
     private static final String MARKER = "{" + STORED_MARKER + "}";
 
@@ -45,7 +45,7 @@ final class HtmlEntitiesRepair implements PegdownRepair {
     }
 
     @Override
-    public String beforePegdownParser(String markdown) {
+    public String beforeMarkdownParser(String markdown) {
         final StringBuffer result = new StringBuffer();
         final Matcher matcher = SUBST_REGEX.matcher(markdown);
         while (matcher.find()) {
@@ -59,7 +59,7 @@ final class HtmlEntitiesRepair implements PegdownRepair {
     }
 
     @Override
-    public String afterPegdownParser(String markup) {
+    public String afterMarkdownParser(String markup) {
         final StringBuffer result = new StringBuffer();
         final Matcher matcher = RESTORE_REGEX.matcher(markup);
         while (matcher.find()) {

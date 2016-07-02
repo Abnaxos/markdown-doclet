@@ -94,7 +94,7 @@ public abstract class PredefinedArgumentPredicates {
      * @see #regex(String)
      */
     public static ArgumentPredicate options(List<String> optionList) {
-        return regex(StringUtils.join(new HashSet<>(optionList), "|"));
+        return regex(StringUtils.join(new HashSet<>(optionList), "|").replace("+","\\+"));
     }
 
     /**

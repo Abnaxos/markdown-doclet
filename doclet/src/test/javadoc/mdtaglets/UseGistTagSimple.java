@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2016 Raffael Herzog / Marko Umek
+ * Copyright 2013-2016 Raffael Herzog, Marko Umek
  *
  * This file is part of pegdown-doclet.
  *
@@ -15,20 +15,14 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with pegdown-doclet.  If not, see <http://www.gnu.org/licenses/>.
+ *
  */
-package ch.raffael.doclets.pegdown.inlinetag.gist;
 
-import ch.raffael.doclets.pegdown.Options;
+package mdtaglets;
 
 /**
- * GistTagRenderAssembler is responsible for ...
+ * # Title.
+ * This is a simple {{gist feafcf888d949627001948b8346e0da7}} to render.
  */
-public final class GistTagRenderAssembler {
-    
-    public static GistTagRender createInlineTagRender(Options options) {
-        final GistClient gistClient=GistRestClient.standardGistClient();
-        final GistTagContentConverter markdownConverter = new GistTagContentConverter(gistClient);
-
-        return new GistTagRender(markdownConverter);
-    } 
+public class UseGistTagSimple {
 }
