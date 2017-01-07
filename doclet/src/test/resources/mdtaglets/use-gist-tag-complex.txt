@@ -1,0 +1,49 @@
+<h1>Title.</h1>
+<p>This is a complex example</p>
+<blockquote>
+ <p>Gist description: <em>ajUnit - Final Step 6 (Override method execute()).</em></p>
+ <pre><code class="java">/**
+ * ajUnit - Final Step 6 (Override method execute()).
+ *
+ * NOW you're done! No more "ajUnit - Setup Error: ..."! You can start developing your aspect - sorry I mean your pointcut :-)
+ *
+ * You got an test failure (not an setup error):
+ *
+ *      java.lang.AssertionError: ajUnit - Pointcut test failed with 2 error(s).
+ *
+ *      Details:
+ *
+ *      - No join points selected. Possible reasons:
+ *      * Method assertPointcut(JoinPointSelector) uses notYetSpecified().
+ *      * You defined a join point selector which has a impossible condition.
+ *
+ *      - Missing none selected join points. Possible reason:
+ *      * Your ajUnit universe is too small. For example: Add a new method which should not selected by your pointcut definition.
+ *      at org.junit.Assert.fail(Assert.java:88)
+ *      at org.failearly.ajunit.AjUnit4Test.doFail(AjUnit4Test.java:42)
+ *      (...)
+ */
+public class MyAjUnit6Test extends AjUnit4Test {
+
+    @Override
+    public void setup(AjUnitSetup ajUnitSetup) {
+        ajUnitSetup.assignAspect("com.company.project.aspects.MyAspect");
+        ajUnitSetup.addTestFixtureClass(com.company.project.aspects.testfixture.MyTestFixture.class);
+    }
+
+
+    @Override
+    public void execute() throws Exception {
+        // TODO: Do your callings on your test fixture class(es).
+    }
+
+    @Override
+    public void assertPointcut(JoinPointSelector joinPointSelector) {
+        // TODO: Replace notYetSpecified with your join point selectors.
+        joinPointSelector.notYetSpecified();
+    }
+}
+</code></pre>
+ <p>(Visit <b><a href="https://gist.github.com/e4b760b92b4c353f516e" target="_blank">Gist on Github</a></b> or <b><a href="https://gist.githubusercontent.com/loddar/e4b760b92b4c353f516e/raw/ffdf696a6ce6b859464a8c8240b969e71aa71848/MyAjUnit6Test.java" target="_blank">MyAjUnit6Test.java</a></b>)</p>
+</blockquote>
+<p>to render.</p>

@@ -1,0 +1,11 @@
+#* @vtlvariable name="renderDescription" type="java.lang.Boolean" *#
+#* @vtlvariable name="gist" type="org.kohsuke.github.GHGist" *#
+#* @vtlvariable name="gistFile" type="org.kohsuke.github.GHGistFile" *#
+#if( $renderDescription==true )
+Gist description: _${gist.description}_
+#end
+```${gistFile.language.toLowerCase()}
+${gistFile.content}
+```
+(Visit <b><a href="${gist.htmlUrl}" target="_blank">Gist on Github</a></b> or <b><a href="${gistFile.rawUrl}"
+                                                                                    target="_blank">${gistFile.fileName}</a></b>)

@@ -8,6 +8,15 @@ dependencies {
     compile libs.plantuml
     compileOnly libs.jdkTools
 
+    // MARKDOWN TAGLET
+    compile libs.jakartaCommonsLang3
+
+    // GIST MARKDOWN TAGLET
+    compile libs.github
+    compileOnly libs.findbugs
+    compile libs.okhttp
+    compile libs.velocity
+
     testCompile group: 'org.jsoup', name: 'jsoup', version: '1.8.3'
 }
 

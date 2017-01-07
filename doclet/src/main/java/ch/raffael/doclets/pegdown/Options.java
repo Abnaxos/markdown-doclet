@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Raffael Herzog
+ * Copyright 2013-2016 Raffael Herzog, Marko Umek
  *
  * This file is part of pegdown-doclet.
  *
@@ -15,21 +15,13 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with pegdown-doclet.  If not, see <http://www.gnu.org/licenses/>.
+ *
  */
 package ch.raffael.doclets.pegdown;
 
-import java.io.File;
-import java.lang.reflect.Field;
-import java.math.BigDecimal;
-import java.nio.charset.Charset;
-import java.nio.charset.IllegalCharsetNameException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.regex.Pattern;
-
+import ch.raffael.doclets.pegdown.mdtaglet.MarkdownTaglets;
+import ch.raffael.doclets.pegdown.pdrepair.MarkdownRepair;
+import ch.raffael.doclets.pegdown.pdrepair.MarkdownRepairKit;
 import com.google.common.base.Splitter;
 import com.sun.javadoc.DocErrorReporter;
 import com.sun.tools.doclets.standard.Standard;
@@ -37,6 +29,14 @@ import org.pegdown.Extensions;
 import org.pegdown.LinkRenderer;
 import org.pegdown.PegDownProcessor;
 import org.pegdown.ToHtmlSerializer;
+
+import java.io.File;
+import java.lang.reflect.Field;
+import java.math.BigDecimal;
+import java.nio.charset.Charset;
+import java.nio.charset.IllegalCharsetNameException;
+import java.util.*;
+import java.util.regex.Pattern;
 
 import static com.google.common.base.MoreObjects.firstNonNull;
 
@@ -100,6 +100,8 @@ public class Options {
 
     private LinkRenderer linkRenderer = null;
     private PegDownProcessor processor = null;
+
+    private final MarkdownTaglets markdownTaglets=MarkdownTaglets.instance();
 
     public Options() {
     }
@@ -236,6 +238,10 @@ public class Options {
             setTodoTitle(todoTitle);
             optionsIter.remove();
         }
+        else if( markdownTaglets.handleOptions(opt, errorReporter) ) {
+            optionsIter.remove();
+        }
+
         return true;
     }
 
@@ -485,16 +491,23 @@ public class Options {
      * @return The resulting HTML.
      */
     public String toHtml(String markup, boolean fixLeadingSpaces) {
+        final MarkdownRepair markdownRepairKit =new MarkdownRepairKit(fixLeadingSpaces);
         if ( processor == null ) {
             processor = createProcessor();
         }
-        if ( fixLeadingSpaces ) {
-            markup = LINE_START.matcher(markup).replaceAll("");
-        }
-        List<String> tags = new ArrayList<>();
-        String html = createDocletSerializer().toHtml(processor.parseMarkdown(Tags.extractInlineTags(markup, tags).toCharArray()));
-        return Tags.insertInlineTags(html, tags);
+
+        String markdown = renderMarkdownTags(markdownRepairKit.beforeMarkdownTaglets(markup));
+
+        markdown= markdownRepairKit.beforeMarkdownParser(markdown);
+        final String html = createDocletSerializer().toHtml(processor.parseMarkdown(markdown.toCharArray()));
+        return markdownRepairKit.afterMarkdownParser(html);
     }
+
+    private String renderMarkdownTags(String markup) {
+        return this.markdownTaglets.apply(markup);
+    }
+
+
 
     /**
      * Create a new processor. If you need to further customise the markup processing,
@@ -528,9 +541,14 @@ public class Options {
             case OPT_DISABLE_HIGHLIGHT:
             case OPT_ENABLE_AUTO_HIGHLIGHT:
                 return 1;
-            default:
-                return Standard.optionLength(option);
         }
+
+        final int optionLength = MarkdownTaglets.optionLengths(option);
+        if( optionLength>0 ) {
+            return optionLength;
+        }
+
+        return Standard.optionLength(option);
     }
 
     /**

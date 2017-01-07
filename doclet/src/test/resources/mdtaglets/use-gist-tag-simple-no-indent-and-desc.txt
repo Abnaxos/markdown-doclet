@@ -1,0 +1,10 @@
+<h1>Title.</h1>
+<p>This is a simple</p>
+<pre><code class="java">// This is the content of Gist feafcf888d949627001948b8346e0da7
+@AnyAnnotation
+public class MyClass {
+// Any method
+}
+</code></pre>
+<p>(Visit <b><a href="https://gist.github.com/feafcf888d949627001948b8346e0da7" target="_blank">Gist on Github</a></b> or <b><a href="https://gist.githubusercontent.com/loddar/feafcf888d949627001948b8346e0da7/raw/6f28c97ad74d8dea71eeb3373623261c74d66067/GistTest.java" target="_blank">GistTest.java</a></b>)</p>
+<p>to render.</p>

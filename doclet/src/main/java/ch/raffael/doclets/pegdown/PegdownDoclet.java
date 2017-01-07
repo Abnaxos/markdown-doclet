@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Raffael Herzog
+ * Copyright 2013-2016 Raffael Herzog, Marko Umek
  *
  * This file is part of pegdown-doclet.
  *
@@ -15,36 +15,21 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with pegdown-doclet.  If not, see <http://www.gnu.org/licenses/>.
+ *
  */
 package ch.raffael.doclets.pegdown;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.lang.reflect.Field;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-
+import ch.raffael.doclets.pegdown.mdtaglet.MarkdownTaglets;
 import com.google.common.io.ByteStreams;
 import com.google.common.io.Files;
-import com.sun.javadoc.AnnotationTypeDoc;
-import com.sun.javadoc.ClassDoc;
-import com.sun.javadoc.Doc;
-import com.sun.javadoc.DocErrorReporter;
-import com.sun.javadoc.LanguageVersion;
-import com.sun.javadoc.MemberDoc;
-import com.sun.javadoc.PackageDoc;
-import com.sun.javadoc.RootDoc;
-import com.sun.javadoc.SourcePosition;
-import com.sun.javadoc.Tag;
+import com.sun.javadoc.*;
 import com.sun.tools.doclets.standard.Standard;
 import com.sun.tools.javadoc.Main;
 import org.parboiled.errors.ParserRuntimeException;
+
+import java.io.*;
+import java.lang.reflect.Field;
+import java.util.*;
 
 
 /**
@@ -72,7 +57,6 @@ public class PegdownDoclet implements DocErrorReporter {
 
     /**
      * Construct a new Pegdown Doclet.
-     *
      * @param options The command line options.
      * @param rootDoc The root document.
      */
@@ -128,12 +112,14 @@ public class PegdownDoclet implements DocErrorReporter {
      * @see com.sun.javadoc.Doclet#start(RootDoc)
      */
     public static boolean start(RootDoc rootDoc) {
+        final MarkdownTaglets markdownTaglets = MarkdownTaglets.instance();
         Options options = new Options();
         String[][] forwardedOptions = options.load(rootDoc.options(), rootDoc);
         if ( forwardedOptions == null ) {
             return false;
         }
         PegdownDoclet doclet = new PegdownDoclet(options, rootDoc);
+        markdownTaglets.setDocErrorReporter(doclet);
         doclet.process();
         if ( doclet.isError() ) {
             return false;
