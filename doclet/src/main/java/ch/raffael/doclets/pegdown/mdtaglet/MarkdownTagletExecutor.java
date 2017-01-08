@@ -28,7 +28,9 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.google.common.base.Function;
 import com.google.common.base.Joiner;
+import com.google.common.collect.Iterables;
 
 import static ch.raffael.doclets.pegdown.mdtaglet.MarkdownTagletUtils.stripBlanksFromLineEnd;
 
@@ -280,7 +282,12 @@ public final class MarkdownTagletExecutor {
 
     private String createTagletPattern() {
         return STR_LEADWS_REGEX
-                + createTagletPattern(Joiner.on("|").join(tags.keySet()))
+                + createTagletPattern(Joiner.on("|").join(Iterables.transform(tags.keySet(), new Function<String, String>() {
+                        @Override
+                        public String apply(String s) {
+                            return Pattern.quote(s);
+                        }
+                    })))
                 + STR_TRAILWS_REGEX;
     }
 
