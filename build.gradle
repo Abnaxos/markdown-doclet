@@ -21,7 +21,7 @@
 apply plugin:'wrapper'
 
 wrapper {
-    gradleVersion = '2.12'
+    gradleVersion = '3.3'
 }
 
 ext.componentBaseVersion = '1.4'
@@ -129,7 +129,4 @@ subprojects {
         }
     }
 
-    idea.module {
-        inheritOutputDirs = false
-    }
 }
