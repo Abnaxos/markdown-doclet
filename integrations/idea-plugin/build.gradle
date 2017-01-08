@@ -12,7 +12,9 @@ dependencies {
                     collect { baseName -> "$ideaHome/lib/${baseName}.jar" })
     compileOnly libs.jdkTools
 
-    packaged docletProject
+    packaged docletProject, {
+        exclude module:'velocity'
+    }
 }
 
 processResources {
