@@ -20,11 +20,15 @@
 
 package ch.raffael.doclets.pegdown.mdtaglet;
 
-import org.apache.commons.lang3.StringUtils;
-
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import com.google.common.base.Joiner;
 
 import static ch.raffael.doclets.pegdown.mdtaglet.MarkdownTagletUtils.stripBlanksFromLineEnd;
 
@@ -255,13 +259,28 @@ public final class MarkdownTagletExecutor {
         return argList;
     }
 
+    @SuppressWarnings("StatementWithEmptyBody")
     private static String strip(String arg) {
-        return StringUtils.strip(arg, "\"'");
+        if ( arg == null || arg.isEmpty() ) {
+            return arg;
+        }
+        int start = 0;
+        for (; start < arg.length() && isQuoteChar(arg.charAt(start)); start++);
+        if ( start >= arg.length() ) {
+            return "";
+        }
+        int end = arg.length() - 1;
+        for(;end>=0 && isQuoteChar(arg.charAt(end)); end--);
+        return arg.substring(start, end + 1);
+    }
+
+    private static boolean isQuoteChar(char c) {
+        return c == '"' || c == '\'';
     }
 
     private String createTagletPattern() {
         return STR_LEADWS_REGEX
-                + createTagletPattern(StringUtils.join(tags.keySet(), "|"))
+                + createTagletPattern(Joiner.on("|").join(tags.keySet()))
                 + STR_TRAILWS_REGEX;
     }
 

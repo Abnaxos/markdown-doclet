@@ -20,14 +20,15 @@
 
 package ch.raffael.doclets.pegdown.mdtaglet.argval;
 
-import org.apache.commons.lang3.StringUtils;
-
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.regex.Pattern;
+
+import com.google.common.base.Function;
+import com.google.common.base.Joiner;
+import com.google.common.collect.Lists;
 
 /**
  * # PredefinedArgumentPredicates provides predefined {@link ArgumentPredicate} factory methods.
@@ -94,7 +95,12 @@ public abstract class PredefinedArgumentPredicates {
      * @see #regex(String)
      */
     public static ArgumentPredicate options(List<String> optionList) {
-        return regex(StringUtils.join(new HashSet<>(optionList), "|").replace("+","\\+"));
+        return regex(Joiner.on("|").join(Lists.transform(optionList, new Function<String, String>() {
+            @Override
+            public String apply(String s) {
+                return Pattern.quote(s);
+            }
+        })));
     }
 
     /**

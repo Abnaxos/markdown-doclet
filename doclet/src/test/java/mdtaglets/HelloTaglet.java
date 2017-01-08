@@ -20,11 +20,12 @@
 
 package mdtaglets;
 
+import java.util.List;
+
+import com.google.common.base.Joiner;
+
 import ch.raffael.doclets.pegdown.mdtaglet.MarkdownTaglet;
 import ch.raffael.doclets.pegdown.mdtaglet.MarkdownTagletBase;
-import org.apache.commons.lang3.StringUtils;
-
-import java.util.List;
 
 /**
  * # HelloTaglet is a sample {@link MarkdownTaglet}.
@@ -66,7 +67,7 @@ public final class HelloTaglet extends MarkdownTagletBase {
     }
 
     private String sayHelloTo(List<String> argumentList) {
-        final String audience = " " + StringUtils.join(argumentList, ", ");
+        final String audience = " " + Joiner.on(", ").join(argumentList);
         switch(language) {
             case "IT":  return "Ciao" + audience;
         }
