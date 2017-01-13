@@ -21,10 +21,10 @@
 apply plugin:'wrapper'
 
 wrapper {
-    gradleVersion = '2.12'
+    gradleVersion = '3.3'
 }
 
-ext.componentBaseVersion = '1.3'
+ext.componentBaseVersion = '1.4'
 ext.docletBaseVersion = '1.4'
 def snapshot(boolean snapshot) {
     return snapshot ? '-SNAPSHOT' : ''
@@ -76,7 +76,6 @@ subprojects {
                 github:   [group: 'org.kohsuke', name: 'github-api', version: '1.76'],
                 findbugs:  [group: 'com.google.code.findbugs', name : 'findbugs-annotations', version :'3.0.1'],
                 okhttp:   [group: 'com.squareup.okhttp', name: 'okhttp-urlconnection', version: '2.7.5'],
-                jakartaCommonsLang3:   [group: 'org.apache.commons', name: 'commons-lang3', version: '3.4'],
                 velocity:   [group: 'org.apache.velocity', name: 'velocity', version: '1.7'],
                 jdkTools: files("${System.properties['java.home']}/../lib/tools.jar"),
         ]
@@ -129,7 +128,4 @@ subprojects {
         }
     }
 
-    idea.module {
-        inheritOutputDirs = false
-    }
 }

@@ -25,6 +25,8 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.google.common.base.Optional;
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.pom.java.LanguageLevel;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiClassType;
@@ -32,9 +34,12 @@ import com.intellij.psi.PsiDocCommentOwner;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiMethod;
 import com.intellij.psi.PsiParameter;
+import com.intellij.psi.PsiParameterList;
 import com.intellij.psi.PsiType;
+import com.intellij.psi.impl.source.PsiParameterListImpl;
 import com.intellij.psi.javadoc.PsiDocComment;
 import com.intellij.psi.search.GlobalSearchScope;
+import com.intellij.psi.util.PsiTreeUtil;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -48,6 +53,8 @@ import org.jetbrains.annotations.Nullable;
  * @author <a href="mailto:herzog@raffael.ch">Raffael Herzog</a>
  */
 public abstract class PsiProxy<T> {
+
+    private final static Logger LOG = Logger.getInstance(PsiProxy.class);
 
     protected final T delegate;
 
@@ -113,6 +120,10 @@ public abstract class PsiProxy<T> {
     }
 
     public static PsiMethod forMethod(PsiMethod delegate) {
+        return forMethod(delegate, Interceptor.<PsiMethod>nop());
+    }
+
+    private static PsiMethod forMethod(PsiMethod delegate, Interceptor<PsiMethod> additionalInterceptor) {
         class FindDeepestSuperMethodsInterceptor extends Interceptor<PsiMethod> {
             private PsiMethod[] deepestSuperMethods;
             private FindDeepestSuperMethodsInterceptor() {
@@ -132,31 +143,118 @@ public abstract class PsiProxy<T> {
         }
         delegate = (PsiMethod)delegate.getNavigationElement();
         return proxy(delegate,
-                     new GetDocCommentInterceptor(),
-                     GetNavigationElementInterceptor.INSTANCE,
-                     new FindDeepestSuperMethodsInterceptor(),
-                     new Interceptor<PsiMethod>("getContainingClass", params()) {
-                         private PsiClass containing;
-                         @Override
-                         protected Object intercept(PsiMethod proxy, PsiMethod target, Method method, Object[] parameters) throws Throwable {
-                             if ( containing == null ) {
-                                 containing = target.getContainingClass();
-                                 if ( containing != null ) {
-                                     containing = forClass(containing);
-                                 }
-                             }
-                             return containing;
-                         }
-                     });
+                additionalInterceptor,
+                new GetDocCommentInterceptor(),
+                GetNavigationElementInterceptor.INSTANCE,
+                new FindDeepestSuperMethodsInterceptor(),
+                new Interceptor<PsiMethod>("getContainingClass", params()) {
+                    private PsiClass containing;
+                    @Override
+                    protected Object intercept(PsiMethod proxy, PsiMethod target, Method method, Object[] parameters) throws Throwable {
+                        if ( containing == null ) {
+                            containing = target.getContainingClass();
+                            if ( containing != null ) {
+                                containing = forClass(containing);
+                            }
+                        }
+                        return containing;
+                    }
+                });
     }
 
     public static PsiParameter forParameter(PsiParameter delegate) {
-        return proxy(delegate, new GetParentInterceptor());
+        // OK, there are ugly things in this code. Very ugly things. But this one beats it all. It's just monstrous.
+        // So, make sure you sit tight and have your seat belts fastened.
+        class GetParameterParentInterceptor extends GetParentInterceptor {
+            private String getParameterIndexClassName = PsiParameterListImpl.class.getName();
+            private String getParameterListMethodName = getParameterListMethodName();
+            private final GetParameterParentInterceptor parent;
+            private PsiParameterList parameterList;
+            private GetParameterParentInterceptor(GetParameterParentInterceptor parent) {
+                this.parent = parent;
+            }
+            private String getParameterListMethodName() {
+                try {
+                    return PsiParameterListImpl.class
+                            .getDeclaredMethod("getParameterIndex", PsiParameter.class)
+                            .getName();
+                }
+                catch ( NoSuchMethodException e ) {
+                    LOG.assertTrue(false, "Exception: " + e + " This indicates an incompatible change in IDEA's code.");
+                    throw new AssertionError("Unreachable code reached");
+                }
+            }
+            @Override
+            boolean appliesTo(Method method) {
+                // Sometimes, psiParameterList.getParameterIndex() is called with a proxy.
+                // The implementation of getParameterList() has an assertion that the parent of the proxy is identical
+                // (==) to this. However, the parent of the proxy will be another proxy. The method actually works fine
+                // that way, but the assertion will fail (see Issue #52).
+                // We cannot control where the PsiParameterList comes from, so we can't just intercept
+                // getParameterIndex(). It might be the original PsiParameterList and there's nothing, we can do about
+                // that.
+                // Therefore, this method inspects the stack trace and doesn't intercept getParent(), if it's being
+                // called from getParameterIndex().
+                //
+                // There's no performance issue, this code is called only after Ctrl-Q. The user won't notice.
+                // But it's ugly as hell!
+                if ( super.appliesTo(method) ) {
+                    for ( StackTraceElement elem : Thread.currentThread().getStackTrace() ) {
+                        if ( elem.getClassName().equals(getParameterIndexClassName) && elem.getMethodName().equals(getParameterListMethodName) ) {
+                            return false;
+                        }
+                    }
+                    return true;
+                }
+                return false;
+            }
+
+            @Override
+            PsiElement createGetParentInterceptor(final PsiElement element) {
+                if ( element instanceof PsiMethod ) {
+                    // The ugliness gets worse. The expression used to check whether our parameter is a method parameter
+                    // (in contrast to e.g. a foreach parameter), the following expression is used:
+                    //    method != null && method.getParameterList() == parameter.getParent();
+                    // So, we're intercepting getParameterList() to return our proxy.
+                    return forMethod((PsiMethod)element, new Interceptor<PsiMethod>("getParameterList", params()) {
+                        @Override
+                        protected Object intercept(PsiMethod proxy, PsiMethod target, Method method, Object[] parameters) throws Throwable {
+                            GetParameterParentInterceptor root = GetParameterParentInterceptor.this;
+                            while ( root.parent != null ) {
+                                root = root.parent;
+                            }
+                            return root.parameterList;
+                        }
+                    });
+                }
+                else {
+                    return proxy(element, new GetParameterParentInterceptor(GetParameterParentInterceptor.this));
+                }
+            }
+        }
+        checkNoDoubleProxy(delegate);
+        if ( !isMethodParameter(delegate) ) {
+            // TODO: 29.05.16 nothing to do here?
+            return delegate;
+        }
+        GetParameterParentInterceptor interceptor = new GetParameterParentInterceptor(null);
+        PsiParameter proxy = proxy(delegate, interceptor);
+        // save the original parameter list proxy
+        interceptor.parameterList = (PsiParameterList)proxy.getParent();
+        return proxy;
+    }
+
+    private static boolean isMethodParameter(PsiParameter parameter) {
+        PsiMethod method = PsiTreeUtil.getParentOfType(parameter, PsiMethod.class);
+        // see JavaDocInfoGenerator::generateMethodParameterJavaDoc
+        //noinspection ObjectEquality
+        return method != null && method.getParameterList() == parameter.getParent();
     }
 
     @SafeVarargs
     @SuppressWarnings("unchecked")
     private static <T> T proxy(T delegate, Interceptor<? super T>... interceptors) {
+        checkNoDoubleProxy(delegate);
         Set<Class> interfaces = new HashSet<>();
         Class clazz = delegate.getClass();
         while ( !clazz.equals(Object.class) ) {
@@ -164,6 +262,12 @@ public abstract class PsiProxy<T> {
             clazz = clazz.getSuperclass();
         }
         return (T)Proxy.newProxyInstance(delegate.getClass().getClassLoader(), interfaces.toArray(new Class[interfaces.size()]), new Invoker<T>(delegate, interceptors));
+    }
+
+    private static void checkNoDoubleProxy(Object delegate) {
+        if ( Proxy.isProxyClass(delegate.getClass()) ) {
+            throw new IllegalArgumentException("Attempt to proxy a proxy");
+        }
     }
 
     private static Class[] params(Class... types) {
@@ -174,13 +278,32 @@ public abstract class PsiProxy<T> {
     }
 
     private static abstract class Interceptor<T> {
+        private static final Interceptor<Object> NOP = new Interceptor<Object>(null, null) {
+            @Override
+            boolean appliesTo(Method method) {
+                return false;
+            }
+            @Override
+            protected Object intercept(Object proxy, Object target, Method method, Object[] parameters) throws Throwable {
+                throw new IllegalStateException();
+            }
+            @Override
+            public String toString() {
+                return Interceptor.class.getName() + "::NOP";
+            }
+        };
+        @SuppressWarnings("unchecked")
+        public static <T> Interceptor<T> nop() {
+            return (Interceptor<T>)NOP;
+        }
+
         private final String name;
         private final Class[] paramTypes;
         protected Interceptor(String name, Class[] paramTypes) {
             this.name = name;
             this.paramTypes = paramTypes;
         }
-        private boolean appliesTo(Method method) {
+        boolean appliesTo(Method method) {
             return method.getName().equals(name)
                     && (paramTypes == null || Arrays.equals(method.getParameterTypes(), paramTypes));
         }
@@ -251,7 +374,8 @@ public abstract class PsiProxy<T> {
 
     private static class GetParentInterceptor extends Interceptor<PsiElement> {
 
-        private PsiElement parent = null;
+        @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
+        private Optional<PsiElement> parent = null;
 
         public GetParentInterceptor() {
             super("getParent", PsiProxy.params());
@@ -260,15 +384,24 @@ public abstract class PsiProxy<T> {
         @Override
         protected Object intercept(PsiElement proxy, PsiElement target, Method method, Object[] parameters) throws Throwable {
             if ( parent == null ) {
-                parent = (PsiElement)method.invoke(target);
-                if ( parent instanceof PsiMethod ) {
-                    parent = forMethod((PsiMethod)parent);
+                PsiElement element = (PsiElement)method.invoke(target);
+                if ( element != null ) {
+                    parent = Optional.fromNullable(createGetParentInterceptor(element));
                 }
-                else if ( parent != null ) {
-                    parent = proxy(parent, new GetParentInterceptor());
+                else {
+                    parent = Optional.absent();
                 }
             }
-            return parent;
+            return parent.orNull();
+        }
+
+        PsiElement createGetParentInterceptor(PsiElement element) {
+            if ( element instanceof PsiMethod ) {
+                return forMethod((PsiMethod)element);
+            }
+            else {
+                return proxy(element, new GetParentInterceptor());
+            }
         }
     }
 

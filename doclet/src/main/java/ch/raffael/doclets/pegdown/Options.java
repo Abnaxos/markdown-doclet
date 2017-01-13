@@ -19,9 +19,16 @@
  */
 package ch.raffael.doclets.pegdown;
 
-import ch.raffael.doclets.pegdown.mdtaglet.MarkdownTaglets;
-import ch.raffael.doclets.pegdown.pdrepair.MarkdownRepair;
-import ch.raffael.doclets.pegdown.pdrepair.MarkdownRepairKit;
+import java.io.File;
+import java.lang.reflect.Field;
+import java.math.BigDecimal;
+import java.nio.charset.Charset;
+import java.nio.charset.IllegalCharsetNameException;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.regex.Pattern;
+
 import com.google.common.base.Splitter;
 import com.sun.javadoc.DocErrorReporter;
 import com.sun.tools.doclets.standard.Standard;
@@ -30,13 +37,9 @@ import org.pegdown.LinkRenderer;
 import org.pegdown.PegDownProcessor;
 import org.pegdown.ToHtmlSerializer;
 
-import java.io.File;
-import java.lang.reflect.Field;
-import java.math.BigDecimal;
-import java.nio.charset.Charset;
-import java.nio.charset.IllegalCharsetNameException;
-import java.util.*;
-import java.util.regex.Pattern;
+import ch.raffael.doclets.pegdown.mdtaglet.MarkdownTaglets;
+import ch.raffael.doclets.pegdown.pdrepair.MarkdownRepair;
+import ch.raffael.doclets.pegdown.pdrepair.MarkdownRepairKit;
 
 import static com.google.common.base.MoreObjects.firstNonNull;
 
@@ -483,6 +486,7 @@ public class Options {
      * `fixLeadingSpaces` is `true`, exactly one leading whitespace character ('\\u0020')
      * will be removed, if it exists.
      *
+     * @todo Find a better way than setting the classloader for Velocity.
      * @todo This method doesn't belong here, move it to {@link PegdownDoclet}.
      *
      * @param markup           The Markdown source.
@@ -491,16 +495,24 @@ public class Options {
      * @return The resulting HTML.
      */
     public String toHtml(String markup, boolean fixLeadingSpaces) {
-        final MarkdownRepair markdownRepairKit =new MarkdownRepairKit(fixLeadingSpaces);
-        if ( processor == null ) {
-            processor = createProcessor();
+        Thread currentThread = Thread.currentThread();
+        ClassLoader previousContextClassLoader = currentThread.getContextClassLoader();
+        try {
+            currentThread.setContextClassLoader(getClass().getClassLoader());
+            final MarkdownRepair markdownRepairKit =new MarkdownRepairKit(fixLeadingSpaces);
+            if ( processor == null ) {
+                processor = createProcessor();
+            }
+
+            String markdown = renderMarkdownTags(markdownRepairKit.beforeMarkdownTaglets(markup));
+
+            markdown= markdownRepairKit.beforeMarkdownParser(markdown);
+            final String html = createDocletSerializer().toHtml(processor.parseMarkdown(markdown.toCharArray()));
+            return markdownRepairKit.afterMarkdownParser(html);
         }
-
-        String markdown = renderMarkdownTags(markdownRepairKit.beforeMarkdownTaglets(markup));
-
-        markdown= markdownRepairKit.beforeMarkdownParser(markdown);
-        final String html = createDocletSerializer().toHtml(processor.parseMarkdown(markdown.toCharArray()));
-        return markdownRepairKit.afterMarkdownParser(html);
+        finally {
+            currentThread.setContextClassLoader(previousContextClassLoader);
+        }
     }
 
     private String renderMarkdownTags(String markup) {

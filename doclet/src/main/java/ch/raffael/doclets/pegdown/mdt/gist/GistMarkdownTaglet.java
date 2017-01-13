@@ -20,16 +20,6 @@
 
 package ch.raffael.doclets.pegdown.mdt.gist;
 
-import ch.raffael.doclets.pegdown.mdtaglet.*;
-import ch.raffael.doclets.pegdown.mdtaglet.argval.ArgumentPredicate;
-import ch.raffael.doclets.pegdown.mdtaglet.argval.PredefinedArgumentPredicates;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.velocity.Template;
-import org.apache.velocity.VelocityContext;
-import org.apache.velocity.app.VelocityEngine;
-import org.kohsuke.github.GHGist;
-import org.kohsuke.github.GHGistFile;
-
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.LinkedList;
@@ -38,10 +28,28 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.regex.Pattern;
 
+import com.google.common.base.Joiner;
+import org.apache.velocity.Template;
+import org.apache.velocity.VelocityContext;
+import org.apache.velocity.app.VelocityEngine;
+import org.kohsuke.github.GHGist;
+import org.kohsuke.github.GHGistFile;
+
+import ch.raffael.doclets.pegdown.mdtaglet.ArgumentValidator;
+import ch.raffael.doclets.pegdown.mdtaglet.MarkdownTaglet;
+import ch.raffael.doclets.pegdown.mdtaglet.MarkdownTagletBase;
+import ch.raffael.doclets.pegdown.mdtaglet.PredefinedWhiteSpacePreserver;
+import ch.raffael.doclets.pegdown.mdtaglet.WhiteSpacePreserver;
+import ch.raffael.doclets.pegdown.mdtaglet.argval.ArgumentPredicate;
+import ch.raffael.doclets.pegdown.mdtaglet.argval.PredefinedArgumentPredicates;
+
 import static ch.raffael.doclets.pegdown.mdtaglet.argval.IndexFilter.at;
 import static ch.raffael.doclets.pegdown.mdtaglet.argval.PredefinedArgumentPredicates.isInteger;
 import static ch.raffael.doclets.pegdown.mdtaglet.argval.PredefinedArgumentPredicates.options;
-import static ch.raffael.doclets.pegdown.mdtaglet.argval.PredefinedArgumentValidators.*;
+import static ch.raffael.doclets.pegdown.mdtaglet.argval.PredefinedArgumentValidators.allOf;
+import static ch.raffael.doclets.pegdown.mdtaglet.argval.PredefinedArgumentValidators.anyOf;
+import static ch.raffael.doclets.pegdown.mdtaglet.argval.PredefinedArgumentValidators.argumentTypeValidator;
+import static ch.raffael.doclets.pegdown.mdtaglet.argval.PredefinedArgumentValidators.atLeast;
 
 /**
  * # GistMarkdownTaglet is the implementation for &#123;&#123;gist ...&#125;&#125;.
@@ -193,7 +201,7 @@ public final class GistMarkdownTaglet extends MarkdownTagletBase {
         final StringBuilder markdown = new StringBuilder();
         final GHGist gist = githubAccessor.getGist(gistId);
         final List<String> renderContent = doRenderGistFiles(gist, fileSelector);
-        markdown.append(StringUtils.join(renderContent, htmlNewline()));
+        markdown.append(Joiner.on(htmlNewline()).join(renderContent));
         return markdown.toString();
     }
 

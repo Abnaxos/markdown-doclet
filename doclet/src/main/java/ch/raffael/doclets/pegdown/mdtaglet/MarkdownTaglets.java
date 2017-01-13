@@ -19,13 +19,17 @@
  */
 package ch.raffael.doclets.pegdown.mdtaglet;
 
+import java.lang.reflect.Method;
+import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
+
 import com.google.common.collect.Multimap;
 import com.google.common.collect.MultimapBuilder;
 import com.sun.javadoc.DocErrorReporter;
-
-import java.lang.reflect.Method;
-import java.text.MessageFormat;
-import java.util.*;
 
 import static ch.raffael.doclets.pegdown.mdtaglet.MarkdownTaglet.OPT_MD_TAGLET;
 import static ch.raffael.doclets.pegdown.mdtaglet.MarkdownTaglet.OPT_MD_TAGLET_OPTION_PREFIX;
@@ -37,6 +41,7 @@ import static ch.raffael.doclets.pegdown.mdtaglet.MarkdownTaglet.OPT_MD_TAGLET_O
  * + It handles the registration and initialization of {@link MarkdownTaglet}s.
  * + It handles the options.
  *
+ * @todo Singletons are bad!
  */
 public final class MarkdownTaglets {
     private static MarkdownTaglets INSTANCE = createInstance();
