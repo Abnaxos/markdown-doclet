@@ -36,6 +36,7 @@ public final class MarkdownRepairKit implements MarkdownRepair {
         final MarkdownRepair spaceCharacterRepair = new SpaceCharacterRepair();
         final MarkdownRepair inlineTagletMarkdownRepair = new InlineTagletRepair();
         final MarkdownRepair atCharacterRepair=new AtSymbolRepair();
+        final MarkdownRepair atCharacterRepair2=new AtSymbolRepair2();
         final MarkdownRepair htmlEntitiesRepair=new HtmlEntitiesRepair();
 
         // before
@@ -44,12 +45,13 @@ public final class MarkdownRepairKit implements MarkdownRepair {
         }
 
         before.add(inlineTagletMarkdownRepair);
-        before.add(atCharacterRepair);
+        //before.add(atCharacterRepair);
+        before.add(atCharacterRepair2);
         before.add(htmlEntitiesRepair);
 
         // after
         after.add(htmlEntitiesRepair);
-        after.add(atCharacterRepair);
+        //after.add(atCharacterRepair);
         after.add(inlineTagletMarkdownRepair);
         after.add(spaceCharacterRepair);
     }

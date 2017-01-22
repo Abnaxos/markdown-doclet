@@ -26,6 +26,17 @@ import java.util.regex.Pattern;
 
 /**
  * AtSymbolRepair corrects the &#64; symbol issue, by replacing it with `&#64;`.
+ *
+ * *Demo:* (which will currently fail, unfortunately)
+ *
+ * ```java
+ * @MyAnnotation
+ * public class MyClass {
+ * }
+ * ```
+ *
+ * @see Issue soundso
+ *
  */
 final class AtSymbolRepair extends DefaultMarkdownRepair {
     static final String MARKER = "{-at-}";
