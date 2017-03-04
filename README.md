@@ -163,7 +163,7 @@ buildscript {
         mavenCentral() // or jcenter()
     }
     dependencies {
-        classpath 'ch.raffael.pegdown-doclet:pegdown-doclet:1.2'
+        classpath 'ch.raffael.pegdown-doclet:pegdown-doclet:1.3'
     }
 }
 
@@ -185,7 +185,7 @@ Add the following to your POM to use the doclet with Maven:
         <docletArtifact>
           <groupId>ch.raffael.pegdown-doclet</groupId>
           <artifactId>pegdown-doclet</artifactId>
-          <version>1.1</version>
+          <version>1.3</version>
         </docletArtifact>
         <useStandardDocletOptions>true</useStandardDocletOptions>
       </configuration>
