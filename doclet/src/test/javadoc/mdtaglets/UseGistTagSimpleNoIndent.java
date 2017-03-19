@@ -1,5 +1,5 @@
 /*
- * Copyright 2013
+ * Copyright 2013-2016 Raffael Herzog, Marko Umek
  *
  * This file is part of pegdown-doclet.
  *
@@ -15,21 +15,14 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with pegdown-doclet.  If not, see <http://www.gnu.org/licenses/>.
+ *
  */
-package ch.raffael.doclets.pegdown
 
-import spock.lang.Specification;
+package mdtaglets;
 
 /**
- * @author Franta Mejta
+ * # Title.
+ * This is a simple {{gist -indent feafcf888d949627001948b8346e0da7}} to render.
  */
-class TagsSpec extends Specification {
-
-    def "Re-insering tag should quote replacements"() {
-        expect:
-        Tags.insertInlineTags("{@}", [result]) == result
-
-        where:
-        result << ["#normal text", "\$() jQuery Object"]
-    }
+public class UseGistTagSimpleNoIndent {
 }

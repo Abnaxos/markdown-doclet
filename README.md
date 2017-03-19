@@ -67,11 +67,13 @@ Tag handling can be customised by implementing your own `TagRenderer`s and regis
 
 This currently only works for block tags.
 
-### Inline Tags
+### Custom Markdown Taglet
 
-Inline tags will be removed before processing the Markdown source and re-inserted afterwards. Therefore, markup within inline tags won't work.
+[How to define your own Markdown Taglet](markdown-taglet-description.md) 
 
-There's currently no way to customise this behaviour or customize the way inline tags are rendered back into the processed doc comment.
+#### Gist Markdown Taglet ({{gist _gistid_}})
+
+see [Description Of Gist Taglet](gist-taglet-description.md)
 
 
 PlantUML

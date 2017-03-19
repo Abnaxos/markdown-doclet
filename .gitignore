@@ -5,3 +5,8 @@ run/
 
 # exclude build settings
 local.properties
+
+.idea/
+*.ipr
+*.iws
+*.iml

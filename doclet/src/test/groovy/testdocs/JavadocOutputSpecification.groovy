@@ -36,14 +36,14 @@ abstract class JavadocOutputSpecification extends Specification {
     }
 
     Document packageDoc(Class clazz) {
-        def name = clazz.getName()
-        int pos = name.lastIndexOf('.')
-        assert pos > 0
-        return parse(name.substring(0, pos).replace('.', '/')+'/package-summary')
+        //        int pos = name.lastIndexOf('.')
+//        assert pos > 0
+//        return parse(name.substring(0, pos).replace('.', '/')+'/package-summary')
+        return parse(clazz.package.name+'.package-summary')
     }
 
     Document doc(Class clazz) {
-        parse(clazz.getName().replace('.', '/'))
+        parse(clazz.getName())
     }
 
     Document parse(String path) {

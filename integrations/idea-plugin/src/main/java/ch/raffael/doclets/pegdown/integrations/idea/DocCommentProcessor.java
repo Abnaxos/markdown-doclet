@@ -67,6 +67,7 @@ import ch.raffael.doclets.pegdown.Options;
 import ch.raffael.doclets.pegdown.PegdownDoclet;
 import ch.raffael.doclets.pegdown.SeeTagRenderer;
 import ch.raffael.doclets.pegdown.TagRendering;
+import ch.raffael.doclets.pegdown.mdtaglet.MarkdownTaglets;
 
 
 /**
@@ -128,6 +129,8 @@ public class DocCommentProcessor {
      * representing the resulting HTML. The resulting `PsiDocComment` can then be passed
      * to IDEA's default QuickDoc implementation.
      *
+     * @todo Error reporting ({@link com.sun.javadoc.DocErrorReporter} without {@link com.sun.javadoc.RootDoc}).
+     *
      * @param docComment    The `PsiDocComment` to process.
      *
      * @return A `PsiDocComment` representing the resulting HTML.
@@ -174,6 +177,7 @@ public class DocCommentProcessor {
         PsiDocCommentOwner context = PsiTreeUtil.getParentOfType(docComment, PsiDocCommentOwner.class);
         pegdownOptions.applyTo(options);
         PegdownDoclet doclet = new PegdownDoclet(options, null);
+        MarkdownTaglets.instance().setDocErrorReporter(doclet);
         StringBuilder buf = new StringBuilder();
         StringBuilder tagBlock = new StringBuilder();
         boolean start = true;
