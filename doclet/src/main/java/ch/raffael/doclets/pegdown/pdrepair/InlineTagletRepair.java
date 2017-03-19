@@ -46,9 +46,6 @@ final class InlineTagletRepair extends DefaultMarkdownRepair {
         this.tags = tags;
     }
 
-
-
-
     @Override
     public String beforeMarkdownParser(String markdown) {
         final StringBuffer result=new StringBuffer();

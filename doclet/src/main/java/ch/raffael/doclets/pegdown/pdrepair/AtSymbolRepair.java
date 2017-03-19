@@ -25,18 +25,16 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * AtSymbolRepair corrects the &#64; symbol issue, by replacing it with `&#64;`.
+ * AtSymbolRepair allows to use the '@' symbol in external JavaDoc fragments (like
+ * the Gist Taglet) without running into any issues with JavaDoc.
  *
- * *Demo:* (which will currently fail, unfortunately)
+ * **Important Note**: This is only useful when importing fragments that may contain
+ * '@' from external sources. If an '@' is in the actual JavaDoc source code, it will
+ * be interpreted by JavaDoc before this class gets a chance to fix anything.
  *
- * ```java
- * @MyAnnotation
- * public class MyClass {
- * }
- * ```
- *
- * @see Issue soundso
- *
+ * {@link UnescapeAtSymbolRepair} is used for providing an escape for the JavaDoc sources.
+ * The two classes don't clash, i.e. in external sources, there's no need to escape
+ * the '@' symbol, escaping actually won't even work with those.
  */
 final class AtSymbolRepair extends DefaultMarkdownRepair {
     static final String MARKER = "{-at-}";

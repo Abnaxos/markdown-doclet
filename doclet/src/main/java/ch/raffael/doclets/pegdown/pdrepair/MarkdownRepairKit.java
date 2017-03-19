@@ -35,9 +35,11 @@ public final class MarkdownRepairKit implements MarkdownRepair {
     public MarkdownRepairKit(boolean dropLeadingSpace) {
         final MarkdownRepair spaceCharacterRepair = new SpaceCharacterRepair();
         final MarkdownRepair inlineTagletMarkdownRepair = new InlineTagletRepair();
-        final MarkdownRepair atCharacterRepair=new AtSymbolRepair();
-        final MarkdownRepair atCharacterRepair2=new AtSymbolRepair2();
+        final MarkdownRepair atSymbolRepair=new AtSymbolRepair();
+        final MarkdownRepair unescapeAtSymbolRepair=new UnescapeAtSymbolRepair();
         final MarkdownRepair htmlEntitiesRepair=new HtmlEntitiesRepair();
+
+        before.add(unescapeAtSymbolRepair); // un-escape '@', then let atSymbolRepair do its job
 
         // before
         if( dropLeadingSpace ) {
@@ -45,13 +47,12 @@ public final class MarkdownRepairKit implements MarkdownRepair {
         }
 
         before.add(inlineTagletMarkdownRepair);
-        //before.add(atCharacterRepair);
-        before.add(atCharacterRepair2);
+        before.add(atSymbolRepair);
         before.add(htmlEntitiesRepair);
 
         // after
         after.add(htmlEntitiesRepair);
-        //after.add(atCharacterRepair);
+        after.add(atSymbolRepair);
         after.add(inlineTagletMarkdownRepair);
         after.add(spaceCharacterRepair);
     }
