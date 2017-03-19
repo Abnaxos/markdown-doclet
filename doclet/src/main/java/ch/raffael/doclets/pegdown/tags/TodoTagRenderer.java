@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with pegdown-doclet.  If not, see <http://www.gnu.org/licenses/>.
  */
-package ch.raffael.doclets.pegdown;
+package ch.raffael.doclets.pegdown.tags;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -24,6 +24,8 @@ import java.util.Map;
 import com.sun.javadoc.Doc;
 import com.sun.javadoc.MemberDoc;
 import com.sun.javadoc.Tag;
+
+import ch.raffael.doclets.pegdown.PegdownDoclet;
 
 
 /**

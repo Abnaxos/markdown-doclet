@@ -40,6 +40,7 @@ import org.pegdown.ToHtmlSerializer;
 import ch.raffael.doclets.pegdown.mdtaglet.MarkdownTaglets;
 import ch.raffael.doclets.pegdown.pdrepair.MarkdownRepair;
 import ch.raffael.doclets.pegdown.pdrepair.MarkdownRepairKit;
+import ch.raffael.doclets.pegdown.tags.DocletLinkRenderer;
 
 import static com.google.common.base.MoreObjects.firstNonNull;
 

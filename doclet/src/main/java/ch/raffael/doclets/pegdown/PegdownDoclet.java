@@ -19,17 +19,42 @@
  */
 package ch.raffael.doclets.pegdown;
 
-import ch.raffael.doclets.pegdown.mdtaglet.MarkdownTaglets;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.lang.reflect.Field;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
 import com.google.common.io.ByteStreams;
 import com.google.common.io.Files;
-import com.sun.javadoc.*;
+import com.sun.javadoc.AnnotationTypeDoc;
+import com.sun.javadoc.ClassDoc;
+import com.sun.javadoc.Doc;
+import com.sun.javadoc.DocErrorReporter;
+import com.sun.javadoc.LanguageVersion;
+import com.sun.javadoc.MemberDoc;
+import com.sun.javadoc.PackageDoc;
+import com.sun.javadoc.RootDoc;
+import com.sun.javadoc.SourcePosition;
+import com.sun.javadoc.Tag;
 import com.sun.tools.doclets.standard.Standard;
 import com.sun.tools.javadoc.Main;
 import org.parboiled.errors.ParserRuntimeException;
 
-import java.io.*;
-import java.lang.reflect.Field;
-import java.util.*;
+import ch.raffael.doclets.pegdown.mdtaglet.MarkdownTaglets;
+import ch.raffael.doclets.pegdown.tags.ParamTagRenderer;
+import ch.raffael.doclets.pegdown.tags.SeeTagRenderer;
+import ch.raffael.doclets.pegdown.tags.SimpleTagRenderer;
+import ch.raffael.doclets.pegdown.tags.TagRenderer;
+import ch.raffael.doclets.pegdown.tags.ThrowsTagRenderer;
+import ch.raffael.doclets.pegdown.tags.TodoTagRenderer;
+import ch.raffael.doclets.pegdown.tags.UmlTagRenderer;
 
 
 /**

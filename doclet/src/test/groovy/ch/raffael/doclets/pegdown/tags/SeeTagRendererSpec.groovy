@@ -16,11 +16,14 @@
  * You should have received a copy of the GNU General Public License
  * along with pegdown-doclet.  If not, see <http://www.gnu.org/licenses/>.
  */
-package ch.raffael.doclets.pegdown
+package ch.raffael.doclets.pegdown.tags
 
+import ch.raffael.doclets.pegdown.Options
+import ch.raffael.doclets.pegdown.PegdownDoclet
 import com.sun.javadoc.RootDoc
 import com.sun.javadoc.SeeTag
-import spock.lang.Specification;
+import spock.lang.Specification
+
 
 /**
  * @author <a href="mailto:herzog@raffael.ch">Raffael Herzog</a>

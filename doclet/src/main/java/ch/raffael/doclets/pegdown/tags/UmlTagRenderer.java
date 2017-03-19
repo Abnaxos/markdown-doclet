@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with pegdown-doclet.  If not, see <http://www.gnu.org/licenses/>.
  */
-package ch.raffael.doclets.pegdown;
+package ch.raffael.doclets.pegdown.tags;
 
 import java.io.File;
 import java.io.IOException;
@@ -31,6 +31,8 @@ import com.sun.javadoc.RootDoc;
 import com.sun.javadoc.Tag;
 import net.sourceforge.plantuml.SourceStringReader;
 import net.sourceforge.plantuml.preproc.Defines;
+
+import ch.raffael.doclets.pegdown.PegdownDoclet;
 
 
 /**

@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with pegdown-doclet.  If not, see <http://www.gnu.org/licenses/>.
  */
-package ch.raffael.doclets.pegdown;
+package ch.raffael.doclets.pegdown.tags;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -24,6 +24,8 @@ import java.util.regex.Pattern;
 import com.sun.javadoc.SeeTag;
 import org.pegdown.Extensions;
 import org.pegdown.FastEncoder;
+
+import ch.raffael.doclets.pegdown.PegdownDoclet;
 
 
 /**

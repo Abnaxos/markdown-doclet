@@ -65,9 +65,9 @@ import org.pegdown.ToHtmlSerializer;
 import ch.raffael.doclets.pegdown.DocletSerializer;
 import ch.raffael.doclets.pegdown.Options;
 import ch.raffael.doclets.pegdown.PegdownDoclet;
-import ch.raffael.doclets.pegdown.SeeTagRenderer;
-import ch.raffael.doclets.pegdown.TagRendering;
 import ch.raffael.doclets.pegdown.mdtaglet.MarkdownTaglets;
+import ch.raffael.doclets.pegdown.tags.SeeTagRenderer;
+import ch.raffael.doclets.pegdown.tags.TagRendering;
 
 
 /**

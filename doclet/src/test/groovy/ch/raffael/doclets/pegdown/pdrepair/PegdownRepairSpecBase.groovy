@@ -19,7 +19,7 @@
  */
 package ch.raffael.doclets.pegdown.pdrepair
 
-import ch.raffael.doclets.pegdown.DocletLinkRenderer
+import ch.raffael.doclets.pegdown.tags.DocletLinkRenderer
 import org.pegdown.Extensions
 import org.pegdown.PegDownProcessor
 import org.pegdown.ToHtmlSerializer

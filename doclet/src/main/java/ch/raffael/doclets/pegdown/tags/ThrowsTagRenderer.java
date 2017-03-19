@@ -16,11 +16,11 @@
  * You should have received a copy of the GNU General Public License
  * along with pegdown-doclet.  If not, see <http://www.gnu.org/licenses/>.
  */
-package ch.raffael.doclets.pegdown;
+package ch.raffael.doclets.pegdown.tags;
 
 import com.sun.javadoc.ThrowsTag;
 
-import static ch.raffael.doclets.pegdown.TagRendering.*;
+import ch.raffael.doclets.pegdown.PegdownDoclet;
 
 
 /**
@@ -36,6 +36,6 @@ public class ThrowsTagRenderer implements TagRenderer<ThrowsTag> {
     public void render(ThrowsTag tag, StringBuilder target, PegdownDoclet doclet) {
         target.append(tag.name())
                 .append(' ').append(tag.exceptionName())
-                .append(' ').append(simplifySingleParagraph(doclet.toHtml(tag.exceptionComment())));
+                .append(' ').append(TagRendering.simplifySingleParagraph(doclet.toHtml(tag.exceptionComment())));
     }
 }
