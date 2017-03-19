@@ -10,3 +10,6 @@ local.properties
 *.ipr
 *.iws
 *.iml
+
+# exclude mind maps
+*.mm
