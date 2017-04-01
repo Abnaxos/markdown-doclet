@@ -1,6 +1,6 @@
 package testdocs
 
-import ch.raffael.doclets.pegdown.PegdownDoclet
+import ch.raffael.mddoclet.MarkdownDoclet
 
 import javax.tools.ToolProvider
 import java.nio.file.Files
@@ -33,10 +33,10 @@ final class JavadocRunner {
         }
         def javadocTool = ToolProvider.systemDocumentationTool
         def fileManager = javadocTool.getStandardFileManager(null, null, null)
-        def task = javadocTool.getTask(null, fileManager, null, PegdownDoclet,
+        def task = javadocTool.getTask(null, fileManager, null, MarkdownDoclet,
                                        [ '-locale', 'en',
                                          '-d', OUTPUT_PATH.toString(),
-                                         '-windowtitle', 'Pegdown Doclet Test Javado',
+                                         '-windowtitle', 'Markdown Doclet Test Javadoc',
                                          '-overview', Paths.get('src', 'test', 'javadoc', 'overview.md').toString(),
                                          '-link', 'http://docs.oracle.com/javase/7/docs/api/',
                                          '-link', 'http://docs.oracle.com/javase/7/docs/jdk/api/javadoc/doclet',

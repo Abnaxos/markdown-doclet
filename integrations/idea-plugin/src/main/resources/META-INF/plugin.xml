@@ -1,30 +1,30 @@
 <!--
   ~ Copyright 2013 Raffael Herzog
   ~
-  ~ This file is part of pegdown-doclet.
+  ~ This file is part of markdown-doclet.
   ~
-  ~ pegdown-doclet is free software: you can redistribute it and/or modify
+  ~ markdown-doclet is free software: you can redistribute it and/or modify
   ~ it under the terms of the GNU General Public License as published by
   ~ the Free Software Foundation, either version 3 of the License, or
   ~ (at your option) any later version.
   ~
-  ~ pegdown-doclet is distributed in the hope that it will be useful,
+  ~ markdown-doclet is distributed in the hope that it will be useful,
   ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
   ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
   ~ GNU General Public License for more details.
   ~
   ~ You should have received a copy of the GNU General Public License
-  ~ along with pegdown-doclet.  If not, see <http://www.gnu.org/licenses/>.
+  ~ along with markdown-doclet.  If not, see <http://www.gnu.org/licenses/>.
   -->
-<idea-plugin version="2">
-  <id>PegdownDocletIdea</id>
-  <name>Pegdown Doclet for IDEA</name>
+<idea-plugin>
+  <id>MarkdownDocletIdea</id>
+  <name>Markdown Doclet for IDEA</name>
   <version>@idea-plugin-version@</version>
-  <vendor email="herzog@raffael.ch" url="https://github.com/Abnaxos/pegdown-doclet/">Raffael Herzog</vendor>
+  <vendor email="herzog@raffael.ch" url="https://github.com/Abnaxos/markdown-doclet/">Raffael Herzog</vendor>
 
   <description><![CDATA[
       <p>Enables support for Quick Documentation (Ctrl-Q) for projects that use the
-      Pegdown Doclet. Enable and configure the plugin in "Settings &ndash; Pegdown
+      Markdown Doclet. Enable and configure the plugin in "Settings &ndash; Markdown
       Doclet".</p>
 
       <p><em>Tip:</em> Also install the the PlantUML integration plugin for live-previews
@@ -34,15 +34,15 @@
       <ul>
         <li>Some formatting problems in certain constellations; the doc is still readable,
             though</li>
-        <li>No option for Pegdown parse timeout</li>
+        <li>No option for Markdown parse timeout</li>
       </ul>
       <p><em>Limitation that won't be fixed</em></p>
       <ul>
         <li>It will only process JavaDocs of project source files, external libraries
             won't be processed; use generated JavaDocs for libraries</li>
         <li>It works only if the class where Ctrl-Q was used is located in a
-            Pegdown-enabled module</li>
-        <li>It may get confused on certain constellations of Pegdown-enabled and
+            Markdown-enabled module</li>
+        <li>It may get confused on certain constellations of Markdown-enabled and
             Standard-JavaDoc modules</li>
       </ul>
       ]]></description>
@@ -52,8 +52,8 @@
         <dt>1.3-1 (2017-01-07)</dt>
         <dd>
           <ul>
-            <li>Fix <a href="https://github.com/Abnaxos/pegdown-doclet/issues/52">Issue #52</a>
-              (Assertion failed at PsiParameterListImpl.getParameterIndex at PegdownDocumentationProvider.generateDoc)</li>
+            <li>Fix <a href="https://github.com/Abnaxos/markdown-doclet/issues/52">Issue #52</a>
+              (Assertion failed at PsiParameterListImpl.getParameterIndex at MarkdownDocumentationProvider.generateDoc)</li>
           </ul>
         </dd>
         <dt>1.3-0 (2016-05-20)</dt>
@@ -90,23 +90,23 @@
 
   <application-components>
     <component>
-      <implementation-class>ch.raffael.doclets.pegdown.integrations.idea.TempFileManager</implementation-class>
+      <implementation-class>ch.raffael.mddoclet.integrations.idea.TempFileManager</implementation-class>
     </component>
   </application-components>
   <project-components>
     <component>
-      <implementation-class>ch.raffael.doclets.pegdown.integrations.idea.ProjectConfiguration</implementation-class>
+      <implementation-class>ch.raffael.mddoclet.integrations.idea.ProjectConfiguration</implementation-class>
     </component>
   </project-components>
   <module-components>
     <component>
-      <implementation-class>ch.raffael.doclets.pegdown.integrations.idea.ModuleConfiguration</implementation-class>
+      <implementation-class>ch.raffael.mddoclet.integrations.idea.ModuleConfiguration</implementation-class>
     </component>
   </module-components>
 
   <extensions defaultExtensionNs="com.intellij">
-    <lang.documentationProvider language="JAVA" implementationClass="ch.raffael.doclets.pegdown.integrations.idea.PegdownDocumentationProvider" order="first"/>
-    <projectConfigurable instance="ch.raffael.doclets.pegdown.integrations.idea.PegdownConfigurable"
-                         id="PegdownDocletIdea.Config" displayName="Pegdown Doclet" groupId="tools"/>
+    <lang.documentationProvider language="JAVA" implementationClass="ch.raffael.mddoclet.integrations.idea.MarkdownDocumentationProvider" order="first"/>
+    <projectConfigurable instance="ch.raffael.mddoclet.integrations.idea.MarkdownConfigurable"
+                         id="MarkdownDocletIdea.Config" displayName="Markdown Doclet" groupId="tools"/>
   </extensions>
 </idea-plugin>

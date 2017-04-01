@@ -2,7 +2,7 @@ include 'doclet'
 include 'integrations:idea-plugin'
 include 'integrations:gradle-plugin'
 
-rootProject.name = 'pegdown-doclet'
+rootProject.name = 'markdown-doclet'
 
 gradle.projectsLoaded {
     def loadProperties

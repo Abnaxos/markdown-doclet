@@ -1,20 +1,20 @@
 /*
  * Copyright 2013-2016 Raffael Herzog, Marko Umek
  *
- * This file is part of pegdown-doclet.
+ * This file is part of markdown-doclet.
  *
- * pegdown-doclet is free software: you can redistribute it and/or modify
+ * markdown-doclet is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * pegdown-doclet is distributed in the hope that it will be useful,
+ * markdown-doclet is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with pegdown-doclet.  If not, see <http://www.gnu.org/licenses/>.
+ * along with markdown-doclet.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
 
@@ -31,7 +31,7 @@ def snapshot(boolean snapshot) {
 }
 
 allprojects {
-    group = 'ch.raffael.pegdown-doclet'
+    group = 'ch.raffael.markdown-doclet'
     buildDir = 'target'
     version = docletBaseVersion + snapshot(true)
 }
@@ -90,7 +90,7 @@ subprojects {
     processResources {
         //noinspection UnnecessaryQualifiedReference
         filter org.apache.tools.ant.filters.ReplaceTokens, tokens: [
-                "pegdown-doclet-version": project(':doclet').version
+                "markdown-doclet-version": project(':doclet').version
         ]
     }
 
@@ -107,7 +107,7 @@ subprojects {
             options {
                 locale 'en'
                 docletpath = (sourceSets.main.output + sourceSets.main.compileClasspath) as List
-                doclet = 'ch.raffael.doclets.pegdown.PegdownDoclet'
+                doclet = 'ch.raffael.mddoclet.MarkdownDoclet'
                 def overviewFile = file('src/main/javadoc/overview.md')
                 if ( overviewFile.exists() ) {
                     file('src/main/javadoc/overview.md')
@@ -120,7 +120,7 @@ subprojects {
                 ]
 //                addStringOption 'javadocversion', 'v7'
                 footer = """
-              <a href="https://github.com/Abnaxos/pegdown-doclet/" target="_top">
+              <a href="https://github.com/Abnaxos/markdown-doclet/" target="_top">
                 <img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png" alt="Fork me on GitHub">
               </a>
               """

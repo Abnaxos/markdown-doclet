@@ -1,6 +1,6 @@
 apply plugin:OSSRH
 
-archivesBaseName = 'pegdown-doclet'
+archivesBaseName = 'markdown-doclet'
 
 dependencies {
     compile libs.pegdown

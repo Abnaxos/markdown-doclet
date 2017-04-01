@@ -39,9 +39,9 @@ class OSSRH implements Plugin<Project> {
                         }
 
                         pom.project {
-                            name 'Pegdown Doclet'
+                            name 'Markdown Doclet'
                             description 'A Doclet that allows the use of Markdown and PlantUML in JavaDoc comments.'
-                            url 'https://github.com/Abnaxos/pegdown-doclet'
+                            url 'https://github.com/Abnaxos/markdown-doclet'
                             packaging 'jar'
 
                             developers {
@@ -62,8 +62,8 @@ class OSSRH implements Plugin<Project> {
                             }
 
                             scm {
-                                url 'https://github.com/Abnaxos/pegdown-doclet'
-                                connection 'scm:git:https://github.com/Abnaxos/pegdown-doclet.git'
+                                url 'https://github.com/Abnaxos/markdown-doclet'
+                                connection 'scm:git:https://github.com/Abnaxos/markdown-doclet.git'
                             }
                         }
                     }

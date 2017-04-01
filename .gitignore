@@ -11,5 +11,4 @@ local.properties
 *.iws
 *.iml
 
-# exclude mind maps
-*.mm
+archive/
