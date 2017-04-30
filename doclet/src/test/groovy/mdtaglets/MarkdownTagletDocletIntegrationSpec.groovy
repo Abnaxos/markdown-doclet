@@ -41,9 +41,10 @@ class MarkdownTagletDocletIntegrationSpec extends MarkdownTagletSpecBase {
         javadoc.select('div.contentContainer div.description div.block').html() == markup
 
         where:
-        options                                                  || markup
-        []                                                       || "<h1>Just say {{hello Peter Paul Mary}}.</h1>"
-        markdownTaglets(HelloTaglet)                             || "<h1>Just say <em>Hello Peter, Paul, Mary</em>.</h1>"
-        markdownTaglets(HelloTaglet) + ["-mdt-hello-lang", "IT"] || "<h1>Just say <em>Ciao Peter, Paul, Mary</em>.</h1>"
+        options                    || markup
+        // No way to test the case taglet not registered, as it's registered for all tests through /META-INF/services
+        // []                      || "<h1>Just say {{hello Peter Paul Mary}}.</h1>"
+        []                         || "<h1>Just say <em>Hello Peter, Paul, Mary</em>.</h1>"
+        ["-mdt-hello-lang", "IT"]  || "<h1>Just say <em>Ciao Peter, Paul, Mary</em>.</h1>"
     }
 }

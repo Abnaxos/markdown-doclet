@@ -41,15 +41,12 @@ import ch.raffael.mddoclet.mdtaglet.argval.PredefinedArgumentValidators;
  * + {@linkplain #getArgumentValidator() validates} the argument list
  * + the {@link #render(List)} or {@link #renderRaw(String)} method, which should create markdown code.
  *
+ * Each markdown taglet **must** be registered in `META-INF/services/ch.raffael.mddoclet.mdtaglet.MarkdownTaglet`
+ * (see {@link java.util.ServiceLoader}
+ *
+ * @see java.util.ServiceLoader
  */
 public interface MarkdownTaglet {
-    /**
-     * Name of the markdown taglet option: {@value #OPT_MD_TAGLET}.
-     *
-     * Use this to register a custom (markdown) taglet.
-     */
-    String OPT_MD_TAGLET = "-mdtaglet";
-
     /**
      * Every taglet specific option must starts with {@value #OPT_MD_TAGLET_OPTION_PREFIX}.
      */

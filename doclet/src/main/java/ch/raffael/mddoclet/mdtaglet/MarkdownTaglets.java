@@ -25,13 +25,13 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.ServiceLoader;
 import java.util.Set;
 
 import com.google.common.collect.Multimap;
 import com.google.common.collect.MultimapBuilder;
 import com.sun.javadoc.DocErrorReporter;
 
-import static ch.raffael.mddoclet.mdtaglet.MarkdownTaglet.OPT_MD_TAGLET;
 import static ch.raffael.mddoclet.mdtaglet.MarkdownTaglet.OPT_MD_TAGLET_OPTION_PREFIX;
 
 /**
@@ -78,8 +78,20 @@ public final class MarkdownTaglets {
 
     private static MarkdownTaglets createInstance() {
         final MarkdownTaglets markdownTaglets = new MarkdownTaglets(new MarkdownTagletExecutor());
-        StandardTaglets.registerStandardTaglets(markdownTaglets);
+        ClassLoader loader = Thread.currentThread().getContextClassLoader();
+        if ( loader == null ) {
+            loader = MarkdownTaglets.class.getClassLoader();
+        }
+        markdownTaglets.loadTagletPrototypes(loader);
         return markdownTaglets;
+    }
+
+    private void loadTagletPrototypes(ClassLoader classLoader) {
+        ServiceLoader<MarkdownTaglet> tagletsLoader = ServiceLoader.load(MarkdownTaglet.class, MarkdownTaglet.class.getClassLoader());
+        for ( MarkdownTaglet prototype : tagletsLoader ) {
+            markdownTagletClasses.add(prototype.getClass());
+            markdownTaglets.add(prototype);
+        }
     }
 
     /**
@@ -88,10 +100,6 @@ public final class MarkdownTaglets {
      * @return the option length
      */
     public static int optionLengths(String option) {
-        if( option.equals(MarkdownTaglet.OPT_MD_TAGLET) ) {
-            return 2;
-        }
-
         if( option.startsWith(MarkdownTaglet.OPT_MD_TAGLET_OPTION_PREFIX) ) {
             return 2;
         }
@@ -107,29 +115,16 @@ public final class MarkdownTaglets {
      * @param errorReporter the error reporter
      * @return {@code true} if a markdown option has been found, otherwise false
      *
-     * @see MarkdownTaglet#OPT_MD_TAGLET
      * @see MarkdownTaglet#OPT_MD_TAGLET_OPTION_PREFIX
      * @see #optionLengths(String)
      */
     public boolean handleOptions(String[] options, DocErrorReporter errorReporter) {
         final String potentialMarkdownTagletOption = options[0];
 
-        if( potentialMarkdownTagletOption.equals(OPT_MD_TAGLET) ) {
-            final String markdownTagletClassName = options[1];
-            final MarkdownTaglet markdownTaglet= createMarkdownTagletPrototype(markdownTagletClassName, errorReporter);
-            if (markdownTaglet != null) {
-                registerMarkdownTaglet(markdownTaglet);
-            } else {
-                errorReporter.printError(OPT_MD_TAGLET + " " + markdownTagletClassName + ": could not be registered! Taglet is not available.");
-            }
-            return true;
-        }
-
         if( potentialMarkdownTagletOption.startsWith(OPT_MD_TAGLET_OPTION_PREFIX) ) {
             storeMarkdownTagletOption(potentialMarkdownTagletOption, options[1]);
             return true;
         }
-
 
         return false;
     }
@@ -162,36 +157,6 @@ public final class MarkdownTaglets {
         options.put(stripped, markdownTagletOptionValue);
         options.put(markdownTagletOption, markdownTagletOptionValue);
     }
-
-    private MarkdownTaglet createMarkdownTagletPrototype(String markdownTagletClassName, DocErrorReporter errorReporter) {
-        try {
-            final Class<?> clazz = Class.forName(markdownTagletClassName);
-            return MarkdownTaglet.class.cast(clazz.newInstance());
-        } catch (ClassNotFoundException e) {
-            errorReporter.printError(OPT_MD_TAGLET + " " + markdownTagletClassName + ": Class not found! Did you add " + markdownTagletClassName + " to your classpath?");
-            e.printStackTrace();
-        } catch (InstantiationException e) {
-            errorReporter.printError(OPT_MD_TAGLET + " " + markdownTagletClassName + ": No instance could be created! Did you implement the Default Constructor?");
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
-            errorReporter.printError(OPT_MD_TAGLET + " " + markdownTagletClassName + ": Default Constructor is not public!");
-            e.printStackTrace();
-        } catch (ClassCastException e) {
-            errorReporter.printError(OPT_MD_TAGLET + " " + markdownTagletClassName + ": Does not implement MarkdownTaglet! Please extend your Taglet from " + MarkdownTagletBase.class);
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-
-    final void registerMarkdownTaglet(MarkdownTaglet markdownTaglet) {
-        if( ! initialized ) {
-            if (markdownTagletClasses.add(markdownTaglet.getClass())) {
-                markdownTaglets.add(markdownTaglet);
-            }
-        }
-    }
-
 
     private void doInitExecutor() {
         for (MarkdownTaglet markdownTaglet : markdownTaglets) {

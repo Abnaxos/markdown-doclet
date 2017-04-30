@@ -53,8 +53,6 @@ import static ch.raffael.mddoclet.mdtaglet.argval.PredefinedArgumentValidators.a
 
 /**
  * # GistMarkdownTaglet is the implementation for &#123;&#123;gist ...&#125;&#125;.
- *
- * It's a standard taglet which is already registered by {@link ch.raffael.mddoclet.mdtaglet.StandardTaglets}.
  */
 public final class GistMarkdownTaglet extends MarkdownTagletBase {
     private static final Pattern LINE_START = Pattern.compile("^", Pattern.MULTILINE);

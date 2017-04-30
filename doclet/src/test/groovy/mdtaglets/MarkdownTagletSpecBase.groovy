@@ -19,7 +19,6 @@
  */
 package mdtaglets
 
-import ch.raffael.mddoclet.mdtaglet.MarkdownTaglet
 import ch.raffael.mddoclet.mdtaglet.MarkdownTagletBase
 import ch.raffael.mddoclet.mdtaglet.MarkdownTaglets
 import org.jsoup.Jsoup
@@ -31,6 +30,8 @@ import java.nio.file.Path
 
 import static ch.raffael.mddoclet.mdtaglet.MarkdownTagletUtils.stripBlanksFromLineEnd
 import static ch.raffael.mddoclet.mdtaglet.MarkdownTagletUtils.stripBlanksFromLineStart
+
+
 /**
  * MarkdownTagletSpecBase should be used for testing {@link ch.raffael.mddoclet.mdtaglet.MarkdownTaglet}.
  */
@@ -51,20 +52,6 @@ abstract class MarkdownTagletSpecBase extends Specification {
 
         println("Reset markdown taglets")
         MarkdownTaglets.reset();
-    }
-
-    /**
-     * Create a markdown taglet option list.
-     * @param markdownTagletClasses the markdown taglet classes.
-     * @return the markdown taglet options
-     */
-    protected static List<String> markdownTaglets(Class<? extends MarkdownTaglet>... markdownTagletClasses) {
-        def result = []
-        for (def mdtc : markdownTagletClasses) {
-            result += MarkdownTaglet.OPT_MD_TAGLET;
-            result += mdtc.getName()
-        }
-        return result
     }
 
     /**
