@@ -17,7 +17,7 @@
   ~ along with markdown-doclet.  If not, see <http://www.gnu.org/licenses/>.
   -->
 <idea-plugin>
-  <id>MarkdownDocletIdea</id>
+  <id>ch.raffael.mddoclet.integrations.idea.MarkdownDocletIdea</id>
   <name>Markdown Doclet for IDEA</name>
   <version>@version@</version>
   <vendor email="herzog@raffael.ch" url="https://github.com/Abnaxos/markdown-doclet/">Raffael Herzog</vendor>
@@ -117,6 +117,6 @@
   <extensions defaultExtensionNs="com.intellij">
     <lang.documentationProvider language="JAVA" implementationClass="ch.raffael.mddoclet.integrations.idea.MarkdownDocumentationProvider" order="first"/>
     <projectConfigurable instance="ch.raffael.mddoclet.integrations.idea.MarkdownConfigurable"
-                         id="MarkdownDocletIdea.Config" displayName="Markdown Doclet" groupId="tools"/>
+                         id="ch.raffael.mddoclet.integrations.idea.MarkdownDocletIdea.Config" displayName="Markdown Doclet" groupId="tools"/>
   </extensions>
 </idea-plugin>

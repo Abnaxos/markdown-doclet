@@ -32,7 +32,7 @@ public final class Plugin {
 
     public static final boolean DEBUG = Boolean.getBoolean("ch.raffael.mddoclet.integrations.idea.debug");
 
-    public static final String PLUGIN_NAME = "MarkdownDocletIdea";
+    public static final String PLUGIN_NAME = "ch.raffael.mddoclet.integrations.idea.MarkdownDocletIdea";
 
     public static final String TEMP_FILE_MANAGER_NAME = PLUGIN_NAME + ".TempFileManager";
     public static final String PROJECT_CONFIG_NAME = PLUGIN_NAME + ".ProjectConfig";
