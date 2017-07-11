@@ -27,7 +27,7 @@ def snapshot(boolean snapshot) {
 allprojects {
     group = 'ch.raffael.markdown-doclet'
     buildDir = 'target'
-    version = docletBaseVersion + snapshot(true)
+    version = docletBaseVersion + snapshot(false)
 }
 
 subprojects {

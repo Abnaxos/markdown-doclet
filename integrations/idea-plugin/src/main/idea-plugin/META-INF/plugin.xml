@@ -51,7 +51,7 @@
 
   <change-notes><![CDATA[
       <dl>
-        <dt>1.4-SNAPSHOT (2017-07-11)</dt>
+        <dt>1.4-0 (2017-07-11)</dt>
         <dd>
           <ul>
             <li>Rename to Markdown Doclet</li>

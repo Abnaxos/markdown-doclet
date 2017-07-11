@@ -1,10 +1,10 @@
+version = componentBaseVersion + '-0' + snapshot(false)
+
 apply plugin:IdeaPluginSync
 
 configurations {
     packaged
 }
-
-version = componentBaseVersion + '-0' + snapshot(true)
 
 dependencies {
     compile docletProject
