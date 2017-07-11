@@ -67,6 +67,38 @@ Tag handling can be customised by implementing your own `TagRenderer`s and regis
 
 This currently only works for block tags.
 
+### Handling of '@'
+
+'@' at the beginning of a new line introduces the tag block. This is very inconvenient especially in example code blocks:
+
+```java
+ /**
+  * Java Example:
+  *
+  * ```java
+  * @Override
+  * public void myMethod() {
+  * }
+  * ```
+  */
+```
+
+The tag block will start with `@Override` and the rest of the documentation block will be cut off. There's unfortunately no way to circumvent this. However, the Doclet provides a discrete way to escape such leading '@' signs:
+
+```java
+ /**
+  * Java Example:
+  *
+  * ```java
+  * .@Override
+  * public void myMethod() {
+  * }
+  * ```
+  */
+```
+
+Note the leading dot in `.@Override`. This dot will not be rendered in the JavaDoc. If you *really* meant `.@`, add another dot: `..@` will be rendered as `.@`. This only works for the '@' sign and only at the beginning of a line.
+
 ### Custom Markdown Taglet
 
 [How to define your own Markdown Taglet](markdown-taglet-description.md) 
