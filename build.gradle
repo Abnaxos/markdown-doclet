@@ -19,7 +19,7 @@
  */
 
 ext.componentBaseVersion = '1.4'
-ext.docletBaseVersion = '1.4'
+ext.docletBaseVersion = '1.5'
 def snapshot(boolean snapshot) {
     return snapshot ? '-SNAPSHOT' : ''
 }
@@ -27,7 +27,7 @@ def snapshot(boolean snapshot) {
 allprojects {
     group = 'ch.raffael.markdown-doclet'
     buildDir = 'target'
-    version = docletBaseVersion + snapshot(false)
+    version = docletBaseVersion + snapshot(true)
 }
 
 subprojects {
