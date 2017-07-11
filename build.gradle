@@ -18,12 +18,6 @@
  *
  */
 
-apply plugin:'wrapper'
-
-wrapper {
-    gradleVersion = '3.3'
-}
-
 ext.componentBaseVersion = '1.4'
 ext.docletBaseVersion = '1.4'
 def snapshot(boolean snapshot) {
@@ -51,15 +45,6 @@ subprojects {
         jcenter()
     }
 
-    sourceSets {
-        main {
-            output.resourcesDir = output.classesDir
-        }
-        test {
-            output.resourcesDir = output.classesDir
-        }
-    }
-
     dependencies {
         testCompile group:'org.codehaus.groovy', name:'groovy-all', version:'2.4.6'
         testCompile('org.spockframework:spock-core:1.0-groovy-2.4') {
@@ -72,7 +57,7 @@ subprojects {
         libs = [
                 pegdown : [group: 'org.pegdown', name: 'pegdown', version: '1.6.0'],
                 guava   : [group: 'com.google.guava', name: 'guava', version: '18.0'],
-                plantuml: [group: 'net.sourceforge.plantuml', name: 'plantuml', version: '8032'],
+                plantuml: [group: 'net.sourceforge.plantuml', name: 'plantuml', version: '8059'],
                 github:   [group: 'org.kohsuke', name: 'github-api', version: '1.76'],
                 findbugs:  [group: 'com.google.code.findbugs', name : 'findbugs-annotations', version :'3.0.1'],
                 okhttp:   [group: 'com.squareup.okhttp', name: 'okhttp-urlconnection', version: '2.7.5'],

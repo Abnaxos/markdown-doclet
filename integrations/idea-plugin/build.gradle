@@ -1,3 +1,5 @@
+apply plugin:IdeaPluginSync
+
 configurations {
     packaged
 }
@@ -7,9 +9,6 @@ version = componentBaseVersion + '-0' + snapshot(true)
 dependencies {
     compile docletProject
 
-    compileOnly files(
-            ['openapi', 'extensions', 'idea', 'util', 'annotations', 'forms_rt'].
-                    collect { baseName -> "$ideaHome/lib/${baseName}.jar" })
     compileOnly libs.jdkTools
 
     packaged docletProject, {
@@ -17,18 +16,14 @@ dependencies {
     }
 }
 
-processResources {
-    //noinspection UnnecessaryQualifiedReference
-    filter org.apache.tools.ant.filters.ReplaceTokens, tokens: [
-            "idea-plugin-version": project.version
-    ]
+ideaPlugin {
+    lib = configurations.packaged
 }
+
+idea.module.name = "$rootProject.name-$project.name"
 
 tasks.jar {
     exclude 'com/intellij/uiDesigner/**'
-    configurations.packaged.collect { p ->
-        from(zipTree(p)) {
-            exclude 'META-INF/**'
-        }
-    }
 }
+
+tasks.build.dependsOn ideaPlugin
