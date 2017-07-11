@@ -1,7 +1,7 @@
 Markdown Doclet
 ===============
 
-A Doclet that allows the use of Markdown and [PlantUML](http://plantuml.sourceforge.net/) in JavaDoc comments. It uses [Pegdown](http://www.pegdown.org/) as Markdown processor. It's a simple preprocessor to the standard Doclet: It processes all JavaDoc comments in the documentation tree and then forwards the result to the standard Doclet. The JavaDoc output by this Doclet for this Doclet can be found [here](http://projects.raffael.ch/pegdown-doclet).
+A Doclet that allows the use of Markdown and [PlantUML](http://plantuml.sourceforge.net/) in JavaDoc comments. It uses [Pegdown](http://www.pegdown.org/) as Markdown processor. It's a simple preprocessor to the standard Doclet: It processes all JavaDoc comments in the documentation tree and then forwards the result to the standard Doclet. The JavaDoc output by this Doclet for this Doclet can be found [here](http://projects.raffael.ch/markdown-doclet).
 
 This Doclet is released under the [GPL 3.0](http://www.gnu.org/licenses/gpl-3.0-standalone.html).
 
@@ -59,7 +59,6 @@ The third variant however, which is originally meant to refer to a printed book,
 
 These are all rendered as `@see <a href="http://www.example.com/">LABEL</a>`, where LABEL falls back to the link's URL, if no label is given.
 
-**Warning:** Version 1.2 of this doclet will redefine Wiki-Style links (see [issue #7](https://github.com/Abnaxos/pegdown-doclet/issues/7)). It's recommended not to use them for now.
 
 ### Custom Tag Handling
 
@@ -137,10 +136,10 @@ The Pegdown Doclet integrates [highlight.js](http://softwaremaniacs.org/soft/hig
 Invoking
 --------
 
-Download `pegdown-doclet-<version>-all.jar` from the [Maven repository](https://oss.sonatype.org/content/repositories/releases/ch/raffael/pegdown-doclet/pegdown-doclet/) and specify it on the command line:
+Download `markdown-doclet-<version>-all.jar` from the [Maven repository](https://oss.sonatype.org/content/repositories/releases/ch/raffael/markdown-doclet/markdown-doclet/) and specify it on the command line:
 
 ```
-javadoc -doclet ch.raffael.doclets.pegdown.PegdownDoclet -docletpath /path/to/pegdown-doclet-<version>-all.jar
+javadoc -doclet ch.raffael.mddoclet.MarkdownDoclet -docletpath /path/to/markdown-doclet-<version>-all.jar
 ```
 
 It supports all options the standard Doclet supports and some additional options:
@@ -184,7 +183,7 @@ If the locale is `en` and no break iterator is set, the `</h1>` after "My Title"
 
 I'd therefore recommend to set the locale explicitly to `en`.
 
-*See also:* [Issue #44](https://github.com/Abnaxos/pegdown-doclet/issues/44)
+*See also:* [Issue #44](https://github.com/Abnaxos/markdown-doclet/issues/44)
 
 
 ### Gradle
@@ -197,11 +196,11 @@ buildscript {
         mavenCentral() // or jcenter()
     }
     dependencies {
-        classpath 'ch.raffael.pegdown-doclet:pegdown-doclet:1.3'
+        classpath 'ch.raffael.markdown-doclet:markdown-doclet:1.4'
     }
 }
 
-apply plugin: 'ch.raffael.pegdown-doclet'
+apply plugin: 'ch.raffael.markdown-doclet'
 ```
 
 ### Maven
@@ -215,11 +214,11 @@ Add the following to your POM to use the doclet with Maven:
       <artifactId>maven-javadoc-plugin</artifactId>
       <version>2.9</version>
       <configuration>
-        <doclet>ch.raffael.doclets.pegdown.PegdownDoclet</doclet>
+        <doclet>ch.raffael.mddoclet.MarkdownDoclet</doclet>
         <docletArtifact>
-          <groupId>ch.raffael.pegdown-doclet</groupId>
-          <artifactId>pegdown-doclet</artifactId>
-          <version>1.3</version>
+          <groupId>ch.raffael.markdown-doclet</groupId>
+          <artifactId>markdown-doclet</artifactId>
+          <version>1.4</version>
         </docletArtifact>
         <useStandardDocletOptions>true</useStandardDocletOptions>
       </configuration>
@@ -276,4 +275,4 @@ Markdown Extensions
 
  *  *Wiki-style links*: Prettier syntax for links: `[[http://www.google.com Link Title]]`
 
-    **Warning:** Version 1.2 of this doclet will redefine Wiki-Style links (see [issue #7](https://github.com/Abnaxos/pegdown-doclet/issues/7)). It's recommended not to use them for now.
+    **Warning:** Version 1.2 of this doclet will redefine Wiki-Style links (see [issue #7](https://github.com/Abnaxos/markdown-doclet/issues/7)). It's recommended not to use them for now.
