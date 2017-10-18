@@ -233,7 +233,7 @@ The doclet is available in Maven Central.
 IDE support
 -----------
 
-There is a [plugin](http://plugins.jetbrains.com/plugin/7253) that enables *Ctrl-Q* in [IntelliJ IDEA](http://www.jetbrains.com/idea/). Just download it from the plugin repository ("Settings -- Plugins -- Browse Repositories"), or build it yourself (see `integrations/idea-plugin/README.md`).
+There is a [plugin](https://plugins.jetbrains.com/plugin/9840-markdown-doclet-for-idea) that enables *Ctrl-Q* in [IntelliJ IDEA](http://www.jetbrains.com/idea/). Just download it from the plugin repository ("Settings -- Plugins -- Browse Repositories"), or build it yourself (see `integrations/idea-plugin/README.md`).
 
 Use the [PlantUML integration plugin](http://plugins.jetbrains.com/plugin/7017?pr=idea) for a live preview while editing PlantUML diagrams. This only works if you use the "classic" `@startuml` and `@enduml` tags.
 
