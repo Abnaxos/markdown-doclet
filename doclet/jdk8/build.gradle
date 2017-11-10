@@ -1,0 +1,11 @@
+componentVersion(0)
+
+dependencies {
+    compile project(':doclet:doclets')
+
+    compile group: 'org.pegdown', name: 'pegdown', version: '1.6.0'
+    compile files("${System.properties['java.home']}/../lib/tools.jar")
+
+    testCompile group: 'org.jsoup', name: 'jsoup', version: '1.8.3'
+}
+sourceSets.test.java.srcDir 'src/test/javadoc'

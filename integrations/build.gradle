@@ -1,3 +1,0 @@
-subprojects {
-    archivesBaseName = "markdown-doclet-$project.name"
-}

@@ -18,19 +18,32 @@
  *
  */
 
-ext.componentBaseVersion = '1.4'
-ext.docletBaseVersion = '1.5'
-def snapshot(boolean snapshot) {
-    return snapshot ? '-SNAPSHOT' : ''
-}
-
+// versioning functions
 allprojects {
+    def SNAPSHOT = '-SNAPSHOT'
+    ext.componentVersion = { int version ->
+        if ( project.version.endsWith(SNAPSHOT) ) {
+            project.version = project.version.substring(0, project.version.length()-SNAPSHOT.length()) + '-' + version + SNAPSHOT
+        } else {
+            project.version = project.version.substring(0, project.version.length()-SNAPSHOT.length()) + '-' + version
+        }
+    }
+    ext.snapshot = { boolean snapshot ->
+        if ( snapshot && !project.version.endsWith(SNAPSHOT) ) {
+            project.version = project.version + SNAPSHOT
+        } else if ( !snaphsot && project.version.endsWith(SNAPSHOT) ) {
+            project.version = project.version.substring(0, project.version.length() - SNAPSHOT.length())
+        }
+    }
     group = 'ch.raffael.markdown-doclet'
     buildDir = 'target'
-    version = docletBaseVersion + snapshot(true)
 }
 
-subprojects {
+
+allprojects {
+    version = '2.0-SNAPSHOT'
+    group = 'ch.raffael.markdown-doclet'
+    buildDir = 'target'
 
     if ( !file('src').isDirectory() ) {
         return
@@ -46,43 +59,21 @@ subprojects {
     }
 
     dependencies {
-        testCompile group:'org.codehaus.groovy', name:'groovy-all', version:'2.4.6'
-        testCompile('org.spockframework:spock-core:1.0-groovy-2.4') {
-            exclude group:'org.codehaus.groovy'
+        if ( path != ':nullity' ) {
+            compileOnly project(':nullity')
         }
-        testCompile group:'cglib', name:'cglib-nodep', version:'3.1'
+        testCompile group: 'org.codehaus.groovy', name: 'groovy-all', version: '2.4.6'
+        testCompile('org.spockframework:spock-core:1.0-groovy-2.4') {
+            exclude group: 'org.codehaus.groovy'
+        }
+        testCompile group: 'cglib', name: 'cglib-nodep', version: '3.1'
     }
     configurations { testCompile.extendsFrom compileOnly }
-    ext {
-        libs = [
-                pegdown : [group: 'org.pegdown', name: 'pegdown', version: '1.6.0'],
-                guava   : [group: 'com.google.guava', name: 'guava', version: '18.0'],
-                plantuml: [group: 'net.sourceforge.plantuml', name: 'plantuml', version: '8059'],
-                github:   [group: 'org.kohsuke', name: 'github-api', version: '1.76'],
-                findbugs:  [group: 'com.google.code.findbugs', name : 'findbugs-annotations', version :'3.0.1'],
-                okhttp:   [group: 'com.squareup.okhttp', name: 'okhttp-urlconnection', version: '2.7.5'],
-                velocity:   [group: 'org.apache.velocity', name: 'velocity', version: '1.7'],
-                jdkTools: files("${System.properties['java.home']}/../lib/tools.jar"),
-        ]
-        docletProject = project(':doclet')
-    }
 
     sourceCompatibility = '1.7'
-    if ( !project == rootProject ) {
-        archivesBaseName += "-${project.name}"
-    }
-
-    processResources {
-        //noinspection UnnecessaryQualifiedReference
-        filter org.apache.tools.ant.filters.ReplaceTokens, tokens: [
-                "markdown-doclet-version": project(':doclet').version
-        ]
-    }
-
-    jar {
-        // needed for unified classes/resources output dir
-        // if this is missing, all classes and resources are included twice
-        duplicatesStrategy = org.gradle.api.file.DuplicatesStrategy.EXCLUDE
+    archivesBaseName = "markdown-doclet"
+    if ( project != rootProject ) {
+        archivesBaseName += '-' + project.name
     }
 
     javadoc.dependsOn classes

@@ -1,4 +1,4 @@
-version = componentBaseVersion + '-1' + snapshot(true)
+componentVersion(0)
 
 apply plugin:IdeaPluginSync
 
@@ -7,11 +7,9 @@ configurations {
 }
 
 dependencies {
-    compile docletProject
+    compile project(':doclet:jdk8')
 
-    compileOnly libs.jdkTools
-
-    packaged docletProject, {
+    packaged project(':doclet:jdk8'), {
         exclude module:'velocity'
     }
 }

@@ -1,0 +1,7 @@
+dependencies {
+    compile group: 'com.google.guava', name: 'guava', version: '18.0'
+    compile group: 'net.sourceforge.plantuml', name: 'plantuml', version: '8059'
+    compile group: 'org.kohsuke', name: 'github-api', version: '1.76'
+    compile group: 'com.squareup.okhttp', name: 'okhttp-urlconnection', version: '2.7.5'
+    compile group: 'org.apache.velocity', name: 'velocity', version: '1.7'
+}
