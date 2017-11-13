@@ -1,7 +1,6 @@
 include 'core', 'nullity'
 include 'doclet:doclets', 'doclet:jdk8', 'doclet:jdk9'
 include 'integrations:idea-plugin'
-include 'integrations:gradle-plugin'
 
 rootProject.name = 'markdown-doclet'
 

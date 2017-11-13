@@ -62,15 +62,15 @@ allprojects {
         if ( path != ':nullity' ) {
             compileOnly project(':nullity')
         }
-        testCompile group: 'org.codehaus.groovy', name: 'groovy-all', version: '2.4.6'
-        testCompile('org.spockframework:spock-core:1.0-groovy-2.4') {
+        testCompile group: 'org.codehaus.groovy', name: 'groovy-all', version: '2.4.12'
+        testCompile('org.spockframework:spock-core:1.1-groovy-2.4') {
             exclude group: 'org.codehaus.groovy'
         }
         testCompile group: 'cglib', name: 'cglib-nodep', version: '3.1'
     }
     configurations { testCompile.extendsFrom compileOnly }
 
-    sourceCompatibility = '1.7'
+    sourceCompatibility = '8'
     archivesBaseName = "markdown-doclet"
     if ( project != rootProject ) {
         archivesBaseName += '-' + project.name

@@ -1,1 +1,3 @@
 componentVersion(0)
+
+sourceCompatibility = '9'
