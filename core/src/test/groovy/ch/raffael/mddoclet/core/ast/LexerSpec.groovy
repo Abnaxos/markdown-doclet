@@ -1,7 +1,5 @@
 package ch.raffael.mddoclet.core.ast
 
-import spock.lang.Specification
-
 import static ch.raffael.mddoclet.core.ast.DocNode.Type.*
 import static ch.raffael.mddoclet.core.ast.RootDocNode.scanFullDocComment
 import static ch.raffael.mddoclet.core.ast.RootDocNode.scanStrippedDocComment
@@ -10,128 +8,106 @@ import static ch.raffael.mddoclet.core.ast.RootDocNode.scanStrippedDocComment
 /**
  * @author Raffael Herzog
  */
-class LexerSpec extends Specification {
-
-    private RootDocNode ast
-    private Iterator<DocNode> childIterator
+class LexerSpec extends AbstractAstSpec {
 
     def "Full comment without leading stars"() {
       when:
-        ast = scanFullDocComment(' /** \nMy Comment \n*/  ')
+        push scanFullDocComment(' /** \nMy Comment \n*/  ')
 
       then:
-        matchChild(nextChild(), COMMENT_START, ' /**')
-        matchChild(nextChild(), TEXT, ' ')
-        matchChild(nextChild(), NEWLINE, '\n')
-        matchChild(nextChild(), TEXT, 'My Comment ')
-        matchChild(nextChild(), NEWLINE, '\n')
-        matchChild(nextChild(), COMMENT_END, '*/  ')
+        matches(next(), COMMENT_START, ' /**')
+        matches(next(), TEXT, ' ')
+        matches(next(), NEWLINE, '\n')
+        matches(next(), TEXT, 'My Comment ')
+        matches(next(), NEWLINE, '\n')
+        matches(next(), COMMENT_END, '*/  ')
         noMoreChildren()
     }
 
     def "Full comment without doc start"() {
       when:
-        ast = scanFullDocComment(' \nMy Comment */  ')
+        push scanFullDocComment(' \nMy Comment */  ')
 
       then:
-        matchChild(nextChild(), TEXT, ' ')
-        matchChild(nextChild(), NEWLINE, '\n')
-        matchChild(nextChild(), TEXT, 'My Comment ')
-        matchChild(nextChild(), COMMENT_END, '*/  ')
+        matches(next(), TEXT, ' ')
+        matches(next(), NEWLINE, '\n')
+        matches(next(), TEXT, 'My Comment ')
+        matches(next(), COMMENT_END, '*/  ')
         noMoreChildren()
     }
 
     def "Full comment without doc end"() {
       when:
-        ast = scanFullDocComment('/** \nMy Comment \n  ')
+        push scanFullDocComment('/** \nMy Comment \n  ')
 
       then:
-        matchChild(nextChild(), COMMENT_START, '/**')
-        matchChild(nextChild(), TEXT, ' ')
-        matchChild(nextChild(), NEWLINE, '\n')
-        matchChild(nextChild(), TEXT, 'My Comment ')
-        matchChild(nextChild(), NEWLINE, '\n')
-        matchChild(nextChild(), TEXT, '  ')
+        matches(next(), COMMENT_START, '/**')
+        matches(next(), TEXT, ' ')
+        matches(next(), NEWLINE, '\n')
+        matches(next(), TEXT, 'My Comment ')
+        matches(next(), NEWLINE, '\n')
+        matches(next(), TEXT, '  ')
         noMoreChildren()
     }
 
     def "Full comment without any doc delimiters"() {
       when:
-        ast = scanFullDocComment(' \nMy Comment \n  ')
+        push scanFullDocComment(' \nMy Comment \n  ')
 
       then:
-        matchChild(nextChild(), TEXT, ' ')
-        matchChild(nextChild(), NEWLINE, '\n')
-        matchChild(nextChild(), TEXT, 'My Comment ')
-        matchChild(nextChild(), NEWLINE, '\n')
-        matchChild(nextChild(), TEXT, '  ')
+        matches(next(), TEXT, ' ')
+        matches(next(), NEWLINE, '\n')
+        matches(next(), TEXT, 'My Comment ')
+        matches(next(), NEWLINE, '\n')
+        matches(next(), TEXT, '  ')
         noMoreChildren()
     }
 
     def "Comment delimiters are ignored by scanStrippedDocComment"() {
       when:
-        ast = scanStrippedDocComment('  /**\nMyComment*/')
+        push scanStrippedDocComment('  /**\nMyComment*/')
 
       then:
-        matchChild(nextChild(), TEXT, '  /**')
-        matchChild(nextChild(), NEWLINE, '\n')
-        matchChild(nextChild(), TEXT , 'MyComment*/')
+        matches(next(), TEXT, '  /**')
+        matches(next(), NEWLINE, '\n')
+        matches(next(), TEXT, 'MyComment*/')
         noMoreChildren()
     }
 
-    def "Leading whitespaces + * + whitespace? are stripped"() {
+    def "The leading asterisk, the whitespaces before and one whitespace after are stripped as LEAD (if present)"() {
       when:
-        ast = scanFullDocComment('/** * not leading\n * standard lead\n   *   more whitespace after lead\n*no space after asterisk\nno lead\n  no lead with whitespace')
+        push scanFullDocComment('/** * not leading\n * standard lead\n   *   more whitespace after lead\n*no space after asterisk\nno lead\n  no lead with whitespace')
 
       then:
-        matchChild(nextChild(), COMMENT_START, '/**')
-        matchChild(nextChild(), TEXT, ' * not leading')
-        matchChild(nextChild(), NEWLINE, '\n')
-        matchChild(nextChild(), LEAD, ' * ')
-        matchChild(nextChild(), TEXT, 'standard lead')
-        matchChild(nextChild(), NEWLINE, '\n')
-        matchChild(nextChild(), LEAD, '   * ')
-        matchChild(nextChild(), TEXT, '  more whitespace after lead')
-        matchChild(nextChild(), NEWLINE, '\n')
-        matchChild(nextChild(), LEAD, '*')
-        matchChild(nextChild(), TEXT, 'no space after asterisk')
-        matchChild(nextChild(), NEWLINE, '\n')
-        matchChild(nextChild(), TEXT, 'no lead')
-        matchChild(nextChild(), NEWLINE, '\n')
-        matchChild(nextChild(), TEXT, '  no lead with whitespace')
+        matches(next(), COMMENT_START, '/**')
+        matches(next(), TEXT, ' * not leading')
+        matches(next(), NEWLINE, '\n')
+        matches(next(), LEAD, ' * ')
+        matches(next(), TEXT, 'standard lead')
+        matches(next(), NEWLINE, '\n')
+        matches(next(), LEAD, '   * ')
+        matches(next(), TEXT, '  more whitespace after lead')
+        matches(next(), NEWLINE, '\n')
+        matches(next(), LEAD, '*')
+        matches(next(), TEXT, 'no space after asterisk')
+        matches(next(), NEWLINE, '\n')
+        matches(next(), TEXT, 'no lead')
+        matches(next(), NEWLINE, '\n')
+        matches(next(), TEXT, '  no lead with whitespace')
         noMoreChildren()
     }
 
     def "Mixed newlines"() {
       when:
-        ast = scanStrippedDocComment('\n\r\r\r\n\n')
+        push scanStrippedDocComment('\n\r\r\r\n\n')
 
       then:
-        matchChild(nextChild(), NEWLINE, '\n')
-        matchChild(nextChild(), NEWLINE, '\r')
-        matchChild(nextChild(), NEWLINE, '\r')
-        matchChild(nextChild(), NEWLINE, '\r\n')
-        matchChild(nextChild(), NEWLINE, '\n')
+        matches(next(), NEWLINE, '\n')
+        matches(next(), NEWLINE, '\r')
+        matches(next(), NEWLINE, '\r')
+        matches(next(), NEWLINE, '\r\n')
+        matches(next(), NEWLINE, '\n')
         noMoreChildren()
-    }
-
-    private static boolean matchChild(DocNode child, DocNode.Type type, String text) {
-        child.type == type && child.textRange.text == text
-    }
-
-    private DocNode nextChild() {
-        childIterator().next()
-    }
-
-    private boolean noMoreChildren() {
-        !childIterator().hasNext()
-    }
-
-    private Iterator<DocNode> childIterator() {
-        if (childIterator == null) {
-            childIterator = ast.children.iterator()
-        }
-        return childIterator
     }
 
 }
