@@ -10,14 +10,18 @@ import ch.raffael.nullity.Nullable;
  *
  * @author Raffael Herzog
  */
-public final class MutableContextData extends ContextData {
+public final class DataStore extends ImmutableDataStore {
 
-    MutableContextData() {
+    DataStore() {
         super();
     }
 
-    MutableContextData(Map<Key<?>, Object> data) {
+    DataStore(Map<Key<?>, Object> data) {
         super(data);
+    }
+
+    public static DataStore create() {
+        return new DataStore();
     }
 
     @SuppressWarnings("unchecked")
@@ -32,8 +36,8 @@ public final class MutableContextData extends ContextData {
     }
 
     @Override
-    public ContextData readOnlyView() {
-        return new ContextData(data);
+    public ImmutableDataStore immutableView() {
+        return new ImmutableDataStore(data);
     }
 
 }

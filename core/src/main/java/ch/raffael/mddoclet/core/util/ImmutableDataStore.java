@@ -4,7 +4,6 @@ package ch.raffael.mddoclet.core.util;
 import java.util.HashMap;
 import java.util.Map;
 
-import ch.raffael.nullity.NotNull;
 import ch.raffael.nullity.Nullable;
 
 
@@ -13,20 +12,20 @@ import ch.raffael.nullity.Nullable;
  *
  * @author Raffael Herzog
  */
-public class ContextData {
+public class ImmutableDataStore {
 
     final Map<Key<?>, Object> data;
 
-    ContextData() {
-        this(new HashMap<Key<?>, Object>());
+    public ImmutableDataStore() {
+        this(new HashMap<>());
     }
 
-    ContextData(Map<Key<?>, Object> data) {
+    ImmutableDataStore(Map<Key<?>, Object> data) {
         this.data = data;
     }
 
-    public static ContextData create() {
-        return new ContextData();
+    public static ImmutableDataStore create() {
+        return new ImmutableDataStore();
     }
 
     public <T> T get(Key<T> key) {
@@ -49,27 +48,16 @@ public class ContextData {
         return (T)data.get(key);
     }
 
-    public ContextData readOnlyCopy(@Nullable Predicate<Key<?>> filter) {
-        return new ContextData(copyMap(filter));
+    public ImmutableDataStore immutableCopy() {
+        return new ImmutableDataStore(new HashMap<>(data));
     }
 
-    public ContextData mutableCopy(@Nullable Predicate<Key<?>> filter) {
-        return new ContextData(copyMap(filter));
+    public DataStore mutableCopy() {
+        return new DataStore(new HashMap<>(data));
     }
 
-    public ContextData readOnlyView() {
+    public ImmutableDataStore immutableView() {
         return this;
-    }
-
-    @NotNull
-    protected Map<Key<?>, Object> copyMap(@Nullable Predicate<Key<?>> filter) {
-        Map<Key<?>, Object> copy = new HashMap<>();
-        for ( Map.Entry<Key<?>, Object> entry : data.entrySet() ) {
-            if ( filter == null || filter.test(entry.getKey()) ) {
-                copy.put(entry.getKey(), entry.getValue());
-            }
-        }
-        return copy;
     }
 
     public static <T> Key<T> key() {
