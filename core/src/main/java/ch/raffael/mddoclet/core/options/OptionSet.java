@@ -62,6 +62,6 @@ public class OptionSet implements Iterable<OptionDescriptor> {
 
     @Override
     public String toString() {
-        return getClass().getSimpleName() + "[." + options + "]";
+        return getClass().getSimpleName() + "[" + options + "]";
     }
 }
