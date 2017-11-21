@@ -1,8 +1,6 @@
 package ch.raffael.mddoclet.core.options
 
 /**
- * TODO: 13.11.17 Javadoc?
- *
  * @author Raffael Herzog
  */
 class Arguments {

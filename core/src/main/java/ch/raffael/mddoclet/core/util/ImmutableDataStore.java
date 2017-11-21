@@ -8,7 +8,19 @@ import ch.raffael.nullity.Nullable;
 
 
 /**
- * TODO: 10.11.17 Javadoc?
+ * A type-safe data store for any data. Can be used to attach arbitrary data
+ * to objects that provide a data store.
+ *
+ * The date store is designed such that the keys cannot be accessed by
+ * iterating through all data. This way, the visibility of the key is kept,
+ * i.e. code that has no access to the key used to store the data, has no
+ * way to gain access to that data. If the key is private, so is the data
+ * attached to it.
+ *
+ * In most cases, you'll probably want to use the {@link DataStore}, which
+ * is mutable. This class is mainly used for defensive copies.
+ *
+ * @see DataStore
  *
  * @author Raffael Herzog
  */
@@ -16,7 +28,7 @@ public class ImmutableDataStore {
 
     final Map<Key<?>, Object> data;
 
-    public ImmutableDataStore() {
+    ImmutableDataStore() {
         this(new HashMap<>());
     }
 
@@ -56,6 +68,12 @@ public class ImmutableDataStore {
         return new DataStore(new HashMap<>(data));
     }
 
+    /**
+     * Get an immutable view on this data store. Changes to this store will
+     * still be visible in the immutable view.
+     *
+     * @return An immutable view of this data store.
+     */
     public ImmutableDataStore immutableView() {
         return this;
     }

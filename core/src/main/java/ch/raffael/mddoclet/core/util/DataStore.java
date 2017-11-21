@@ -6,7 +6,9 @@ import ch.raffael.nullity.Nullable;
 
 
 /**
- * TODO: 10.11.17 Javadoc?
+ * A mutable {@link ImmutableDataStore data store}.
+ *
+ * @see ImmutableDataStore
  *
  * @author Raffael Herzog
  */

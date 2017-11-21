@@ -6,7 +6,7 @@ import ch.raffael.nullity.Nullable;
 
 
 /**
- * TODO: 13.11.17 Javadoc?
+ * Some utilities for choosing the charsets.
  *
  * @author Raffael Herzog
  */
