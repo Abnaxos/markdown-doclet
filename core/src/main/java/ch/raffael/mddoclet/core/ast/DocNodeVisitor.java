@@ -8,8 +8,9 @@ package ch.raffael.mddoclet.core.ast;
 public interface DocNodeVisitor {
 
     /**
-     * Visit nodes of types {@link DocNode.Type#TEXT TEXT} and {@link
-     * DocNode.Type#NEWLINE NEWLINE}.
+     * Visit nodes of types {@link DocNode.Type#TEXT TEXT}, {@link
+     * DocNode.Type#WHITESPACE WHITESPACE} and {@link DocNode.Type#NEWLINE
+     * NEWLINE}.
      */
     void visitDocTextNode(DocNode node);
 
@@ -27,8 +28,6 @@ public interface DocNodeVisitor {
     /**
      * Visit the root node.
      */
-    default void visitRootDocNode(RootDocNode node) {
-
-    }
+    void visitRootDocNode(RootDocNode node);
 
 }

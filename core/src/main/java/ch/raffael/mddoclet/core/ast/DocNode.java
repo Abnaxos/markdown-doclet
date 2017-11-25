@@ -1,10 +1,9 @@
 package ch.raffael.mddoclet.core.ast;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.Objects;
 
 import ch.raffael.mddoclet.core.util.DataStore;
+import ch.raffael.nullity.Nullable;
 
 
 /**
@@ -24,10 +23,10 @@ import ch.raffael.mddoclet.core.util.DataStore;
 public class DocNode {
 
     private final Type type;
-    private final TextRange textRange;
+    private TextRange textRange;
 
+    @Nullable
     private DocNode parent;
-    private final ArrayList<DocNode> children = new ArrayList<>();
 
     private final DataStore userData =  DataStore.create();
 
@@ -37,6 +36,10 @@ public class DocNode {
     }
 
     public static DocNode createTextNode(TextRange textRange) {
+        return new DocNode(Type.TEXT, textRange);
+    }
+
+    public static DocNode createWhitespaceNode(TextRange textRange) {
         return new DocNode(Type.TEXT, textRange);
     }
 
@@ -52,7 +55,7 @@ public class DocNode {
         return new TagDocNode(Type.BLOCK_TAG, textRange);
     }
 
-    public static DocNode createHiddenTextNode(TextRange textRange) {
+    public static DocNode createLeadNode(TextRange textRange) {
         return new DocNode(Type.LEAD, textRange);
     }
 
@@ -76,6 +79,15 @@ public class DocNode {
         return textRange;
     }
 
+    public void setTextRange(TextRange textRange) {
+        this.textRange = textRange;
+    }
+
+    public DocNode withTextRange(TextRange textRange) {
+        setTextRange(textRange);
+        return this;
+    }
+
     /**
      * Get the parent node, throws an {@link UnsupportedOperationException}
      * if this is a root node.
@@ -83,75 +95,23 @@ public class DocNode {
      * @throws UnsupportedOperationException If this node is a root node.
      */
     public DocNode getParent() {
+        if (parent==null) throw new IllegalStateException("Root node");
         return parent;
     }
 
+    @SuppressWarnings("ObjectEquality")
+    DocNode reparent(@Nullable DocNode newParent) {
+        if (parent != newParent) {
+            if (newParent != null && parent != null) {
+                throw new IllegalStateException("Illegal reparent: " + parent + " -> " + newParent);
+            }
+            parent = newParent;
+        }
+        return this;
+    }
+
     public boolean isRoot() {
-        return false;
-    }
-
-    public List<DocNode> getChildren() {
-        return children;
-    }
-
-    public void appendChild(DocNode child) {
-        children.add(child);
-    }
-
-    public void appendChildren(Collection<? extends DocNode> children) {
-        this.children.addAll(children);
-    }
-
-    public void insertChildBefore(DocNode after, DocNode newChild) {
-        children.add(requireIndexOfChild(after), newChild);
-    }
-
-    public void insertChildAfter(DocNode after, DocNode newChild) {
-        children.add(requireIndexOfChild(after) + 1, newChild);
-    }
-
-    public void replaceChild(DocNode after, DocNode... newChildren) {
-        int index = requireIndexOfChild(after);
-        if (newChildren.length == 0) {
-            children.remove(index);
-        } else {
-            children.set(index, newChildren[0]);
-            children.ensureCapacity(children.size() + newChildren.length - 1);
-            for (int i = 1; i < newChildren.length; i++) {
-                children.add(index + i, newChildren[i]);
-            }
-        }
-    }
-
-    public void replaceChild(DocNode after, Collection<? extends DocNode> newChildren) {
-        int index = requireIndexOfChild(after);
-        switch (newChildren.size()) {
-        case 0:
-            children.remove(index);
-            break;
-        case 1:
-            if (newChildren instanceof List) {
-                children.set(index, (DocNode)((List)newChildren).get(index));
-            } else {
-                children.set(index, newChildren.iterator().next());
-            }
-            break;
-        default:
-            children.remove(index);
-            children.addAll(index, newChildren);
-        }
-    }
-
-    public void removeChild(DocNode child) {
-        children.remove(child);
-    }
-
-    private int requireIndexOfChild(DocNode after) {
-        int index = children.indexOf(after);
-        if (index < 0) {
-            throw new IllegalArgumentException("Node " + this + " has no child " + after);
-        }
-        return index;
+        return parent == null;
     }
 
     public <T extends DocNodeVisitor> T accept(T visitor) {
@@ -175,14 +135,47 @@ public class DocNode {
                 + "']";
     }
 
-    enum Type {
-        TEXT, NEWLINE,
+    @Nullable
+    protected <T extends DocNode> T reparent(@Nullable T currentNode, @Nullable T newNode) {
+        if (!Objects.equals(currentNode, newNode)) {
+            if (currentNode != null) currentNode.reparent(null);
+            if (newNode != null) newNode.reparent(this);
+        }
+        return newNode;
+    }
+
+    public enum Type {
+        TEXT, WHITESPACE, NEWLINE,
+        INLINE_TAG_START_MARKER, INLINE_TAG_END_MARKER, BLOCK_TAG_START_MARKER,
         INLINE_TAG, BLOCK_TAG,
         ROOT,
         LEAD, COMMENT_START, COMMENT_END;
 
+        private boolean hidden;
+        private boolean whitespace;
+
+        static {
+            for (Type t : values()) {
+                t.hidden = oneOf(t, LEAD,
+                        INLINE_TAG_START_MARKER, INLINE_TAG_END_MARKER, BLOCK_TAG_START_MARKER,
+                        COMMENT_START, COMMENT_END);
+                t.whitespace = oneOf(t, WHITESPACE, NEWLINE);
+            }
+        }
+        private static boolean oneOf(Type type, Type... oneOf) {
+            for (Type t : oneOf) {
+                if (type == t) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
         public boolean hidden() {
-            return ordinal() >= LEAD.ordinal();
+            return hidden;
+        }
+        public boolean whitespace() {
+            return whitespace;
         }
     }
 

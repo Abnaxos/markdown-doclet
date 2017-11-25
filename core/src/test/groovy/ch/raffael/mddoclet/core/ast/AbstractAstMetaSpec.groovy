@@ -1,5 +1,6 @@
 package ch.raffael.mddoclet.core.ast
 
+import static ch.raffael.mddoclet.core.ast.DocNode.Type.INLINE_TAG
 import static ch.raffael.mddoclet.core.ast.DocNode.Type.TEXT
 import static ch.raffael.mddoclet.core.ast.DocNode.createRootNode
 
@@ -13,15 +14,15 @@ class AbstractAstMetaSpec extends AbstractAstSpec {
       given:
         push createRootNode(TextRange.ofAll('0123')).with {
             def source = it.textRange.text
-            appendChildren([
+            content.addAll([
                     createTextNode(TextRange.ofStartAndLength(source, 0, 1)),
-                    createTextNode(TextRange.ofStartAndLength(source, 1, 1)).with {
+                    createInlineTagNode(TextRange.ofStartAndLength(source, 1, 1)).with {
                         def subSource = 'ab'
-                        appendChild(createTextNode(TextRange.ofStartAndLength(subSource, 0, 1)))
-                        appendChild(createTextNode(TextRange.ofStartAndLength(subSource, 1, 1)))
+                        content.add createTextNode(TextRange.ofStartAndLength(subSource, 0, 1))
+                        content.add createTextNode(TextRange.ofStartAndLength(subSource, 1, 1))
                         return it
                     },
-                    createTextNode(TextRange.ofStartAndLength(source, 2, 1)),
+                    createInlineTagNode(TextRange.ofStartAndLength(source, 2, 1)),
                     createTextNode(TextRange.ofStartAndLength(source, 3, 1)),
             ])
             return it
@@ -31,25 +32,25 @@ class AbstractAstMetaSpec extends AbstractAstSpec {
         next()
       then:
         matches(current(), TEXT, '0')
-        matches(next(), TEXT, '1')
+        matches(next(), INLINE_TAG, '1')
 
       when:
         pushCurrent()
       then:
         matches(next(), TEXT, 'a')
         matches(next(), TEXT, 'b')
-        noMoreChildren()
+        end()
 
       when:
         pop()
       then:
-        matches(current(), TEXT, '1')
-        matches(next(), TEXT, '2')
+        matches(current(), INLINE_TAG, '1')
+        matches(next(), INLINE_TAG, '2')
 
       when:
         push(current())
       then:
-        noMoreChildren()
+        end()
       when:
         next()
       then:
@@ -59,7 +60,7 @@ class AbstractAstMetaSpec extends AbstractAstSpec {
         pop()
       then:
         matches(next(), TEXT, '3')
-        noMoreChildren()
+        end()
     }
 
 }

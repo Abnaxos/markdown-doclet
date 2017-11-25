@@ -1,5 +1,7 @@
 package ch.raffael.mddoclet.core.ast;
 
+import java.util.regex.Matcher;
+
 import com.google.common.base.Preconditions;
 
 
@@ -30,6 +32,18 @@ public final class TextRange {
         Preconditions.checkArgument(start >= 0, "start >= 0");
         Preconditions.checkArgument(end >= start, "end >= start");
         return new TextRange(source, start, end - start);
+    }
+
+    public static TextRange ofMatcher(CharSequence source, Matcher matcher) {
+        return ofStartAndEnd(source, matcher.start(), matcher.end());
+    }
+
+    public static TextRange ofMatcher(CharSequence source, Matcher matcher, int group) {
+        return ofStartAndEnd(source, matcher.start(group), matcher.end(group));
+    }
+
+    public static TextRange ofMatcher(CharSequence source, Matcher matcher, String group) {
+        return ofStartAndEnd(source, matcher.start(group), matcher.end(group));
     }
 
     public static TextRange ofAll(CharSequence source) {
