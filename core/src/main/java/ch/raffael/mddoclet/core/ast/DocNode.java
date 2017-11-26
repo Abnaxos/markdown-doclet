@@ -35,40 +35,40 @@ public class DocNode {
         this.textRange = textRange;
     }
 
-    public static DocNode createTextNode(TextRange textRange) {
+    public static DocNode createText(TextRange textRange) {
         return new DocNode(Type.TEXT, textRange);
     }
 
-    public static DocNode createWhitespaceNode(TextRange textRange) {
+    public static DocNode createWhitespace(TextRange textRange) {
         return new DocNode(Type.TEXT, textRange);
     }
 
-    public static DocNode createNewlineNode(TextRange textRange) {
+    public static DocNode createNewline(TextRange textRange) {
         return new DocNode(Type.NEWLINE, textRange);
     }
 
-    public static TagDocNode createInlineTagNode(TextRange textRange) {
-        return new TagDocNode(Type.INLINE_TAG, textRange);
-    }
-
-    public static TagDocNode createBlockTagNode(TextRange textRange) {
-        return new TagDocNode(Type.BLOCK_TAG, textRange);
-    }
-
-    public static DocNode createLeadNode(TextRange textRange) {
+    public static DocNode createLead(TextRange textRange) {
         return new DocNode(Type.LEAD, textRange);
     }
 
-    public static DocNode createCommentStartNode(TextRange textRange) {
+    public static DocNode createInlineTagStartMarker(TextRange textRange) {
+        return new DocNode(Type.INLINE_TAG_START_MARKER, textRange);
+    }
+
+    public static DocNode createInlineTagEndMarker(TextRange textRange) {
+        return new DocNode(Type.INLINE_TAG_END_MARKER, textRange);
+    }
+
+    public static DocNode createBlockTagStartMarker(TextRange textRange) {
+        return new DocNode(Type.BLOCK_TAG_START_MARKER, textRange);
+    }
+
+    public static DocNode createCommentStart(TextRange textRange) {
         return new DocNode(Type.COMMENT_START, textRange);
     }
 
-    public static DocNode createCommentEndNode(TextRange textRange) {
+    public static DocNode createCommentEnd(TextRange textRange) {
         return new DocNode(Type.COMMENT_END, textRange);
-    }
-
-    public static RootDocNode createRootNode(TextRange textRange) {
-        return new RootDocNode(textRange);
     }
 
     public Type getType() {
@@ -101,6 +101,9 @@ public class DocNode {
 
     @SuppressWarnings("ObjectEquality")
     DocNode reparent(@Nullable DocNode newParent) {
+        if (newParent == this) {
+            throw new IllegalStateException("Illegal reparent: Cannot be parent of self");
+        }
         if (parent != newParent) {
             if (newParent != null && parent != null) {
                 throw new IllegalStateException("Illegal reparent: " + parent + " -> " + newParent);
@@ -115,11 +118,27 @@ public class DocNode {
     }
 
     public <T extends DocNodeVisitor> T accept(T visitor) {
-        if (type.hidden()) {
-            visitor.visitHiddenDocNode(this);
-        } else {
-            assert type == Type.TEXT || type == Type.NEWLINE;
+        switch (type) {
+        case TEXT:
+        case WHITESPACE:
+        case NEWLINE:
             visitor.visitDocTextNode(this);
+            break;
+        case INLINE_TAG_START_MARKER:
+        case INLINE_TAG_END_MARKER:
+        case BLOCK_TAG_START_MARKER:
+        case LEAD:
+        case COMMENT_START:
+        case COMMENT_END:
+            visitor.visitHiddenDocNode(this);
+            break;
+        case INLINE_TAG:
+        case BLOCK_TAG:
+            visitor.visitDocTagNode((TagDocNode)this);
+            break;
+        case ROOT:
+            visitor.visitDocTagNode((TagDocNode)this);
+            break;
         }
         return visitor;
     }
@@ -148,18 +167,22 @@ public class DocNode {
         TEXT, WHITESPACE, NEWLINE,
         INLINE_TAG_START_MARKER, INLINE_TAG_END_MARKER, BLOCK_TAG_START_MARKER,
         INLINE_TAG, BLOCK_TAG,
-        ROOT,
-        LEAD, COMMENT_START, COMMENT_END;
+        LEAD, COMMENT_START, COMMENT_END,
+        ROOT;
 
+        private boolean text;
         private boolean hidden;
         private boolean whitespace;
+        private boolean tag;
 
         static {
             for (Type t : values()) {
+                t.text = oneOf(t, TEXT, WHITESPACE, NEWLINE);
                 t.hidden = oneOf(t, LEAD,
                         INLINE_TAG_START_MARKER, INLINE_TAG_END_MARKER, BLOCK_TAG_START_MARKER,
                         COMMENT_START, COMMENT_END);
                 t.whitespace = oneOf(t, WHITESPACE, NEWLINE);
+                t.tag = oneOf(t, INLINE_TAG, BLOCK_TAG);
             }
         }
         private static boolean oneOf(Type type, Type... oneOf) {
@@ -171,11 +194,19 @@ public class DocNode {
             return false;
         }
 
-        public boolean hidden() {
+        public boolean isText() {
+            return text;
+        }
+
+        public boolean isHidden() {
             return hidden;
         }
-        public boolean whitespace() {
+
+        public boolean isWhitespace() {
             return whitespace;
+        }
+        public boolean isTag() {
+            return tag;
         }
     }
 

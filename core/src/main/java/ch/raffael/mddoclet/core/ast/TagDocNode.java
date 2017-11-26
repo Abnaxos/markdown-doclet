@@ -33,10 +33,12 @@ public final class TagDocNode extends DocNode {
         this.content = DocNodeList.ofNullableList(this, content);
     }
 
-    @Override
-    public <T extends DocNodeVisitor> T accept(T visitor) {
-        visitor.visitDocTagNode(this);
-        return visitor;
+    public static TagDocNode createInlineTag(TextRange textRange) {
+        return new TagDocNode(Type.INLINE_TAG, textRange);
+    }
+
+    public static TagDocNode createBlockTag(TextRange textRange) {
+        return new TagDocNode(Type.BLOCK_TAG, textRange);
     }
 
     @Nullable

@@ -2,7 +2,6 @@ package ch.raffael.mddoclet.core.ast
 
 import static ch.raffael.mddoclet.core.ast.DocNode.Type.INLINE_TAG
 import static ch.raffael.mddoclet.core.ast.DocNode.Type.TEXT
-import static ch.raffael.mddoclet.core.ast.DocNode.createRootNode
 
 
 /**
@@ -12,18 +11,18 @@ class AbstractAstMetaSpec extends AbstractAstSpec {
 
     def "Check that the inherited infrastructure works"() {
       given:
-        push createRootNode(TextRange.ofAll('0123')).with {
+        push RootDocNode.create(TextRange.ofAll('0123')).with {
             def source = it.textRange.text
             content.addAll([
-                    createTextNode(TextRange.ofStartAndLength(source, 0, 1)),
-                    createInlineTagNode(TextRange.ofStartAndLength(source, 1, 1)).with {
+                    createText(TextRange.ofStartAndLength(source, 0, 1)),
+                    TagDocNode.createInlineTag(TextRange.ofStartAndLength(source, 1, 1)).with {
                         def subSource = 'ab'
-                        content.add createTextNode(TextRange.ofStartAndLength(subSource, 0, 1))
-                        content.add createTextNode(TextRange.ofStartAndLength(subSource, 1, 1))
+                        content.add createText(TextRange.ofStartAndLength(subSource, 0, 1))
+                        content.add createText(TextRange.ofStartAndLength(subSource, 1, 1))
                         return it
                     },
-                    createInlineTagNode(TextRange.ofStartAndLength(source, 2, 1)),
-                    createTextNode(TextRange.ofStartAndLength(source, 3, 1)),
+                    TagDocNode.createInlineTag(TextRange.ofStartAndLength(source, 2, 1)),
+                    createText(TextRange.ofStartAndLength(source, 3, 1)),
             ])
             return it
         }
@@ -35,7 +34,7 @@ class AbstractAstMetaSpec extends AbstractAstSpec {
         matches(next(), INLINE_TAG, '1')
 
       when:
-        pushCurrent()
+        push()
       then:
         matches(next(), TEXT, 'a')
         matches(next(), TEXT, 'b')

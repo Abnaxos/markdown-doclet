@@ -14,10 +14,6 @@ public final class RootDocNode extends DocNode {
 
     private boolean tagsScanned = false;
 
-    @Nullable
-    private DocNode commentStart = null;
-    @Nullable
-    private DocNode commentEnd = null;
     private final DocNodeList content;
 
     RootDocNode(TextRange textRange) {
@@ -29,41 +25,24 @@ public final class RootDocNode extends DocNode {
         this.content = DocNodeList.ofNullableList(this, content);
     }
 
-    @Nullable
-    public DocNode getCommentStart() {
-        return commentStart;
+    public static RootDocNode create(TextRange textRange) {
+        return new RootDocNode(textRange);
     }
 
-    public void setCommentStart(@Nullable DocNode commentStart) {
-        this.commentStart = commentStart;
+    public static RootDocNode parseFullDocComment(String docComment) {
+        return parseDocComment(docComment, true);
     }
 
-    public RootDocNode withCommentStart(@Nullable DocNode commentStart) {
-        this.commentStart = commentStart;
-        return this;
+    public static RootDocNode parseStrippedDocComment(String docComment) {
+        return parseDocComment(docComment, false);
     }
 
-    @Nullable
-    public DocNode getCommentEnd() {
-        return commentEnd;
-    }
-
-    public void setCommentEnd(@Nullable DocNode commentEnd) {
-        this.commentEnd = commentEnd;
-    }
-
-    public RootDocNode withCommentEnd(@Nullable DocNode commentEnd) {
-        this.commentEnd = commentEnd;
-        return this;
+    public static RootDocNode parseDocComment(String docComment, boolean includesCommentDelimiters) {
+        return new Parser(docComment, includesCommentDelimiters).parse();
     }
 
     public DocNodeList getContent() {
         return content;
     }
 
-    @Override
-    public <T extends DocNodeVisitor> T accept(T visitor) {
-        visitor.visitRootDocNode(this);
-        return visitor;
-    }
 }

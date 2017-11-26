@@ -5,7 +5,6 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
 import java.util.List;
-import java.util.Queue;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -51,7 +50,7 @@ final class Lexer {
     private DocNode commentEndDocNode = null;
     private final Deque<Pattern> inlineTagPatternStack = new ArrayDeque<>();
 
-    private Queue<DocNode> nodeQueue = new ArrayDeque<>(4);
+    private Deque<DocNode> nodeQueue = new ArrayDeque<>(4);
 
     Lexer(String input, boolean includesCommentDelimiters) {
         this.input = input;

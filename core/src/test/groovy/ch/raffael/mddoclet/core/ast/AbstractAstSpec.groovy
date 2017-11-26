@@ -54,7 +54,7 @@ abstract class AbstractAstSpec extends Specification {
      *
      * @see #push(DocNode)
      */
-    void pushCurrent() {
+    void push() {
         push(current())
     }
 
@@ -79,12 +79,26 @@ abstract class AbstractAstSpec extends Specification {
     }
 
     /**
+     * @see #next()
+     */
+    DocNode getNext() {
+        next()
+    }
+
+    /**
      * Return the current child of the stack's top node.
      *
      * @return The current child node.
      */
     DocNode current() {
         peek().currentChild()
+    }
+
+    /**
+     * @see #current()
+     */
+    DocNode getCurrent() {
+        current()
     }
 
     /**

@@ -11,26 +11,33 @@ import ch.raffael.nullity.Nullable;
 
 
 /**
- * TODO: 25.11.17 Javadoc?
+ * A list of nodes. This list also takes care of re-parenting the nodes on
+ * add or remove.
+ *
+ * @todo Needs a spec.
  *
  * @author Raffael Herzog
  */
 public final class DocNodeList extends ArrayList<DocNode> {
 
-    private final DocNode parent;
+    private final DocNode owner;
 
-    DocNodeList(DocNode parent) {
-        this.parent = parent;
+    DocNodeList(DocNode owner) {
+        this.owner = owner;
     }
 
-    DocNodeList(DocNode parent, List<? extends DocNode> nodes) {
+    DocNodeList(DocNode owner, List<? extends DocNode> nodes) {
         super(nodes);
-        this.parent = parent;
+        this.owner = owner;
         forEach(this::reparent);
     }
 
     static DocNodeList ofNullableList(DocNode parent,@Nullable List<? extends DocNode> nodes) {
         return nodes == null ? new DocNodeList(parent) : new DocNodeList(parent, nodes);
+    }
+
+    public DocNode getOwner() {
+        return owner;
     }
 
     public void insertBefore(DocNode after, DocNode newChild) {
@@ -178,7 +185,7 @@ public final class DocNodeList extends ArrayList<DocNode> {
     }
 
     private DocNode reparent(DocNode node) {
-        return node.reparent(parent);
+        return node.reparent(owner);
     }
 
     private DocNode unparent(DocNode node) {
