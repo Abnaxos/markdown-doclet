@@ -1,35 +1,87 @@
 package ch.raffael.mddoclet.core.options;
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import java.util.ArrayList;
+import java.util.List;
+
+import com.google.common.collect.ImmutableList;
+
+import ch.raffael.nullity.Nullable;
 
 
 /**
- * Marks a method that takes command line options.
- *
- * @see ReflectedOptions
+ * Represents an option and its arguments.
  *
  * @author Raffael Herzog
  */
-@Target(ElementType.METHOD)
-@Retention(RetentionPolicy.RUNTIME)
-@Documented
-public @interface Option {
+public final class Option {
 
-    String[] names() default {};
+    private final String name;
+    private final List<String> arguments;
 
-    String description() default "";
-
-    String parameters() default "";
-
-    @Target(ElementType.PARAMETER)
-    @Retention(RetentionPolicy.RUNTIME)
-    @Documented
-    @interface Converter {
-        Class<ArgumentConverter<?>> value();
+    private Option(Builder builder) {
+        if (builder.name == null) throw new IllegalStateException("No option name specified");
+        name = builder.name;
+        arguments = ImmutableList.copyOf(builder.arguments);
     }
 
+    public static Builder builder() {
+        return new Builder();
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public List<String> getArguments() {
+        return arguments;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Option that = (Option)o;
+        return name.equals(that.name) && arguments.equals(that.arguments);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = name.hashCode();
+        result = 31 * result + arguments.hashCode();
+        return result;
+    }
+
+    @Override
+    public String toString() {
+        return "Option[" + name + ":" + arguments + "]";
+    }
+
+    public static final class Builder {
+
+        @Nullable
+        private String name;
+        private List<String> arguments = new ArrayList<>();
+
+        private Builder() {
+        }
+
+        public Builder name(String name) {
+            this.name = name;
+            return this;
+        }
+
+        public Builder arguments(List<String> arguments) {
+            this.arguments = arguments;
+            return this;
+        }
+
+        public Builder addArgument(String argument) {
+            arguments.add(argument);
+            return this;
+        }
+
+        public Option build() {
+            return new Option(this);
+        }
+    }
 }

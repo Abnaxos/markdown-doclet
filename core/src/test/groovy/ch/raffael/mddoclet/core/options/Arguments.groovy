@@ -16,22 +16,22 @@ class Arguments {
     MyEnum enumValue
     Set<MyEnum> enumValues = EnumSet.noneOf(MyEnum)
 
-    @Option(names = '-string')
+    @OptionConsumer(names = '-string')
     void string(String value) {
         stringValue = value
     }
 
-    @Option(names = '-enum')
+    @OptionConsumer(names = '-enum')
     void simple(MyEnum value) {
         enumValue = value
     }
 
-    @Option(names = '-enum-set')
+    @OptionConsumer(names = '-enum-set')
     void multi(EnumSetOption<MyEnum> value) {
         value.applyTo(enumValues)
     }
 
-    @Option(names = '-multi-args')
+    @OptionConsumer(names = '-multi-args')
     void multiArgs(String stringValue, MyEnum enumValue) {
         this.stringValue = stringValue
         this.enumValue = enumValue

@@ -10,7 +10,7 @@ import ch.raffael.mddoclet.core.util.ReflectionException;
 
 
 /**
- * Provides the tools to scan objects/methods for the {@link Option @Option}
+ * Provides the tools to scan objects/methods for the {@link OptionConsumer @Option}
  * annotation and return option processors or descriptors for it.
  *
  * @author Raffael Herzog
@@ -24,7 +24,7 @@ public final class ReflectedOptions {
     public static List<OptionDescriptor> descriptorsForObject(Object target) {
         List<OptionDescriptor> descriptors = new ArrayList<>();
         for (Method method : target.getClass().getMethods()) {
-            if (method.isAnnotationPresent(Option.class)) {
+            if (method.isAnnotationPresent(OptionConsumer.class)) {
                 descriptors.add(descriptorForMethod(target, method));
             }
         }
@@ -32,14 +32,14 @@ public final class ReflectedOptions {
     }
 
     public static OptionDescriptor descriptorForMethod(Object target, Method method) {
-        Option optionAnnotation = method.getAnnotation(Option.class);
-        if (optionAnnotation == null) {
-            throw new IllegalArgumentException("Method " + method + " not annotated with @" + Option.class.getSimpleName());
+        OptionConsumer annotation = method.getAnnotation(OptionConsumer.class);
+        if (annotation == null) {
+            throw new IllegalArgumentException("Method " + method + " not annotated with @" + OptionConsumer.class.getSimpleName());
         }
         return OptionDescriptor.builder()
-                .names(optionAnnotation.names())
-                .description(optionAnnotation.description())
-                .parameters(optionAnnotation.parameters())
+                .names(annotation.names())
+                .description(annotation.description())
+                .parameters(annotation.parameters())
                 .argumentCount(method.getParameterCount())
                 .processor(processorForMethod(target, method))
                 .build();
@@ -49,7 +49,7 @@ public final class ReflectedOptions {
         List<ArgumentConverter<?>> converters = new ArrayList<>(method.getParameterCount());
         for (Parameter parameter : method.getParameters()) {
             ArgumentConverter<?> converter;
-            Option.Converter converterAnnotation = parameter.getAnnotation(Option.Converter.class);
+            OptionConsumer.Converter converterAnnotation = parameter.getAnnotation(OptionConsumer.Converter.class);
             if (converterAnnotation != null) {
                 try {
                     converter = converterAnnotation.value().newInstance();
