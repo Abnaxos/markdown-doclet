@@ -5,6 +5,7 @@ dependencies {
 
     compile group: 'org.pegdown', name: 'pegdown', version: '1.6.0'
     compile files("${System.properties['java.home']}/../lib/tools.jar")
+    compileOnly group: 'com.google.doclava', name: 'doclava', version: '1.0.6'
 
     testCompile group: 'org.jsoup', name: 'jsoup', version: '1.8.3'
 }

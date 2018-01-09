@@ -43,7 +43,6 @@ import com.sun.javadoc.PackageDoc;
 import com.sun.javadoc.RootDoc;
 import com.sun.javadoc.SourcePosition;
 import com.sun.javadoc.Tag;
-import com.sun.tools.doclets.standard.Standard;
 import com.sun.tools.javadoc.Main;
 import org.parboiled.errors.ParserRuntimeException;
 
@@ -163,7 +162,7 @@ public class MarkdownDoclet implements DocErrorReporter {
                 rootDocWrapper.appendOption("-footer", HIGHLIGHT_JS_HTML);
             }
         }
-        return Standard.start(rootDocWrapper) && doclet.postProcess();
+        return BaseDocletWrapper.start(rootDocWrapper) && doclet.postProcess();
     }
 
     /**

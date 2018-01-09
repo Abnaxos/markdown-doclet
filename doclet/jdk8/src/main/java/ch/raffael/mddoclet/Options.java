@@ -31,7 +31,6 @@ import java.util.regex.Pattern;
 
 import com.google.common.base.Splitter;
 import com.sun.javadoc.DocErrorReporter;
-import com.sun.tools.doclets.standard.Standard;
 import org.pegdown.Extensions;
 import org.pegdown.LinkRenderer;
 import org.pegdown.PegDownProcessor;
@@ -215,7 +214,7 @@ public class Options {
             if ( destinationDir != null ) {
                 errorReporter.printError(OPT_OUTPUT_DIR + " may only be specified once");
             }
-            setDestinationDir(new File(opt[1]));
+            setDestinationDir(BaseDocletWrapper.maybeAdjustDestinationDir(new File(opt[1])));
         }
         else if ( opt[0].equals(OPT_STYLESHEETFILE) ) {
             if ( stylesheetFile != null ) {
@@ -561,7 +560,7 @@ public class Options {
             return optionLength;
         }
 
-        return Standard.optionLength(option);
+        return BaseDocletWrapper.optionLength(option);
     }
 
     /**
@@ -577,7 +576,7 @@ public class Options {
     public static boolean validOptions(String[][] options, DocErrorReporter errorReporter) {
         options = new Options().load(options, errorReporter);
         if ( options != null ) {
-            return Standard.validOptions(options, errorReporter);
+            return BaseDocletWrapper.validOptions(options, errorReporter);
         }
         else {
             return false;
