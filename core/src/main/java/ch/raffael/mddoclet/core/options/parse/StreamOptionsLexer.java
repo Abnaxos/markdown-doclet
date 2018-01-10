@@ -11,6 +11,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
+import ch.raffael.mddoclet.core.options.Option;
 import ch.raffael.mddoclet.core.util.Charsets;
 import ch.raffael.nullity.Nullable;
 
@@ -58,6 +59,28 @@ public class StreamOptionsLexer {
         this(file.toPath(), charset);
     }
 
+    public List<Option> toOptionList() throws IOException {
+        ArrayList<Option> optionList = new ArrayList<>();
+        Option.Builder optionBuilder = null;
+        for (Token token = nextToken(); token != null; token = nextToken()) {
+            if (token.isOptionName()) {
+                if (optionBuilder != null) {
+                    optionList.add(optionBuilder.build());
+                }
+                optionBuilder = Option.builder().name(token.getText());
+            } else {
+                if (optionBuilder == null) {
+                    throw new ParseException(token.getLine(), "Option name expected");
+                }
+                optionBuilder.addArgument(token.getText());
+            }
+        }
+        if (optionBuilder != null) {
+            optionList.add(optionBuilder.build());
+        }
+        return optionList;
+    }
+
     public List<Token> toTokenList() throws IOException {
         ArrayList<Token> tokenList = new ArrayList<>();
         Token token;
@@ -86,10 +109,11 @@ public class StreamOptionsLexer {
         int startLine = stream.currentLine();
         if (stream.current() == '\'' || stream.current() == '"') {
             readQuotedWord();
+            return new Token(startLine, word.toString(), true);
         } else {
             readPlainWord();
+            return new Token(startLine, word.toString(), false);
         }
-        return new Token(startLine, word.toString());
     }
 
     private void readPlainWord() throws IOException {
@@ -276,9 +300,11 @@ public class StreamOptionsLexer {
     public static final class Token {
         private final int line;
         private final String text;
-        public Token(int line, String text) {
+        private final boolean quoted;
+        public Token(int line, String text, boolean quoted) {
             this.line = line;
             this.text = text;
+            this.quoted = quoted;
         }
         public int getLine() {
             return line;
@@ -286,9 +312,16 @@ public class StreamOptionsLexer {
         public String getText() {
             return text;
         }
+        public boolean isQuoted() {
+            return quoted;
+        }
+        public boolean isOptionName() {
+            return !isQuoted() && text.startsWith("-");
+        }
         @Override
         public String toString() {
-            return "Token[" + line + ":" + text + "]";
+            String quote = quoted ? "'" : "";
+            return "Token[" + line + ":" + quote + text + quote + "]";
         }
     }
 

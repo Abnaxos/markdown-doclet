@@ -24,8 +24,29 @@ public final class Option {
         arguments = ImmutableList.copyOf(builder.arguments);
     }
 
+    private Option(String name, @Nullable List<String> arguments) {
+        this.name = name;
+        if (arguments == null) {
+            this.arguments = ImmutableList.of();
+        } else {
+            this.arguments = ImmutableList.copyOf(arguments);
+        }
+    }
+
     public static Builder builder() {
         return new Builder();
+    }
+
+    public static Option of(String name) {
+        return new Option(name, null);
+    }
+
+    public static Option of(String name, @Nullable List<String> arguments) {
+        return new Option(name, arguments);
+    }
+
+    public static Option of(String name, @Nullable String... arguments) {
+        return new Option(name, arguments != null ? ImmutableList.copyOf(arguments) : null);
     }
 
     public String getName() {

@@ -1,5 +1,6 @@
 package ch.raffael.mddoclet.core.options.parse
 
+import ch.raffael.mddoclet.core.options.Option
 import spock.lang.Specification
 import spock.lang.Unroll
 
@@ -61,12 +62,41 @@ class StreamOptionsLexerSpec extends Specification {
         text << ["'foo ", '"foo ']
     }
 
+    def "toOptionList()"() {
+      when:
+        def options = toOptionList('-foo foo bar -bar foobar -foobar')
+
+      then:
+        options == [Option.of('-foo', 'foo', 'bar'), Option.of('-bar', 'foobar'), Option.of('-foobar')]
+    }
+
+    def "toOptionList() doesn't interpret quoted words starting with '-' as option name"() {
+      when:
+        def options = toOptionList('-foo "-bar" -foobar')
+
+      then:
+        options == [Option.of('-foo', '-bar'), Option.of('-foobar')]
+    }
+
+    def "toOptionList() throws an exception list doesn't start with an option name"() {
+      when:
+        toOptionList('foo bar')
+
+      then:
+        def e = thrown StreamOptionsLexer.ParseException
+        e.message?.toLowerCase() == '(line 1) option name expected'
+    }
+
     private List<StreamOptionsLexer.Token> toTokenList(String input) {
         new StreamOptionsLexer(new StringReader(input)).toTokenList()
     }
 
     private List<String> toWordList(String input) {
         new StreamOptionsLexer(new StringReader(input)).toWordList()
+    }
+
+    private List<Option> toOptionList(String input) {
+        new StreamOptionsLexer(new StringReader(input)).toOptionList()
     }
 
 }
