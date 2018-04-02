@@ -1,13 +1,11 @@
 package ch.raffael.mddoclet.core.util;
 
 /**
- * TODO: 10.11.17 Javadoc?
- *
  * @author Raffael Herzog
  */
-public final class Reflection {
+public final class Classes {
 
-    private Reflection() {
+    private Classes() {
         throw new AssertionError("Utility class: " + getClass().getName());
     }
 
