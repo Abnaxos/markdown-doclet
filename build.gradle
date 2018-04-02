@@ -90,9 +90,8 @@ allprojects {
                 }
                 linkSource = true
                 links = [
-                        'http://docs.oracle.com/javase/7/docs/api/',
-                        'http://docs.oracle.com/javase/7/docs/jdk/api/javadoc/doclet',
-                        'http://www.decodified.com/pegdown/api'
+                        'http://docs.oracle.com/javase/8/docs/api/',
+//                        'http://docs.oracle.com/javase/8/docs/jdk/api/javadoc/doclet',
                 ]
 //                addStringOption 'javadocversion', 'v7'
                 footer = """
