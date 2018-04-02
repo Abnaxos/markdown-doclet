@@ -1,4 +1,4 @@
-package ch.raffael.mddoclet.core.options.parse;
+package ch.raffael.mddoclet.core.options.files;
 
 import java.io.File;
 import java.io.IOException;
