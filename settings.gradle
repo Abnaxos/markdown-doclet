@@ -3,35 +3,3 @@ include 'doclet:doclets', 'doclet:jdk8', 'doclet:jdk9'
 include 'integrations:idea-plugin'
 
 rootProject.name = 'markdown-doclet'
-
-gradle.projectsLoaded {
-    def loadProperties
-    loadProperties = { Project prj, Properties props, Object prjPath->
-        if ( prj.parent != null ) {
-            loadProperties(prj.parent, props, prjPath)
-        }
-        File localProperties = new File(prj.projectDir, 'local.properties')
-        try {
-            if ( localProperties.isFile() ) {
-                logger.info "local.properties: [$prjPath] Loading $localProperties"
-                new FileInputStream(localProperties).with {
-                    props.load(it)
-                }
-            }
-            else {
-                logger.debug "local.properties: [$prjPath] Not present: $localProperties"
-            }
-        }
-        catch ( Exception e ) {
-            throw new GradleException("[$prjPath] Failed to load $localProperties: $e", e)
-        }
-    }
-    gradle.allprojects { prj ->
-        Properties props = new Properties()
-        loadProperties(prj, props, prj.path)
-        logger.debug "local.properties: [$prj.path] Final property overrides: $props"
-        props.each { entry ->
-            prj[(String)entry.key] = entry.value
-        }
-    }
-}

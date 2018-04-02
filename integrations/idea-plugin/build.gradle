@@ -1,6 +1,7 @@
 componentVersion(0)
 
 apply plugin:IdeaPluginSync
+properties['idea.home'] = ext['idea.home']
 
 configurations {
     packaged
@@ -8,6 +9,9 @@ configurations {
 
 dependencies {
     compile project(':doclet:jdk8')
+    compileOnly fileTree("${project.ext['idea.home']}/lib") {
+        include('*.jar')
+    }
 
     packaged project(':doclet:jdk8'), {
         exclude module:'velocity'

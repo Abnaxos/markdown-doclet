@@ -18,7 +18,31 @@
  *
  */
 
-// versioning functions
+// load local properties
+File localPropertiesFile = new File(rootProject.projectDir, 'local.properties')
+if (!localPropertiesFile.isFile()) {
+    logger.warn "$localPropertiesFile does not exist or is not readable, build probably won't work"
+}
+logger.debug "Reading local properties from $localPropertiesFile"
+localPropertiesFile.withReader('UTF-8') {
+    def props = new Properties()
+    def load = {String propName, boolean required ->
+        def val = props[propName]
+        if (val==null) {
+            throw new GradleException("Property $propName not set. See README.build.md for instructions.")
+        }
+        logger.debug("[local.properties] $propName=$val")
+        ext[propName] = val
+    }
+    props.load(it)
+    load('jdk8.home', true)
+    load('idea.home', true)
+    load('jdk8.ideaName', true)
+}
+
+def illegalAccessOpts = ['--add-opens=java.base/java.lang=ALL-UNNAMED', '--add-opens=java.base/java.lang.invoke=ALL-UNNAMED']
+
+// project base
 allprojects {
     def SNAPSHOT = '-SNAPSHOT'
     ext.componentVersion = { int version ->
@@ -38,7 +62,6 @@ allprojects {
     group = 'ch.raffael.markdown-doclet'
     buildDir = 'target'
 }
-
 
 allprojects {
     version = '2.0-SNAPSHOT'
@@ -62,7 +85,7 @@ allprojects {
         if ( path != ':nullity' ) {
             compileOnly project(':nullity')
         }
-        testCompile group: 'org.codehaus.groovy', name: 'groovy-all', version: '2.4.12'
+        testCompile group: 'org.codehaus.groovy', name: 'groovy-all', version: '2.4.15'
         testCompile('org.spockframework:spock-core:1.1-groovy-2.4') {
             exclude group: 'org.codehaus.groovy'
         }
@@ -72,8 +95,16 @@ allprojects {
 
     sourceCompatibility = '8'
     archivesBaseName = "markdown-doclet"
+    tasks.withType(JavaCompile).forEach {
+        it.options.compilerArgs += [ '-proc:none', '-parameters' ]
+    }
     if ( project != rootProject ) {
         archivesBaseName += '-' + project.name
+    }
+
+    tasks.withType(GroovyCompile).forEach {
+        it.groovyOptions.fork = true
+        it.groovyOptions.forkOptions.jvmArgs += illegalAccessOpts
     }
 
     javadoc.dependsOn classes
@@ -100,6 +131,29 @@ allprojects {
               </a>
               """
             }
+        }
+    }
+
+    afterEvaluate {
+        if (sourceCompatibility == JavaVersion.VERSION_1_8) {
+            def sep = File.separator
+            def jhomePropertyName = 'jdk8.home'
+            def jhome = rootProject.ext."$jhomePropertyName"
+            tasks.withType(Test) {
+                executable = "$jhome${File.separator}bin${File.separator}java"
+            }
+            idea.module {
+                def ideaJdkPropertyName = 'jdk8.ideaName'
+                if (rootProject.ext.properties.containsKey(ideaJdkPropertyName)) {
+                    jdkName = rootProject.ext[ideaJdkPropertyName]
+                } else {
+                    logger.warn "Property '$ideaJdkPropertyName' not set, use 'local.properties' to set a v8 Java SDK."
+                }
+            }
+        } else if (sourceCompatibility == JavaVersion.VERSION_1_9) {
+            // do nothing for now
+        } else {
+            throw new GradleException("Unsupported source compatibility: $sourceCompatibility")
         }
     }
 

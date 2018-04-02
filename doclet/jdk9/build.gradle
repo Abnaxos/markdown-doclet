@@ -1,3 +1,5 @@
 componentVersion(0)
 
+apply plugin:'java'
+
 sourceCompatibility = '9'
