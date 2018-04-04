@@ -1,12 +1,10 @@
 componentVersion(0)
 
 dependencies {
-    def toolsJar = files("${rootProject.ext['jdk8.home']}/lib/tools.jar")
-
     compile project(':doclet:doclets')
 
     compile group: 'org.pegdown', name: 'pegdown', version: '1.6.0'
-    compileOnly toolsJar
+    compileOnly toolsJar()
 
     testCompile group: 'org.jsoup', name: 'jsoup', version: '1.8.3'
 

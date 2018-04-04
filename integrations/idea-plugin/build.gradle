@@ -12,6 +12,7 @@ dependencies {
     compileOnly fileTree("${project.ext['idea.home']}/lib") {
         include('*.jar')
     }
+    compileOnly toolsJar()
 
     packaged project(':doclet:jdk8'), {
         exclude module:'velocity'

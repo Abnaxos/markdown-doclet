@@ -40,7 +40,21 @@ localPropertiesFile.withReader('UTF-8') {
     load('jdk8.ideaName', true)
 }
 
+// some definitions
+@SuppressWarnings("GroovyUnusedDeclaration") // it's used in subprojects
+def toolsJar() {
+    def path = "${rootProject.ext['jdk8.home']}/lib/tools.jar"
+    def toolsJar = files(path)
+    if (toolsJar.empty) throw new GradleException("$path not found")
+    return toolsJar
+}
 def illegalAccessOpts = ['--add-opens=java.base/java.lang=ALL-UNNAMED', '--add-opens=java.base/java.lang.invoke=ALL-UNNAMED']
+//noinspection GroovyAssignabilityCheck  --  I have no idea why this is needed, actually ...
+def j8BootstrapClasspath = "${rootProject.ext['jdk8.home']}/jre/lib/rt.jar".with { path ->
+    def bcp = files(path)
+    if (bcp.empty) throw new GradleException("$it not found")
+    return bcp
+}
 
 // project base
 allprojects {
@@ -95,16 +109,17 @@ allprojects {
 
     sourceCompatibility = '8'
     archivesBaseName = "markdown-doclet"
-    tasks.withType(JavaCompile).forEach {
-        it.options.compilerArgs += [ '-proc:none', '-parameters' ]
-    }
     if ( project != rootProject ) {
         archivesBaseName += '-' + project.name
     }
 
+    tasks.withType(JavaCompile).forEach {
+        it.options.compilerArgs += [ '-proc:none', '-parameters' ]
+    }
     tasks.withType(GroovyCompile).forEach {
         it.groovyOptions.fork = true
         it.groovyOptions.forkOptions.jvmArgs += illegalAccessOpts
+        it.options.compilerArgs += [ '-proc:none', '-parameters' ]
     }
 
     javadoc.dependsOn classes
@@ -136,11 +151,16 @@ allprojects {
 
     afterEvaluate {
         if (sourceCompatibility == JavaVersion.VERSION_1_8) {
-            def sep = File.separator
-            def jhomePropertyName = 'jdk8.home'
-            def jhome = rootProject.ext."$jhomePropertyName"
+            def j8homePropertyName = 'jdk8.home'
+            def j8home = rootProject.ext."$j8homePropertyName"
             tasks.withType(Test) {
-                executable = "$jhome${File.separator}bin${File.separator}java"
+                it.executable = "$j8home${File.separator}bin${File.separator}java"
+            }
+            tasks.withType(JavaCompile).forEach {
+                it.options.bootstrapClasspath = j8BootstrapClasspath
+            }
+            tasks.withType(GroovyCompile).forEach {
+                it.options.bootstrapClasspath = j8BootstrapClasspath
             }
             idea.module {
                 def ideaJdkPropertyName = 'jdk8.ideaName'
