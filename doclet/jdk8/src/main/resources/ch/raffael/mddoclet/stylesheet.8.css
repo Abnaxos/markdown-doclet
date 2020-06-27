@@ -689,7 +689,10 @@ div.todoText {
     display: block;
     padding: 5px;
 }
-
+.block table,.block tr ,.block th ,.block td {
+    border: 1px solid black;
+    border-collapse: collapse;
+}
 /* NEW v8
 div.contentContainer ul.blockList li.blockList h2{
     padding-bottom:0px;
