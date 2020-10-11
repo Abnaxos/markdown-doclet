@@ -18,6 +18,13 @@
  *
  */
 
+//noinspection GroovyAssignabilityCheck
+JavaVersion.VERSION_1_9.with {minVersion ->
+    if (current() < minVersion) {
+        throw new GradleException("Build must be run with at least JDK $minVersion")
+    }
+}
+
 // load local properties
 File localPropertiesFile = new File(rootProject.projectDir, 'local.properties')
 if (!localPropertiesFile.isFile()) {

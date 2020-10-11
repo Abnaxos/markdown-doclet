@@ -1,3 +1,7 @@
 componentVersion(0)
 
 sourceCompatibility = '9'
+
+dependencies {
+    compile project(':core')
+}

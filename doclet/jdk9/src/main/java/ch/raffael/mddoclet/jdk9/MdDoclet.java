@@ -1,48 +1,18 @@
 package ch.raffael.mddoclet.jdk9;
 
-import java.util.Locale;
-import java.util.Set;
-
-import javax.lang.model.SourceVersion;
-
-import jdk.javadoc.doclet.Doclet;
-import jdk.javadoc.doclet.DocletEnvironment;
-import jdk.javadoc.doclet.Reporter;
-
-import ch.raffael.nullity.NotNull;
+import jdk.javadoc.doclet.StandardDoclet;
 
 
 /**
- * TODO: 02.04.18 Javadoc?
+ * Markdown doclet forwarding to the standard doclet.
  *
  * @author Raffael Herzog
  */
-public class MdDoclet implements Doclet {
+@SuppressWarnings("unused")
+public class MdDoclet extends GenericMdDoclet {
 
-    @Override
-    public void init(@NotNull Locale locale, @NotNull Reporter reporter) {
-
+    public MdDoclet() {
+        super(new StandardDoclet());
     }
 
-    @Override
-    public String getName() {
-        return getClass().getSimpleName();
-    }
-
-    @Override
-    public Set<? extends Option> getSupportedOptions() {
-        // FIXME: Not implemented
-        return null;
-    }
-
-    @Override
-    public SourceVersion getSupportedSourceVersion() {
-        return SourceVersion.RELEASE_9;
-    }
-
-    @Override
-    public boolean run(@NotNull DocletEnvironment environment) {
-        // FIXME: Not implemented
-        return false;
-    }
 }
