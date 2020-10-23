@@ -211,6 +211,7 @@ Add the following to your POM to use the doclet with Maven:
 <build>
   <plugins>
     <plugin>
+      <groupId>org.apache.maven.plugins</groupId>
       <artifactId>maven-javadoc-plugin</artifactId>
       <version>2.9</version>
       <configuration>
